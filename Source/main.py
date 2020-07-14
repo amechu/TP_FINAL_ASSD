@@ -12,7 +12,7 @@ cap = cv.VideoCapture(cv.samples.findFile("gido_completo.mp4"))
 #cap = cv.VideoCapture(0)
 
 #for i in range(250):            #DESCOMENTAR PARA EL VIDEO CAR
-   # frame = cap.read()         #(tiene un titulo al principio)
+    # frame = cap.read()         #(tiene un titulo al principio)
 
 lower_thr, upper_thr = [],[]
 
@@ -27,7 +27,7 @@ error = False
 dyn_h = h
 dyn_w = w
 frame = 0
-while(cap.isOpened()):
+while cap.isOpened():
 
     frame_num += 1
     ret, frame_real = cap.read()    #Se lee un frame
@@ -38,12 +38,12 @@ while(cap.isOpened()):
         mask = cv.inRange(hsv, lower_thr, upper_thr)
         frame = cv.bitwise_and(frame, frame, mask=mask)
 
-    if((frame_num != 0 and frame_num%prm.RECALC_EVERY_FRAMES == 0 and not error)): #Se recalculan cada X frames las features de Shi-Tomasi
+    if frame_num != 0 and frame_num%prm.RECALC_EVERY_FRAMES == 0 and not error: #Se recalculan cada X frames las features de Shi-Tomasi
         frame_num = 0                                                                #Siempre y cuando se pueda encontrar al objeto
         prev, x, y = util.recalculateFeatures(prev, prev_gray, h, w)
 
     if error:
-        error, prev, new_dyn_h, new_dyn_w =  util.searchObject(kalman, dyn_h, dyn_w, h, w, frame, error)        #Si no se puede encontrar
+        error, prev, new_dyn_h, new_dyn_w =  util.searchObject(kalman, dyn_h, dyn_w, h, w, frame)        #Si no se puede encontrar
         dyn_h, dyn_w = new_dyn_h, new_dyn_w                                                        #al objeto, se realiza una busqueda por cada frame
 
     if prm.COLOR_ALGORITHM is True:
@@ -56,10 +56,10 @@ while(cap.isOpened()):
     if cv.waitKey(10) & 0xFF == ord('q'):   #Con la letra Q se cierra
         break
     if cv.waitKey(10) & 0xFF == ord('p'):   #Con la letra P se pausea
-        while(True):
+        while True:
             if cv.waitKey(10) & 0xFF == ord('p'):
                 break
-    if  (cv.waitKey(10) & 0xFF == ord('r')):#Con la letra R se reselecciona el area
+    if  cv.waitKey(10) & 0xFF == ord('r'):#Con la letra R se reselecciona el area
         if prm.COLOR_ALGORITHM is True:
             prev, prev_gray, x, y, w, h, lower_thr, upper_thr = util.captureROI(cap)
         else:

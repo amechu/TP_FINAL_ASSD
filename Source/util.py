@@ -11,7 +11,7 @@ def captureROI(capture_device):
     prev = None
     x, y, w, h, = 0, 0, 0, 0
     prev_gray = [[[]]]
-    while (prev is None):
+    while prev is None:
 
         capture_device.read()
         ret, frame = capture_device.read()
@@ -80,7 +80,7 @@ def calculate_means_and_std(prev):
     y_mean = np.mean(np.asarray(prev_y))
     var = np.sqrt((np.std(np.asarray(prev_x))**2 + np.std(np.asarray(prev_y))**2))
 
-    return (x_mean, y_mean, var)
+    return x_mean, y_mean, var
 
 #get_new_box_coordinates
 #Recibe: las features, el ancho y altura de la seleccion original
@@ -103,15 +103,15 @@ def get_new_box_coordinates(prev, h, w):
     y_std = np.std(np.asarray(prev_y))
 
     for i in range(len(prev_x)):
-        if (i >= len(prev_x)):
+        if i >= len(prev_x):
             break
-        if (abs(prev_x[i] - x_mean) > SIGMA_INTERVAL * x_std):      #Se eliminan outliers segun la constante multiplicativa
+        if abs(prev_x[i] - x_mean) > SIGMA_INTERVAL * x_std:      #Se eliminan outliers segun la constante multiplicativa
             del prev_x[i]                                           #SIGMA_INTERVAL que multiplica la varianza
 
     for i in range(len(prev_y)):
-        if (i >= len(prev_y)):
+        if i >= len(prev_y):
             break
-        if (abs(prev_y[i] - y_mean) > SIGMA_INTERVAL * y_std):
+        if abs(prev_y[i] - y_mean) > SIGMA_INTERVAL * y_std:
             del prev_y[i]
 
     x_mean = np.mean(np.asarray(prev_x))        #Se recalcula la media
@@ -120,7 +120,7 @@ def get_new_box_coordinates(prev, h, w):
     x = int(x_mean - (w / 2))
     y = int(y_mean - (h / 2))
 
-    return (x, y)           #Se devuelven las nuevas coordenadas de la seleccion
+    return x, y           #Se devuelven las nuevas coordenadas de la seleccion
 
 #recalculateFeatures
 #Recibe: las features viejas, el frame actual en escala de grises, el ancho y altura de la seleccion donde calcular shi-tomasi
@@ -205,12 +205,11 @@ def drawEstimate(error, good_new, good_old, frame, kalman, dyn_h, dyn_w, h, w,  
 #seachObject
 #Recibe: Filtro de kalman, anchos y alturas fijos y dinamicos, frame actual y bool de error de trackeo.
 #Devuelve: bool de error de trackeo, features encontradas (si las hay), ancho y altura dinamica
-def searchObject(kalman, dyn_h, dyn_w, h, w, frame, error):
-
+def searchObject(kalman, dyn_h, dyn_w, h, w, frame):
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     x = np.int(kalman.statePost[0][0])                          #Se toma como parametro la estimacion de kalman para posicionar el area de busqueda
     y = np.int(kalman.statePost[1][0])
-    prev = cv.goodFeaturesToTrack(gray[int(y - (dyn_h/2)):int(y + (dyn_h/2)), int(x - (dyn_w/2)):int(x + (dyn_w/2))], mask=None,**prm.feature_params)  #Se aplica el algoritmo de shi-tomasi
+    prev = cv.goodFeaturesToTrack(gray[int(y - (dyn_h/2)):int(y + (dyn_h/2)), int(x - (dyn_w/2)):int(x + (dyn_w/2))],**prm.feature_params)  #Se aplica el algoritmo de shi-tomasi
     if prev is not None:
         error = False
         prev = space_translate(x - (dyn_w/2), y - (dyn_h/2), prev)  #Si se encuentra, se actualiza posicion
