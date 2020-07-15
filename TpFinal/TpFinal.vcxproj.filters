@@ -38,6 +38,9 @@
     <ClInclude Include="playGround.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="cvui.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Como instalar OpenCV.txt">

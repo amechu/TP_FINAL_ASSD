@@ -167,6 +167,7 @@
     <ClCompile Include="playGround.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cvui.h" />
     <ClInclude Include="lucasKandale.h" />
     <ClInclude Include="motionDetection.h" />
     <ClInclude Include="playGround.h" />
