@@ -8,7 +8,7 @@ int motionDetection(void) {
     namedWindow("Original", WINDOW_AUTOSIZE);
     namedWindow("Difference", WINDOW_AUTOSIZE);
 
-    VideoCapture captRefrnc(CAP_DSHOW);
+    VideoCapture captRefrnc("gido.mp4")               ;//CAP_DSHOW);
     // Check if external camera opened successfully, otherwise use internal camera
     if (!captRefrnc.isOpened()) {
         VideoCapture captRefrnc(0);
