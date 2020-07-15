@@ -1,0 +1,10 @@
+Pasos para instalar OpenCv en VS 2019
+https://medium.com/@subwaymatch/adding-opencv-4-2-0-to-visual-studio-2019-project-in-windows-using-pre-built-binaries-93a851ed6141
+
+Luego aplicar los ultimos renglones de este post
+https://stackoverflow.com/questions/2694994/opencv-dll-missing-but-its-not
+"Linker -> General ... Set 'Use Library Dependency Inputs' to 'Yes'"
+
+En caso que no detecte la camara externa --> Fix para que funcione la camara
+----------------------------------------------------------------------------
+VideoCapture captRefrnc(CAP_DSHOW);
