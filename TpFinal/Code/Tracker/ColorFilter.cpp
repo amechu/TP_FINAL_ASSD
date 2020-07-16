@@ -1,32 +1,34 @@
 #include "ColorFilter.h"
 #include "../Util/Util.h"
 ColorFilter::ColorFilter() {
-	this->hThreshold = H_THRESHOLD;
-	this->lThreshold = L_THRESHOLD;
-	this->sThreshold = S_THRESHOLD;
+	this->lThreshold = L_THRESHOLD_DEFAULT;
+	this->aThreshold = A_THRESHOLD_DEFAULT;
+	this->bThreshold = B_THRESHOLD_DEFAULT;
 	//Falta
 }
 cv::Mat& ColorFilter::FilteredFrame(cv::Mat frame) {
 //FALTA
 }
 
-
-void ColorFilter::updateHue(double hue) {
-	this->hColor = hue;
-}
 void ColorFilter::updateLightness(double lightness) {
 	this->lColor = lightness;
 }
-void ColorFilter::updateSaturation(double saturation) {
-	this->sColor = saturation;
+
+void ColorFilter::updateA(double a_) {
+	this->aColor = a_;
+}
+void ColorFilter::updateB(double b_) {
+	this->bColor = b_;
 }
 
-void ColorFilter::updateHueThreshold(double hThreshold_) {
-	this->hThreshold = hThreshold_;
-}
 void ColorFilter::updateLightnessThreshold(double lThreshold_) {
 	this->lThreshold = lThreshold_;
 }
-void ColorFilter::updateSaturationThreshold(double sThreshold_) {
-	this->sThreshold = sThreshold_;
+
+void ColorFilter::updateAThreshold(double aThreshold_) {
+	this->aThreshold = aThreshold_;
+}
+
+void ColorFilter::updateBThreshold(double bThreshold_) {
+	this->bThreshold = bThreshold_;
 }

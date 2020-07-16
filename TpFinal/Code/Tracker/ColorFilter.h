@@ -5,22 +5,23 @@ class ColorFilter
 public:
 	ColorFilter();//Todavia no sabemos que poner en el constructor brodanas
 	cv::Mat& FilteredFrame(cv::Mat frame);
-	void updateHue(double hue);
-	void updateLightness(double lightness);
-	void updateSaturation(double saturation);
 
-	void updateHueThreshold(double hThreshold_);
+	void updateLightness(double lightness);
+	void updateA(double a_);
+	void updateB(double b_);
+
 	void updateLightnessThreshold(double lThreshold_);
-	void updateSaturationThreshold(double sThreshold_);
+	void updateAThreshold(double aThreshold_);
+	void updateBThreshold(double bThreshold_);
 
 private:
-	double hThreshold;
-	double sThreshold;
 	double lThreshold;
+	double aThreshold;
+	double bThreshold;
 
-	double hColor;
-	double sColor;
 	double lColor;
+	double aColor;
+	double bColor;
 	cv::Mat filteredFrame;
 };
 

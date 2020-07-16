@@ -177,6 +177,7 @@
     <Text Include="Como instalar OpenCV.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Code\FrontEndRelated\GUI.cpp" />
     <ClCompile Include="Code\OldStuff\lucasKandaleOld.cpp" />
     <ClCompile Include="Code\OldStuff\mainOld.cpp" />
     <ClCompile Include="Code\OldStuff\motionDetectionOld.cpp" />

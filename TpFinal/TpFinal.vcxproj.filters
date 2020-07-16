@@ -37,6 +37,9 @@
     <Filter Include="Archivos de origen\Util">
       <UniqueIdentifier>{7bcf86e0-d1d9-4e0c-b695-1122fe1e04a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de origen\Front End Related\TomiTest">
+      <UniqueIdentifier>{e6c25fae-3640-4104-a205-e802799eb024}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\OldStuff\motionDetectionOld.h">
@@ -108,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FrontEndRelated\GUI.cpp">
+      <Filter>Archivos de origen\Front End Related\TomiTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
