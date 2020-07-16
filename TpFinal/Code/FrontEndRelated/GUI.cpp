@@ -9,7 +9,7 @@ using namespace std;
 
 string FileBrowser();
 
-int main(void)
+/*int main(void)
 {
 	Mat frame = Mat(720, 1280, CV_8UC3);
 	int count = 0;
@@ -101,6 +101,8 @@ int main(void)
 	}
 	return 0;
 }
+*/
+
 
 /*
 string FileBrowser() {
