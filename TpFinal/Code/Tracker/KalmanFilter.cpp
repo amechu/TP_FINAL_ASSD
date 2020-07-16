@@ -1,7 +1,10 @@
 #include "KalmanFilter.h"
-void KalmanFilter::predict() {
-//Falta
+KalmanFilter::KalmanFilter()
+{
 }
-void correct(Point) {
+void KalmanFilter::predict() {
+    //Falta
+}
+void KalmanFilter::correct(Point measurement) {
 	//Falta
 }

@@ -5,8 +5,9 @@
 class KalmanFilter
 {
 public:
+	KalmanFilter();
 	void predict();
-	void correct(Point);
+	void correct(Point measurement);
 private:
 	double statePost[4][1];
 	double stateCovMat[4][4];
