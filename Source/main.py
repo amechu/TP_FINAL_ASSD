@@ -5,14 +5,15 @@ import kalman
 
 kalman = kalman.KalmanFilter() #Se inicializa la clase del filtro de Kalman
 
-#cap = cv.VideoCapture(cv.samples.findFile("videoPeq2.mp4"))
-cap = cv.VideoCapture(cv.samples.findFile("gido_completo.mp4"))
+#cap = cv.VideoCapture(cv.samples.findFile("Videos/videoPeq2.mp4"))
+#cap = cv.VideoCapture(cv.samples.findFile("Videos/gido.mp4"))
+#cap = cv.VideoCapture(cv.samples.findFile("Videos/tomi1.mp4"))
 #cap = cv.VideoCapture(cv.samples.findFile("pendulo_tobi.mp4"))
-#cap = cv.VideoCapture(cv.samples.findFile("car.mp4"))   #DESCOMENTAR LINEAS DE ABAJO
+#cap = cv.VideoCapture(cv.samples.findFile("Videos/car.mp4"))   #DESCOMENTAR LINEAS DE ABAJO
 #cap = cv.VideoCapture(0)
 
 #for i in range(250):            #DESCOMENTAR PARA EL VIDEO CAR
-    # frame = cap.read()         #(tiene un titulo al principio)
+     #frame = cap.read()         #(tiene un titulo al principio)
 
 lower_thr, upper_thr = [],[]
 
@@ -34,13 +35,16 @@ while cap.isOpened():
 
     if prm.COLOR_ALGORITHM is True: #Si el filtro de color esta encendido, se calcula la mascara para el frame actual
         frame = frame_real
-        hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-        mask = cv.inRange(hsv, lower_thr, upper_thr)
+        hls = cv.cvtColor(frame, cv.COLOR_BGR2HLS)
+        mask = cv.inRange(hls, lower_thr, upper_thr)
         frame = cv.bitwise_and(frame, frame, mask=mask)
 
     if frame_num != 0 and frame_num%prm.RECALC_EVERY_FRAMES == 0 and not error: #Se recalculan cada X frames las features de Shi-Tomasi
         frame_num = 0                                                                #Siempre y cuando se pueda encontrar al objeto
         prev, x, y = util.recalculateFeatures(prev, prev_gray, h, w)
+
+    if frame_num != 0 and frame_num%prm.LIG_THR_EVERY_FRAMES == 0 and not error:
+        lower_thr, upper_thr = util.recalc_light(frame, int(y+h/2), int(x+w/2), int(h/2), int(w/2), lower_thr, upper_thr)
 
     if error:
         error, prev, new_dyn_h, new_dyn_w =  util.searchObject(kalman, dyn_h, dyn_w, h, w, frame)        #Si no se puede encontrar

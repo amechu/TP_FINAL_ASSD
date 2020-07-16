@@ -161,12 +161,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lucasKandale.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="motionDetection.cpp" />
-    <ClCompile Include="playGround.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="cvui.h" />
     <ClInclude Include="lucasKandale.h" />
     <ClInclude Include="motionDetection.h" />
@@ -174,6 +168,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Como instalar OpenCV.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

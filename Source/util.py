@@ -34,13 +34,13 @@ def captureROI(capture_device):
             median_b, median_g, median_r = np.median(b), np.median(g), np.median(r)
 
             bgr_mask = np.uint8([[[median_b, median_g, median_r]]])
-            hsv_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2HSV)
+            hls_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2HLS)
 
-            lower_thr = np.array([np.int32(hsv_mask[0, 0, :])[0] - prm.HUE_VAR, np.int32(hsv_mask[0, 0, :])[1] - prm.SAT_VAR, np.int32(hsv_mask[0, 0, :])[2] - prm.VAL_VAR])
-            upper_thr = np.array([np.int32(hsv_mask[0, 0, :])[0] + prm.HUE_VAR, np.int32(hsv_mask[0, 0, :])[1] + prm.SAT_VAR, np.int32(hsv_mask[0, 0, :])[2] + prm.VAL_VAR])
+            lower_thr = np.array([np.int32(hls_mask[0, 0, :])[0] - prm.HUE_VAR, np.int32(hls_mask[0, 0, :])[1] - prm.LIG_VAR, np.int32(hls_mask[0, 0, :])[2] - prm.SAT_VAR])
+            upper_thr = np.array([np.int32(hls_mask[0, 0, :])[0] + prm.HUE_VAR, np.int32(hls_mask[0, 0, :])[1] + prm.LIG_VAR, np.int32(hls_mask[0, 0, :])[2] + prm.SAT_VAR])
 
-            hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-            mask = cv.inRange(hsv, lower_thr, upper_thr)
+            hls = cv.cvtColor(frame, cv.COLOR_BGR2HLS)
+            mask = cv.inRange(hls, lower_thr, upper_thr)
             frame = cv.bitwise_and(frame, frame, mask=mask)
 
             prev_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -52,6 +52,37 @@ def captureROI(capture_device):
         prev = cv.goodFeaturesToTrack(prev_gray[y:y + h, x:x + w], mask=None, **prm.feature_params)
 
     return prev, prev_gray, x, y, w, h
+
+def recalc_light(frame, y, x, h, w, old_lower_thr, old_upper_thr):
+    selection = np.asarray(frame[y:y + h, x:x + w])
+    b, g, r = [], [], []
+
+    yy, xx, col = np.shape(selection)
+    for i in range(yy):
+        for j in range(xx):
+            b.append(selection[i, j, 0])
+            g.append(selection[i, j, 1])
+            r.append(selection[i, j, 2])
+    median_b, median_g, median_r = np.median(b), np.median(g), np.median(r)
+
+    bgr_mask = np.uint8([[[median_b, median_g, median_r]]])
+    hls_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2HLS)
+
+    if old_lower_thr[2] > np.int32(hls_mask[0, 0, :])[1] - prm.LIG_VAR + prm.LIG_THR_CHANGE:
+        old_lower_thr[2] -= prm.LIG_THR_CHANGE
+    elif old_lower_thr[2] < np.int32(hls_mask[0, 0, :])[1] - prm.LIG_VAR + prm.LIG_THR_CHANGE:
+        old_lower_thr[2] += prm.LIG_THR_CHANGE
+    else:
+        old_lower_thr[2] = np.int32(hls_mask[0, 0, :])[1] -prm.LIG_VAR
+
+    if old_upper_thr[2] > np.int32(hls_mask[0, 0, :])[1] +prm.LIG_VAR + prm.LIG_THR_CHANGE:
+        old_upper_thr[2] -= prm.LIG_THR_CHANGE
+    elif old_upper_thr[2] < np.int32(hls_mask[0, 0, :])[1] +prm.LIG_VAR + prm.LIG_THR_CHANGE:
+        old_upper_thr[2] += prm.LIG_THR_CHANGE
+    else:
+        old_upper_thr[2] = np.int32(hls_mask[0, 0, :])[1] +prm.LIG_VAR
+
+    return old_lower_thr, old_upper_thr
 
 #space_translate
 #Recibe: posicion en x e y de la seleccion del usuario y posicion de las features referidas a la seleccion
@@ -68,7 +99,7 @@ def space_translate(x, y, prev):
 #Recibe: las features
 #Devuelve: la media en x, y y la varianza
 def calculate_means_and_std(prev):
-
+    SIGMA_INTERVAL = 1
     prev_x = []
     prev_y = []
 
@@ -76,10 +107,27 @@ def calculate_means_and_std(prev):
         prev_x.append(prev[i][0][0])
         prev_y.append(prev[i][0][1])
 
-    x_mean = np.mean(np.asarray(prev_x))
+    x_mean = np.mean(np.asarray(prev_x))  # Se calcula la media
     y_mean = np.mean(np.asarray(prev_y))
-    var = np.sqrt((np.std(np.asarray(prev_x))**2 + np.std(np.asarray(prev_y))**2))
 
+    x_std = np.std(np.asarray(prev_x))  # Se calcula la varianza
+    y_std = np.std(np.asarray(prev_y))
+
+    for i in range(len(prev_x)):
+        if i >= len(prev_x):
+            break
+        if abs(prev_x[i] - x_mean) > SIGMA_INTERVAL * x_std:  # Se eliminan outliers segun la constante multiplicativa
+            del prev_x[i]  # SIGMA_INTERVAL que multiplica la varianza
+
+    for i in range(len(prev_y)):
+        if i >= len(prev_y):
+            break
+        if abs(prev_y[i] - y_mean) > SIGMA_INTERVAL * y_std:
+            del prev_y[i]
+
+    x_mean = np.mean(np.asarray(prev_x))  # Se recalcula la media
+    y_mean = np.mean(np.asarray(prev_y))
+    var=0
     return x_mean, y_mean, var
 
 #get_new_box_coordinates
@@ -216,6 +264,6 @@ def searchObject(kalman, dyn_h, dyn_w, h, w, frame):
         dyn_h, dyn_w = h, w
     else:
         error = True
-        dyn_h += prm.SEARCHING_ENLARGEMENT*1.05             #Si no se encuentra se agranda area de busqueda
-        dyn_w += prm.SEARCHING_ENLARGEMENT*1.05
+        dyn_h += prm.SEARCHING_ENLARGEMENT             #Si no se encuentra se agranda area de busqueda
+        dyn_w += prm.SEARCHING_ENLARGEMENT*(np.shape(frame)[1]/np.shape(frame)[0])
     return error, prev, dyn_h, dyn_w
