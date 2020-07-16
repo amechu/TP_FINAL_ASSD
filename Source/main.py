@@ -6,8 +6,8 @@ import kalman
 kalman = kalman.KalmanFilter() #Se inicializa la clase del filtro de Kalman
 
 #cap = cv.VideoCapture(cv.samples.findFile("Videos/videoPeq2.mp4"))
-#cap = cv.VideoCapture(cv.samples.findFile("Videos/gido.mp4"))
-#cap = cv.VideoCapture(cv.samples.findFile("Videos/tomi1.mp4"))
+#cap = cv.VideoCapture(cv.samples.findFile("Videos/gido_completo.mp4"))
+cap = cv.VideoCapture(cv.samples.findFile("Videos/tomi1.mp4"))
 #cap = cv.VideoCapture(cv.samples.findFile("pendulo_tobi.mp4"))
 #cap = cv.VideoCapture(cv.samples.findFile("Videos/car.mp4"))   #DESCOMENTAR LINEAS DE ABAJO
 #cap = cv.VideoCapture(0)
@@ -35,8 +35,8 @@ while cap.isOpened():
 
     if prm.COLOR_ALGORITHM is True: #Si el filtro de color esta encendido, se calcula la mascara para el frame actual
         frame = frame_real
-        hls = cv.cvtColor(frame, cv.COLOR_BGR2HLS)
-        mask = cv.inRange(hls, lower_thr, upper_thr)
+        lab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
+        mask = cv.inRange(lab, lower_thr, upper_thr)
         frame = cv.bitwise_and(frame, frame, mask=mask)
 
     if frame_num != 0 and frame_num%prm.RECALC_EVERY_FRAMES == 0 and not error: #Se recalculan cada X frames las features de Shi-Tomasi

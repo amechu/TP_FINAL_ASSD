@@ -34,13 +34,13 @@ def captureROI(capture_device):
             median_b, median_g, median_r = np.median(b), np.median(g), np.median(r)
 
             bgr_mask = np.uint8([[[median_b, median_g, median_r]]])
-            hls_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2HLS)
+            lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
 
-            lower_thr = np.array([np.int32(hls_mask[0, 0, :])[0] - prm.HUE_VAR, np.int32(hls_mask[0, 0, :])[1] - prm.LIG_VAR, np.int32(hls_mask[0, 0, :])[2] - prm.SAT_VAR])
-            upper_thr = np.array([np.int32(hls_mask[0, 0, :])[0] + prm.HUE_VAR, np.int32(hls_mask[0, 0, :])[1] + prm.LIG_VAR, np.int32(hls_mask[0, 0, :])[2] + prm.SAT_VAR])
+            lower_thr = np.array([np.int32(lab_mask[0, 0, :])[0] - prm.L_VAR, np.int32(lab_mask[0, 0, :])[1] - prm.A_VAR, np.int32(lab_mask[0, 0, :])[2] - prm.B_VAR])
+            upper_thr = np.array([np.int32(lab_mask[0, 0, :])[0] + prm.L_VAR, np.int32(lab_mask[0, 0, :])[1] + prm.A_VAR, np.int32(lab_mask[0, 0, :])[2] + prm.B_VAR])
 
-            hls = cv.cvtColor(frame, cv.COLOR_BGR2HLS)
-            mask = cv.inRange(hls, lower_thr, upper_thr)
+            lab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
+            mask = cv.inRange(lab, lower_thr, upper_thr)
             frame = cv.bitwise_and(frame, frame, mask=mask)
 
             prev_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -66,21 +66,21 @@ def recalc_light(frame, y, x, h, w, old_lower_thr, old_upper_thr):
     median_b, median_g, median_r = np.median(b), np.median(g), np.median(r)
 
     bgr_mask = np.uint8([[[median_b, median_g, median_r]]])
-    hls_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2HLS)
+    lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
 
-    if old_lower_thr[2] > np.int32(hls_mask[0, 0, :])[1] - prm.LIG_VAR + prm.LIG_THR_CHANGE:
+    if old_lower_thr[2] > np.int32(lab_mask[0, 0, :])[0] - prm.L_VAR + prm.LIG_THR_CHANGE:
         old_lower_thr[2] -= prm.LIG_THR_CHANGE
-    elif old_lower_thr[2] < np.int32(hls_mask[0, 0, :])[1] - prm.LIG_VAR + prm.LIG_THR_CHANGE:
+    elif old_lower_thr[2] < np.int32(lab_mask[0, 0, :])[0] - prm.L_VAR + prm.LIG_THR_CHANGE:
         old_lower_thr[2] += prm.LIG_THR_CHANGE
     else:
-        old_lower_thr[2] = np.int32(hls_mask[0, 0, :])[1] -prm.LIG_VAR
+        old_lower_thr[2] = np.int32(lab_mask[0, 0, :])[0] -prm.L_VAR
 
-    if old_upper_thr[2] > np.int32(hls_mask[0, 0, :])[1] +prm.LIG_VAR + prm.LIG_THR_CHANGE:
+    if old_upper_thr[2] > np.int32(lab_mask[0, 0, :])[0] +prm.L_VAR + prm.LIG_THR_CHANGE:
         old_upper_thr[2] -= prm.LIG_THR_CHANGE
-    elif old_upper_thr[2] < np.int32(hls_mask[0, 0, :])[1] +prm.LIG_VAR + prm.LIG_THR_CHANGE:
+    elif old_upper_thr[2] < np.int32(lab_mask[0, 0, :])[0] +prm.L_VAR + prm.LIG_THR_CHANGE:
         old_upper_thr[2] += prm.LIG_THR_CHANGE
     else:
-        old_upper_thr[2] = np.int32(hls_mask[0, 0, :])[1] +prm.LIG_VAR
+        old_upper_thr[2] = np.int32(lab_mask[0, 0, :])[0] +prm.L_VAR
 
     return old_lower_thr, old_upper_thr
 

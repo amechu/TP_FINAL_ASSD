@@ -33,9 +33,9 @@ ROI_color = (255, 0, 0)     #Color de la seleccion
 kalman_color = (0, 130, 255)#Color de la estimacion de kalman
 
 """####################"""
-HUE_VAR = 6             #Threshold de hue para filtro de color
-SAT_VAR = 20            #Threshold de saturacion para filtro de color
-LIG_VAR = 80          #Threshold de lightness para filtro de color
+L_VAR = 70             #Threshold de hue para filtro de color
+A_VAR = 20            #Threshold de saturacion para filtro de color
+B_VAR = 20          #Threshold de lightness para filtro de color
 LIG_THR_EVERY_FRAMES = 1
 LIG_THR_CHANGE = 1
 
