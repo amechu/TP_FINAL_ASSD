@@ -1,7 +1,8 @@
 //RECORDAR PONER EL ENVIRONMENT EN X64
 #define CVUI_IMPLEMENTATION
-#include "cvui.h"
-#include "motionDetection.h"
+#include "cvinclude.h"
+#include "Code/FrontEndRelated/cvui.h"
+#include "./Code/OldStuff/motionDetectionOld.h"
 //#include "lucasKandale.h"
 //#include "playGround.h"
 //int main(void) {	

@@ -1,6 +1,7 @@
 #pragma once
 #include "../cvinclude.h"
 #include <vector>
+#include <array>
 #include "../Util/Util.h"
 #include "ColorFilter.h"
 #include "OpticalFlow.h"
@@ -15,7 +16,7 @@ public:
 	cv::Point2f getEstimate();
 	////Debug Functions
 	cv::Point2f getEstimatedVelocity();
-	vector<cv::Point2f>& getFeatures();
+	array<vector<cv::Point2f>, 2>& getFeatures();
 	cv::Mat& getFilteredFrame();
 	cv::Mat& filterFrame(cv::Mat frame);
 

@@ -23,7 +23,7 @@ cv::Point2f Tracker::getEstimatedVelocity() {
     return cv::Point_<double>(this->kalmanFilter->statePost.at<double>(0, 2), this->kalmanFilter->statePost.at<double>(0, 3));
 }
 
-vector<cv::Point2f>& Tracker::getFeatures() {
+array<vector<cv::Point2f>, 2>& Tracker::getFeatures() {
     return this->shiTomasi->getFeatures();
 }
 

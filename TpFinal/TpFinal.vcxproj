@@ -161,19 +161,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lucasKandale.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="motionDetection.cpp" />
-    <ClCompile Include="playGround.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="cvui.h" />
-    <ClInclude Include="lucasKandale.h" />
-    <ClInclude Include="motionDetection.h" />
-    <ClInclude Include="playGround.h" />
+    <ClInclude Include="Code\FrontEndRelated\cvui.h" />
+    <ClInclude Include="Code\OldStuff\lucasKandaleOld.h" />
+    <ClInclude Include="Code\OldStuff\motionDetectionOld.h" />
+    <ClInclude Include="Code\OldStuff\playGroundOld.h" />
+    <ClInclude Include="Code\Tracker\ColorFilter.h" />
+    <ClInclude Include="Code\Tracker\OpticalFlow.h" />
+    <ClInclude Include="Code\Tracker\ShiTomasi.h" />
+    <ClInclude Include="Code\Tracker\Tracker.h" />
+    <ClInclude Include="Code\Util\Util.h" />
+    <ClInclude Include="cvinclude.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Como instalar OpenCV.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Code\FrontEndRelated\GUI.cpp" />
+    <ClCompile Include="Code\OldStuff\lucasKandaleOld.cpp" />
+    <ClCompile Include="Code\OldStuff\mainOld.cpp" />
+    <ClCompile Include="Code\OldStuff\motionDetectionOld.cpp" />
+    <ClCompile Include="Code\OldStuff\playGroundOld.cpp" />
+    <ClCompile Include="Code\Tracker\ColorFilter.cpp" />
+    <ClCompile Include="Code\Tracker\OpticalFlow.cpp" />
+    <ClCompile Include="Code\Tracker\ShiTomasi.cpp" />
+    <ClCompile Include="Code\Tracker\Tracker.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
