@@ -12,10 +12,10 @@ class Tracker
 public:
 	Tracker(cv::Mat & actualFrame_, cv::Mat & prevFrame_);
 	void Update();
-	cv::Point_<double> getEstimate();
+	cv::Point2f getEstimate();
 	////Debug Functions
-	cv::Point_<double> getEstimatedVelocity();
-	vector<cv::Point_<double>>& getFeatures();
+	cv::Point2f getEstimatedVelocity();
+	vector<cv::Point2f>& getFeatures();
 	cv::Mat& getFilteredFrame();
 	cv::Mat& filterFrame(cv::Mat frame);
 

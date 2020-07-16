@@ -3,10 +3,12 @@
 #define L_THRESHOLD_DEFAULT 60
 #define B_THRESHOLD_DEFAULT 6
 #define A_THRESHOLD_DEFAULT 30
-#define MAX_CORNERS 500
 
-class Point {
-public:
-	double x;
-	double y;
-};
+//SHI TOMASI
+
+#define ST_QUALITY_LEVEL_DEFAULT 0.01
+#define MAX_CORNERS_DEFAULT 500
+#define ST_MIN_DISTANCE_DEFAULT 10
+#define ST_BLOCK_SIZE 3
+#define ST_GRADIENT_SIZE 3
+#define ST_K 0.04

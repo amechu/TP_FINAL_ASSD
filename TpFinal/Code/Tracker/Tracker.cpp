@@ -15,15 +15,15 @@ Tracker::Tracker(cv::Mat &  actualFrame_, cv::Mat & prevFrame_) :actualFrame(act
     this->kalmanFilter->statePost = 0;
 }
 
-cv::Point_<double> Tracker::getEstimate() {
+cv::Point2f Tracker::getEstimate() {
     return cv::Point_<double>(this->kalmanFilter->statePost.at<double>(0, 0), this->kalmanFilter->statePost.at<double>(0, 1));
 }
 
-cv::Point_<double> Tracker::getEstimatedVelocity() {
+cv::Point2f Tracker::getEstimatedVelocity() {
     return cv::Point_<double>(this->kalmanFilter->statePost.at<double>(0, 2), this->kalmanFilter->statePost.at<double>(0, 3));
 }
 
-vector<cv::Point_<double>>& Tracker::getFeatures() {
+vector<cv::Point2f>& Tracker::getFeatures() {
     return this->shiTomasi->getFeatures();
 }
 
