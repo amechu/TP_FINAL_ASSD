@@ -13,101 +13,38 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Archivos de origen\Old Stuff">
-      <UniqueIdentifier>{7391eb40-4208-4afb-b912-d09fec69ee06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de encabezado\Old Stuff">
-      <UniqueIdentifier>{23d69cc9-cb68-4da3-8981-7f5f8f9960b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de encabezado\Front End Related">
-      <UniqueIdentifier>{d52f50aa-015e-4d11-9489-4965a01a6e63}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de origen\Tracker">
-      <UniqueIdentifier>{b0d0a86e-b8a3-45d9-89ee-6c34e0fbfd62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de encabezado\Tracker">
-      <UniqueIdentifier>{bcc7624f-621b-4f84-a48d-188a5938aa1e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de origen\Front End Related">
-      <UniqueIdentifier>{2a8d0124-5241-45de-9519-c446bf07f008}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de encabezado\Util">
-      <UniqueIdentifier>{8906927b-1a99-422f-a830-826a3a27c6a2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de origen\Util">
-      <UniqueIdentifier>{7bcf86e0-d1d9-4e0c-b695-1122fe1e04a2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Archivos de origen\Front End Related\TomiTest">
-      <UniqueIdentifier>{e6c25fae-3640-4104-a205-e802799eb024}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Code\OldStuff\motionDetectionOld.h">
-      <Filter>Archivos de encabezado\Old Stuff</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\OldStuff\playGroundOld.h">
-      <Filter>Archivos de encabezado\Old Stuff</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\OldStuff\lucasKandaleOld.h">
-      <Filter>Archivos de encabezado\Old Stuff</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\FrontEndRelated\cvui.h">
-      <Filter>Archivos de encabezado\Front End Related</Filter>
-    </ClInclude>
-    <ClInclude Include="cvinclude.h">
+    <ClCompile Include="motionDetection.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="lucasKandale.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="playGround.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="motionDetection.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Tracker\Tracker.h">
-      <Filter>Archivos de encabezado\Tracker</Filter>
+    <ClInclude Include="lucasKandale.h">
+      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Util\Util.h">
-      <Filter>Archivos de encabezado\Util</Filter>
+    <ClInclude Include="playGround.h">
+      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Tracker\ColorFilter.h">
-      <Filter>Archivos de encabezado\Tracker</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Tracker\OpticalFlow.h">
-      <Filter>Archivos de encabezado\Tracker</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\Tracker\ShiTomasi.h">
-      <Filter>Archivos de encabezado\Tracker</Filter>
+    <ClInclude Include="cvui.h">
+      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Como instalar OpenCV.txt">
       <Filter>Archivos de origen</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Code\OldStuff\lucasKandaleOld.cpp">
-      <Filter>Archivos de origen\Old Stuff</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\OldStuff\mainOld.cpp">
-      <Filter>Archivos de origen\Old Stuff</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\OldStuff\motionDetectionOld.cpp">
-      <Filter>Archivos de origen\Old Stuff</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\OldStuff\playGroundOld.cpp">
-      <Filter>Archivos de origen\Old Stuff</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\Tracker\Tracker.cpp">
-      <Filter>Archivos de origen\Tracker</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\Tracker\ColorFilter.cpp">
-      <Filter>Archivos de origen\Tracker</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\Tracker\ShiTomasi.cpp">
-      <Filter>Archivos de origen\Tracker</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\Tracker\OpticalFlow.cpp">
-      <Filter>Archivos de origen\Tracker</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\FrontEndRelated\GUI.cpp">
-      <Filter>Archivos de origen\Front End Related\TomiTest</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
