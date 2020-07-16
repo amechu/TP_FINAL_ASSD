@@ -1,5 +1,11 @@
 //RECORDAR PONER EL ENVIRONMENT EN X64
 #define CVUI_IMPLEMENTATION
+
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 #include "cvui.h"
 
 #define WINDOW_NAME "MAGT Video Tracker"
@@ -7,10 +13,14 @@
 using namespace cv;
 using namespace std;
 
-string FileBrowser();
+string videoName;
+string videoPath;
 
-/*int main(void)
+bool open();
+
+int main(void)
 {
+
 	Mat frame = Mat(720, 1280, CV_8UC3);
 	int count = 0;
 
@@ -22,6 +32,8 @@ string FileBrowser();
 	int satValue = 0;
 	int lightValue = 0;
 
+	string VideoLoaded = "None";
+
 	string CurrentSource = "None";
 	string DebugModeString = "Off";
 	bool DebugMode = false;
@@ -31,26 +43,29 @@ string FileBrowser();
 		frame = Scalar(49, 52, 49);
 
 		//FRAMES
-		cvui::window(frame, 10, 10, 210, 145, "Video Source:");		//Video Source Frame
-		cvui::window(frame, 10, 165, 210, 470, "Settings:");		//Settings Frame
+		cvui::window(frame, 10, 10, 230, 145, "Video Source:");		//Video Source Frame
+		cvui::window(frame, 10, 165, 230, 470, "Settings:");		//Settings Frame
 
 		//Text
-		cvui::printf(frame, 20, 35, 0.4, 0xdd97fb, "Current Source: %s", CurrentSource.c_str());	//Video Source
+		cvui::printf(frame, 20, 35, 0.4, 0xdd97fb, "Current Source:");	//Video Source
+		cvui::printf(frame, 20, 50, 0.4, 0xdd97fb, "%s", CurrentSource.c_str());	//Video Source
 		cvui::printf(frame, 135, 205, 0.4, 0xdd97fb, "%s", DebugModeString.c_str());				//Debug Mode
 		
 		//Video Source Buttons
-		if (cvui::button(frame, 20, 50, "Load Video")) {
-			CurrentSource =  "Video Loaded";
+		if (cvui::button(frame, 20, 70, "Use Video")) {
+			if (open()) {
+				VideoLoaded = videoPath;
+				CurrentSource = "Video loaded: " + videoName;
+			}
+			else {
+				CurrentSource = "No Video Loaded";
+			}
 			count++;
 		}
-		if(cvui::button(frame, 20, 85, "Use camera")) {
+		if(cvui::button(frame, 20, 105, "Use camera")) {
 			CurrentSource = "Camera On";
 			count++;
 		}
-		if (cvui::button(frame, 20, 120, "Select Video")) {
-
-			count++;
-		}		
 
 		//Settings Buttons
 		if (cvui::button(frame, 20, 195, "Debug Mode")) {
@@ -101,29 +116,31 @@ string FileBrowser();
 	}
 	return 0;
 }
-*/
 
+bool open() {
+	const std::wstring title = L"Select a File";
+	std::wstring filename(MAX_PATH, L'\0');
 
-/*
-string FileBrowser() {
-	wxFileDialog openFileDialog(this, _("Open MIDI file"), "", "", "MIDI files (*.mid)|*.mid", wxFD_OPEN | wxFD_FILE_MUST_EXIST);  //Abro explorador de archivos
-	bool addString = true;
-	if (openFileDialog.ShowModal() == wxID_CANCEL) {			//Esto está por si se cierra el explorador sin elegir archivos
-		return;
+	OPENFILENAMEW ofn = { };
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFilter = L"Music (.mp3)\0*.mp3\0All\0*.*\0";
+	ofn.lpstrFile = &filename[0];  // use the std::wstring buffer directly
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrTitle = title.c_str();
+	ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileNameW(&ofn))
+	{
+		string s(filename.begin(), filename.end());		//Path completo
+
+		string justName = s.substr(s.find_last_of('\\') + 1);
+		justName = justName.substr(justName.find_last_of('\\') + 1, justName.size() - 4);		//Solo el nombre sin el formato
+
+		videoName = justName;
+		videoPath = s;
+
+		return true;
 	}
-
-	wxFileInputStream input_stream(openFileDialog.GetPath());	//Verifico que todo ande joya
-
-	string pathSelected = openFileDialog.GetPath();				//Path completo
-
-	string stringSelected = pathSelected.substr(pathSelected.find_last_of('\\') + 1);
-	stringSelected = stringSelected.substr(stringSelected.find_last_of('\\') + 1, stringSelected.size() - 4);		//Solo el nombre sin el .wav
-
-	if (!input_stream.IsOk()) {
-		return NULL;
-	}
-	else {
-		return pathSelected;
-	}
+	return false;
 }
-*/
