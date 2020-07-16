@@ -6,5 +6,6 @@ vector<cv::Point_<double>>& ShiTomasi::getFeatures() {
 
 
 vector<cv::Point_<double>>& ShiTomasi::recalculateFeatures() {
-
+	return this->features;//(THIS ARE NOT THE NEW FEATURES)
+	//TO DO
 }

@@ -19,6 +19,7 @@ public:
 	cv::Mat& getFilteredFrame();
 	cv::Mat& filterFrame(cv::Mat frame);
 
+	cv::KalmanFilter* kalmanFilter;
 private:
 	double calculateNewColor();
 	double calculateNewLightness();
@@ -26,7 +27,7 @@ private:
 	cv::Mat& prevFrame;
 	ColorFilter * colorFilter;
 	ShiTomasi* shiTomasi;
-	cv::KalmanFilter* kalmanFilter;
+
 	double kalmanDelta = 1.2;
 	double processNoiseCovariance = 0.006;
 	double measurementNoiseCovariance = 0.4;

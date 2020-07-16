@@ -40,9 +40,9 @@ cv::Mat& Tracker::filterFrame(cv::Mat frame) {
 }
 
 double Tracker::calculateNewColor() {
-
+    return 1.0;
 }
 
 double Tracker::calculateNewLightness() {
-
+    return 1.0;
 }

@@ -4,8 +4,9 @@
 
 using namespace std;
 int main(void) {
-	cv::Mat hola = cv::Mat(1, 1, 1);
-	cv::Mat& hay = hola;
-	Tracker tracker = Tracker(hay,hay);
-
+	cv::Mat frame2 = cv::Mat(cv::Size(400, 200), CV_8UC3);
+	cv::Mat& hay = frame2;
+	Tracker tracker = Tracker(hay,hay);	
+	tracker.kalmanFilter->predict();
+	cout << "hola" << endl;
 }

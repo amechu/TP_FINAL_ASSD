@@ -10,7 +10,7 @@ ColorFilter::ColorFilter() {
 	//Falta
 }
 cv::Mat& ColorFilter::filterFrame(cv::Mat frame) {
-//FALTA
+	return this->filteredFrame;
 }
 
 cv::Mat& ColorFilter::getFilteredFrame()
