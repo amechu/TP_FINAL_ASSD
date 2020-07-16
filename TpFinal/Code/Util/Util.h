@@ -1,8 +1,9 @@
 #pragma once
 // Default values:
-#define H_THRESHOLD 6
-#define S_THRESHOLD 30
-#define L_THRESHOLD 60
+#define L_THRESHOLD_DEFAULT 60
+#define B_THRESHOLD_DEFAULT 6
+#define A_THRESHOLD_DEFAULT 30
+
 
 class Point {
 public:
