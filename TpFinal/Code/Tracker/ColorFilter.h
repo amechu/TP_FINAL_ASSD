@@ -4,7 +4,8 @@ class ColorFilter
 {
 public:
 	ColorFilter();//Todavia no sabemos que poner en el constructor brodanas
-	cv::Mat& FilteredFrame(cv::Mat frame);
+	cv::Mat& filterFrame(cv::Mat frame);
+	cv::Mat& getFilteredFrame();
 
 	void updateLightness(double lightness);
 	void updateA(double a_);

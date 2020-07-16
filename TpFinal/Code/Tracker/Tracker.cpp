@@ -24,15 +24,19 @@ cv::Point_<double> Tracker::getEstimatedVelocity() {
 }
 
 vector<cv::Point_<double>>& Tracker::getFeatures() {
-
+    return this->shiTomasi->getFeatures();
 }
 
 void Tracker::Update() {
 
 }
 
-cv::Mat& Tracker::getFilteredMask() {
+cv::Mat& Tracker::getFilteredFrame() {
+    return this->colorFilter->getFilteredFrame();
+}
 
+cv::Mat& Tracker::filterFrame(cv::Mat frame) {
+    return this->colorFilter->filterFrame(frame);
 }
 
 double Tracker::calculateNewColor() {

@@ -4,10 +4,18 @@ ColorFilter::ColorFilter() {
 	this->lThreshold = L_THRESHOLD_DEFAULT;
 	this->aThreshold = A_THRESHOLD_DEFAULT;
 	this->bThreshold = B_THRESHOLD_DEFAULT;
+	this->lColor = 0;
+	this->aColor = 0;
+	this->bColor = 0;
 	//Falta
 }
-cv::Mat& ColorFilter::FilteredFrame(cv::Mat frame) {
+cv::Mat& ColorFilter::filterFrame(cv::Mat frame) {
 //FALTA
+}
+
+cv::Mat& ColorFilter::getFilteredFrame()
+{
+	return this->filteredFrame;
 }
 
 void ColorFilter::updateLightness(double lightness) {

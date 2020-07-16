@@ -16,7 +16,8 @@ public:
 	////Debug Functions
 	cv::Point_<double> getEstimatedVelocity();
 	vector<cv::Point_<double>>& getFeatures();
-	cv::Mat& getFilteredMask();
+	cv::Mat& getFilteredFrame();
+	cv::Mat& filterFrame(cv::Mat frame);
 
 private:
 	double calculateNewColor();
