@@ -945,3 +945,4 @@ MigrationBackup/
 TP4/Python Motion/TP FINAL/V2/.idea/modules.xml
 TP4/Python Motion/TP FINAL/V2/.idea/V2.iml
 *.xml
+*.vcxproj
