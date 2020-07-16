@@ -6,10 +6,10 @@ using namespace std;
 class ShiTomasi
 {
 public:
-	vector<Point>& getFeatures();
-	vector<Point>& recalculateFeatures();
+	vector<cv::Point_<double>>& getFeatures();
+	vector<cv::Point_<double>>& recalculateFeatures();
 private:
-	vector<Point> features;
+	vector<cv::Point_<double>> features;
 	vector<double> parameters;
 };
 

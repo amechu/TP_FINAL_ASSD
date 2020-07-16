@@ -1,10 +1,10 @@
 #include "ShiTomasi.h"
 
-vector<Point>& ShiTomasi::getFeatures() {
+vector<cv::Point_<double>>& ShiTomasi::getFeatures() {
 
 }
 
 
-vector<Point>& ShiTomasi::recalculateFeatures() {
+vector<cv::Point_<double>>& ShiTomasi::recalculateFeatures() {
 
 }

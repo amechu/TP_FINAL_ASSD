@@ -72,9 +72,6 @@
     <ClInclude Include="Code\Tracker\ShiTomasi.h">
       <Filter>Archivos de encabezado\Tracker</Filter>
     </ClInclude>
-    <ClInclude Include="Code\Tracker\KalmanFilter.h">
-      <Filter>Archivos de encabezado\Tracker</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Como instalar OpenCV.txt">
@@ -101,9 +98,6 @@
       <Filter>Archivos de origen\Tracker</Filter>
     </ClCompile>
     <ClCompile Include="Code\Tracker\ShiTomasi.cpp">
-      <Filter>Archivos de origen\Tracker</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\Tracker\KalmanFilter.cpp">
       <Filter>Archivos de origen\Tracker</Filter>
     </ClCompile>
     <ClCompile Include="Code\Tracker\OpticalFlow.cpp">

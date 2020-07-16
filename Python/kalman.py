@@ -8,9 +8,9 @@ class KalmanFilter:
         self.kalman = cv.KalmanFilter(4, 2, 0)  #Se inicializa el filtro kalman con 4 variables de estado y 2 variables de medicion
 
         self.kalman.transitionMatrix = np.array([[1.,    0.,    prm.dt, 0.    ],
-                                                 [0.,    1.,    0.,     prm.dt],
-                                                 [0.,    0.,    1.,     0.    ],
-                                                 [0.,    0.,    0.,     1.    ]])  # Matriz A
+                                                                      [0.,    1.,    0.,     prm.dt],
+                                                                      [0.,    0.,    1.,     0.    ],
+                                                                      [0.,    0.,    0.,     1.    ]])  # Matriz A
 
         self.kalman.measurementMatrix = np.array([[1., 0., 0., 0.],
                                                   [0., 1., 0., 0.]])  # Matriz H, donde se dice que solo se mide la posicion y no la velocidad

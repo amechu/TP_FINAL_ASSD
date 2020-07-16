@@ -3,7 +3,6 @@
 #include <vector>
 #include "../Util/Util.h"
 #include "ColorFilter.h"
-#include "KalmanFilter.h"
 #include "OpticalFlow.h"
 #include "ShiTomasi.h"
 
@@ -13,10 +12,10 @@ class Tracker
 public:
 	Tracker(cv::Mat & actualFrame_, cv::Mat & prevFrame_);
 	void Update();
-	Point getEstimate();
+	cv::Point_<double> getEstimate();
 	////Debug Functions
-	Point& getEstimatedVelocity();
-	vector<Point>& getFeatures();
+	cv::Point_<double> getEstimatedVelocity();
+	vector<cv::Point_<double>>& getFeatures();
 	cv::Mat& getFilteredMask();
 
 private:
@@ -26,7 +25,10 @@ private:
 	cv::Mat& prevFrame;
 	ColorFilter * colorFilter;
 	ShiTomasi* shiTomasi;
-	KalmanFilter* kalmanFilter;
+	cv::KalmanFilter* kalmanFilter;
+	double kalmanDelta = 1.2;
+	double processNoiseCovariance = 0.006;
+	double measurementNoiseCovariance = 0.4;
 	OpticalFlow* opticalFlow;
 };
 

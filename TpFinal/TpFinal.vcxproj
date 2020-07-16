@@ -166,7 +166,6 @@
     <ClInclude Include="Code\OldStuff\motionDetectionOld.h" />
     <ClInclude Include="Code\OldStuff\playGroundOld.h" />
     <ClInclude Include="Code\Tracker\ColorFilter.h" />
-    <ClInclude Include="Code\Tracker\KalmanFilter.h" />
     <ClInclude Include="Code\Tracker\OpticalFlow.h" />
     <ClInclude Include="Code\Tracker\ShiTomasi.h" />
     <ClInclude Include="Code\Tracker\Tracker.h" />
@@ -183,7 +182,6 @@
     <ClCompile Include="Code\OldStuff\motionDetectionOld.cpp" />
     <ClCompile Include="Code\OldStuff\playGroundOld.cpp" />
     <ClCompile Include="Code\Tracker\ColorFilter.cpp" />
-    <ClCompile Include="Code\Tracker\KalmanFilter.cpp" />
     <ClCompile Include="Code\Tracker\OpticalFlow.cpp" />
     <ClCompile Include="Code\Tracker\ShiTomasi.cpp" />
     <ClCompile Include="Code\Tracker\Tracker.cpp" />
