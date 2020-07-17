@@ -5,6 +5,13 @@
 #include "./Code/OldStuff/motionDetectionOld.h"
 #include "Code/Tracker/Tracker.h"
 <<<<<<< HEAD
+=======
+
+#include "Code/OldStuff/lucasKandaleOld.h"
+//#include "playGround.h"
+//int main(void) {	
+//	motionDetection();
+//	//lucasKandale();
 //	//capture_test();
 //}
 >>>>>>> a6bc61cbe377329ac7668242abe3e63191e4f034
@@ -23,7 +30,7 @@ int main() {
     //namedWindow("Original", WINDOW_AUTOSIZE);
 =======
     namedWindow("Original", WINDOW_AUTOSIZE);
-    //lucasKandale();//Mierda con la que probï¿½ shi tomasi y lucas kanade
+    //lucasKandale();//Mierda con la que probé shi tomasi y lucas kanade
 >>>>>>> a6bc61cbe377329ac7668242abe3e63191e4f034
 
     VideoCapture captRefrnc(CAP_DSHOW);
