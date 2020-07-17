@@ -3,7 +3,6 @@
 Gui::Gui() {
 	
 	this->frame = Mat(800, 1280, CV_8UC3);
-	//this->imok = imread("imok.png");
 	
 	this->count = 0;
 
@@ -28,12 +27,9 @@ bool Gui::onWork(void) {
 	while (true) {
 		frame = Scalar(49, 52, 49);
 
-		//imok.copyTo(frame(Rect(500, 230, imok.cols, imok.rows)));		
-
 		//FRAMES
 		cvui::window(frame, 10, 10, 230, 130, "Video Source:");		//Video Source Frame
 		cvui::window(frame, 10, 150, 230, 605, "Settings:");		//Settings Frame
-
 
 		//Text
 		cvui::printf(frame, 20, 35, 0.4, 0xdd97fb, "Current Source:");	//Video Source
@@ -49,6 +45,7 @@ bool Gui::onWork(void) {
 
 		//Video Source Buttons
 		if (cvui::button(frame, 20, 70, "Use Video")) {
+			usingCamera = false;
 			if (openFile()) {
 				VideoLoaded = videoPath;
 				CurrentSource = "Video Loaded: " + videoName;
@@ -59,8 +56,10 @@ bool Gui::onWork(void) {
 			//count++;
 		}
 		if (cvui::button(frame, 20, 105, "Use Camera")) {
-			CurrentSource = "Camera On";
-			count++;
+			if (!usingCamera) {
+				CurrentSource = "Camera On";
+				usingCamera = initCamera();
+			}
 		}
 		if (cvui::button(frame, 60, 760, "Reset Settings")) {
 			resetInitialCond();
@@ -188,9 +187,13 @@ bool Gui::onWork(void) {
 		// Text at position (250, 90), sized 0.4, in red.
 		cvui::printf(frame, 300, 90, 0.4, 0xdd97fb, "Tatometer! \"Se entiende\" count: %d", count);
 
-
 		// Update cvui internal stuff
 		cvui::update();
+
+		if (usingCamera && (callCamera())) {
+			camera.copyTo(frame(Rect(500, 230, camera.cols, camera.rows)));
+		}
+		
 
 		// Show everything on the screen
 		imshow(WINDOW_NAME, frame);
@@ -274,4 +277,33 @@ void Gui::resetInitialCond(void) {
 	ColorFilterActive = false;
 	LightRecalcActive = false;
 	ShiTPropActive = false;
+}
+
+bool Gui::initCamera(void) {
+	
+	deviceID = 0;
+	apiID = CAP_ANY;	
+	
+
+	capCam.open(deviceID, apiID);
+	// check if we succeeded
+	if (!capCam.isOpened()) {
+		cerr << "ERROR! Unable to open camera\n";
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+bool Gui::callCamera(void) {
+	capCam.read(camera);
+	// check if we succeeded
+	if (camera.empty()) {
+		cerr << "ERROR! blank frame grabbed\n";
+		return false;
+	}
+	else {
+		return true;
+	}
 }

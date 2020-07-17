@@ -2,6 +2,11 @@
 
 #include "cvui.h"
 #include <opencv2/highgui/highgui_c.h>
+#include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+#include <iostream>
+#include <stdio.h>
 #include <windows.h>
 
 #define WINDOW_NAME "MAGT Video Tracker"
@@ -34,9 +39,11 @@ public:
 	~Gui();
 
 private:
+	
 	Mat frame;	// = Mat(1280, 1280, CV_8UC3);
-	//Mat imok;	// = imread("imok.png");
+	Mat camera;	
 
+	//borrar cuando
 	int count = 0;
 
 	//Source names
@@ -47,9 +54,17 @@ private:
 	string videoPath;
 	string videoExtension;
 
+	//Utilidad de camara
+	bool usingCamera = false;
+	VideoCapture capCam;
+
 	//Bools and properties values
 	bool DebugMode = false;
 	bool DebugModeChanged = true;
+
+	//Using Device
+	int deviceID = 0;				// 0 = open default camera
+	int apiID = CAP_ANY;      // 0 = autodetect default API
 
 	//Kalman Properties
 	bool KalmanProp = false;
@@ -93,4 +108,8 @@ private:
 	bool openFile(void);
 	bool verifyInitialCond(void);
 	void resetInitialCond(void);
+
+	bool initCamera(void);
+	bool callCamera(void);
+
 };
