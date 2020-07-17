@@ -115,7 +115,7 @@ bool Gui::onWork(void) {
 		LKProp = false;
 		ShiTProp = false;
 
-		if (cvui::checkbox(frame, 20, 400, "Color Filter On/Off", &CFPropOnOff)) {
+		if (cvui::checkbox(frame, 20, 400, "Color Filter", &CFPropOnOff)) {
 			CFLRPropOnOff = false;
 			cvui::printf(frame, 20, 460, 0.4, 0xdd97fb, "Lightness Threshold");
 			cvui::trackbar(frame, 20, 475, 210, &colorFilter_LihtThr, (double)0, (double)150);
@@ -126,7 +126,7 @@ bool Gui::onWork(void) {
 			cvui::printf(frame, 20, 600, 0.4, 0xdd97fb, "B Threshold");
 			cvui::trackbar(frame, 20, 615, 210, &colorFilter_b, (double)0, (double)30);
 		}
-		if (cvui::checkbox(frame, 20, 420, "Lightness Recalculation On/Off", &CFLRPropOnOff)) {
+		if (cvui::checkbox(frame, 20, 420, "Lightness Recalculation", &CFLRPropOnOff)) {
 			CFPropOnOff = false;
 			cvui::printf(frame, 20, 460, 0.4, 0xdd97fb, "Every X Frames");
 			cvui::trackbar(frame, 20, 475, 210, &ligtRec_x, (double)0, (double)150);
@@ -152,16 +152,32 @@ bool Gui::onWork(void) {
 		cvui::printf(frame, 20, 610, 0.4, 0xdd97fb, "Search Pixel Enlargement");
 		cvui::trackbar(frame, 20, 625, 210, &shit_SPix, (double)0, (double)10);
 
-		if (cvui::checkbox(frame, 20, 670, "Feature Recalculation On/Off", &ShiTPropOnOff)) {
+		if (cvui::checkbox(frame, 20, 670, "Feature Recalculation", &ShiTPropOnOff)) {
 			cvui::printf(frame, 20, 690, 0.4, 0xdd97fb, "Every X frames");
 			cvui::trackbar(frame, 20, 705, 210, &shit_Rec, (double)1, (double)100);
 		}
 	}
 
 	//On / Off special parameters:		CHECK WHEN CALLING CALLBACK
-	cvui::checkbox(frame, 140, 340, "CF", &ColorFilterActive);
-	cvui::checkbox(frame, 180, 340, "LR", &LightRecalcActive);
-	cvui::checkbox(frame, 140, 360, "FR", &ShiTPropActive);
+	if (cvui::checkbox(frame, 140, 340, "CF", &ColorFilterActive) && (CFProp)) {				//Verifico si está activado
+		cvui::printf(frame, 135, 402, 0.4, 0xdd97fb, "%s", "On");								//Printeo un on si está en pantalla su configuración
+	}
+	else if (CFProp) {
+		cvui::printf(frame, 135, 402, 0.4, 0xdd97fb, "%s", "Off");								//Solo printeo un off si está en pantalla su configuración
+	}
+	
+	if(cvui::checkbox(frame, 180, 340, "LR", &LightRecalcActive) && (CFProp)) {
+		cvui::printf(frame, 200, 422, 0.4, 0xdd97fb, "%s", "On");
+	}
+	else if (CFProp) {
+		cvui::printf(frame, 200, 422, 0.4, 0xdd97fb, "%s", "Off");
+	}
+	if (cvui::checkbox(frame, 140, 360, "FR", &ShiTPropActive) && (ShiTProp)) {
+		cvui::printf(frame, 200, 672, 0.4, 0xdd97fb, "%s", "On");
+	}
+	else if (ShiTProp) {
+		cvui::printf(frame, 200, 672, 0.4, 0xdd97fb, "%s", "Off");
+	}
 			
 
 	// Show how many times the button has been clicked.
