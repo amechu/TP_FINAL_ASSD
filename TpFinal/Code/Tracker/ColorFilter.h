@@ -24,6 +24,9 @@ private:
 	double lColor;
 	double aColor;
 	double bColor;
+	
+	bool done = false;
 	cv::Mat filteredFrame;
+	
 };
 

@@ -10,16 +10,29 @@ ColorFilter::ColorFilter() {
 	//Falta
 }
 cv::Mat& ColorFilter::filterFrame(cv::Mat frame) {
-
-	cv::Mat mask;
+	cv::Mat mask(frame.rows,frame.cols, frame.type(), cv::Scalar(0));
 	cv::Mat frameLab;
 
-	std::array<int, 3> lowerThreshold = { this->lColor - this->lSemiAmplitude, this->aColor - this->aSemiAmplitude, this->bColor - this->bSemiAmplitude };
-	std::array<int, 3> upperThreshold = { this->lColor + this->lSemiAmplitude, this->aColor + this->aSemiAmplitude, this->bColor + this->bSemiAmplitude };
-	cv::cvtColor(frame, frameLab, cv::COLOR_BGR2Lab);
-	cv::inRange(frameLab, lowerThreshold, upperThreshold, mask);
-	cv::bitwise_and(frame, frame, this->filteredFrame, mask);
+	/*std::array<int, 3> lowerThreshold = { this->lColor - this->lSemiAmplitude, this->aColor - this->aSemiAmplitude, this->bColor - this->bSemiAmplitude };
+	std::array<int, 3> upperThreshold = { this->lColor + this->lSemiAmplitude, this->aColor + this->aSemiAmplitude, this->bColor + this->bSemiAmplitude };*/
 
+	//cv::Scalar lowerThreshold(this->lColor - this->lSemiAmplitude, this->aColor - this->aSemiAmplitude, this->bColor - this->bSemiAmplitude);
+	//cv::Scalar upperThreshold(this->lColor + this->lSemiAmplitude, this->aColor + this->aSemiAmplitude, this->bColor + this->bSemiAmplitude);
+
+
+	cv::Scalar lowerThreshold(110, 50, 50);
+	cv::Scalar upperThreshold(130, 255, 255);
+
+	//cv::cvtColor(frame, frameLab, cv::COLOR_BGR2Lab); //Alan
+	cv::cvtColor(frame, frameLab, cv::COLOR_BGR2HSV);
+
+	cv::inRange(frameLab, lowerThreshold, upperThreshold, mask);
+	//cv::bitwise_and(frame, frame, this->filteredFrame, mask); //Alan
+
+	// ¡¡¡NO TOCAR!!!
+	cv::Mat temp;
+	cv::copyTo(frame, temp, mask);
+	this->filteredFrame = temp.clone();
 	return this->filteredFrame;
 }
 
