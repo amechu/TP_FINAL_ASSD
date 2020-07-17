@@ -4,7 +4,8 @@
 #include "Code/FrontEndRelated/cvui.h"
 #include "./Code/OldStuff/motionDetectionOld.h"
 #include "Code/Tracker/Tracker.h"
-//#include "lucasKandale.h"
+
+#include "Code/OldStuff/lucasKandaleOld.h"
 //#include "playGround.h"
 //int main(void) {	
 //	motionDetection();
@@ -22,6 +23,7 @@ int main() {
     double value = 12.4;
     
     namedWindow("Original", WINDOW_AUTOSIZE);
+    //lucasKandale();//Mierda con la que probé shi tomasi y lucas kanade
 
     VideoCapture captRefrnc(CAP_DSHOW);
     // Check if external camera opened successfully, otherwise use internal camera
@@ -43,6 +45,9 @@ int main() {
     while (true) {
         frame2 = cv::Scalar(49, 52, 49);
         cvui::trackbar(frame2, 40, 30, 220, &value, (double)10.0, (double)15.0);
+
+
+
 
         cvui::imshow(WINDOW1_NAME, frame2);
         std::cout << value << std::endl;
