@@ -162,6 +162,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Code\FrontEndRelated\cvui.h" />
+    <ClInclude Include="Code\FrontEndRelated\Gui.h" />
     <ClInclude Include="Code\OldStuff\lucasKandaleOld.h" />
     <ClInclude Include="Code\OldStuff\motionDetectionOld.h" />
     <ClInclude Include="Code\OldStuff\playGroundOld.h" />
