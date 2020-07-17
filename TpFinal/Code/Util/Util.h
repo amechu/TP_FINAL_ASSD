@@ -12,3 +12,7 @@
 #define ST_BLOCK_SIZE 3
 #define ST_GRADIENT_SIZE 3
 #define ST_K 0.04
+//LUCAS KANADE
+#define LK_WIN_SIZE 15
+#define LK_MIN_EIG_VALUE 0.03
+#define LK_MAX_LEVEL 10
