@@ -72,6 +72,9 @@
     <ClInclude Include="Code\Tracker\ShiTomasi.h">
       <Filter>Archivos de encabezado\Tracker</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FrontEndRelated\Gui.h">
+      <Filter>Archivos de encabezado\Front End Related</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Como instalar OpenCV.txt">
