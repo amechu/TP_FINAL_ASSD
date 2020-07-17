@@ -3,6 +3,7 @@
 Gui::Gui() {
 	
 	this->frame = Mat(800, 1280, CV_8UC3);
+	//this->imok = imread("imok.png");
 	
 	this->count = 0;
 
@@ -27,6 +28,8 @@ bool Gui::onWork(void) {
 	while (true) {
 		frame = Scalar(49, 52, 49);
 
+		//imok.copyTo(frame(Rect(500, 230, imok.cols, imok.rows)));		
+
 		//FRAMES
 		cvui::window(frame, 10, 10, 230, 130, "Video Source:");		//Video Source Frame
 		cvui::window(frame, 10, 150, 230, 605, "Settings:");		//Settings Frame
@@ -48,14 +51,14 @@ bool Gui::onWork(void) {
 		if (cvui::button(frame, 20, 70, "Use Video")) {
 			if (openFile()) {
 				VideoLoaded = videoPath;
-				CurrentSource = "Video loaded: " + videoName;
+				CurrentSource = "Video Loaded: " + videoName;
 			}
 			else {
 				CurrentSource = "No Video Loaded";
 			}
 			//count++;
 		}
-		if (cvui::button(frame, 20, 105, "Use camera")) {
+		if (cvui::button(frame, 20, 105, "Use Camera")) {
 			CurrentSource = "Camera On";
 			count++;
 		}
@@ -192,7 +195,6 @@ bool Gui::onWork(void) {
 		// Show everything on the screen
 		imshow(WINDOW_NAME, frame);
 
-
 		// Check if ESC key was pressed
 		if ((waitKey(1) == 27) || (!cvGetWindowHandle(WINDOW_NAME))) {
 			break;
@@ -208,7 +210,7 @@ bool Gui::openFile(void) {
 	OPENFILENAMEW ofn = { };
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = L"Video (.mp4)\0*.mp4\0All\0*.*\0";
+	ofn.lpstrFilter = L"Video (.mp4)\0*.mp4\0Video (.wav)\0*.wav\0Video (.avi)\0*.avi\0All\0*.*\0";	//L"Video (.mp4)\0*.mp4\0All\0*.*\0";
 	ofn.lpstrFile = &filename[0];  // use the std::wstring buffer directly
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrTitle = title.c_str();
@@ -217,14 +219,13 @@ bool Gui::openFile(void) {
 	if (GetOpenFileNameW(&ofn)) {
 
 		string s(filename.begin(), filename.end());		//Path completo
-
-		string justName = s.substr(s.find_last_of('\\') + 1);
-		justName = justName.substr(justName.find_last_of('\\') + 1, justName.size());		//Solo el nombre sin el formato
-		justName = justName.substr(0, justName.find_first_of('\0') - 4);
-
-		this->videoName = justName;
 		this->videoPath = s;
 
+		string justName = s.substr(s.find_last_of('\\') + 1);								//Tomo el nombre del archivo + .extensión
+		this->videoName = justName.substr(0, justName.find_first_of('\0') - 4);					//Solo el nombre sin el formato
+		
+		this->videoExtension = justName.substr(justName.find_last_of('.') + 1, justName.size());
+		
 		return true;
 	}
 	return false;

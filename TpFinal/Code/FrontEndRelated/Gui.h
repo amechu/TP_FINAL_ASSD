@@ -34,7 +34,8 @@ public:
 	~Gui();
 
 private:
-	Mat frame = Mat(1280, 1280, CV_8UC3);
+	Mat frame;	// = Mat(1280, 1280, CV_8UC3);
+	//Mat imok;	// = imread("imok.png");
 
 	int count = 0;
 
@@ -44,6 +45,7 @@ private:
 	string DebugModeString = "Off";
 	string videoName;
 	string videoPath;
+	string videoExtension;
 
 	//Bools and properties values
 	bool DebugMode = false;
