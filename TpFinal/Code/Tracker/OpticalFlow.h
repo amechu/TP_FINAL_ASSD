@@ -8,7 +8,12 @@ class OpticalFlow
 {
 public:
 	OpticalFlow();
-	void updateFeatures(array<vector<cv::Point2f>, 2>& features, cv::Mat& filteredFrame, cv::Mat& prevFilteredFrame);
+	void updateFeatures(cv::Mat& prevFilteredFrame, cv::Mat& filteredFrame, array<vector<cv::Point2f>, 2>& features, vector<uchar>& status, vector<float>& error, Size& winSize, TermCriteria termcrit);
+	vector<uchar>& getStatus();
+	Size& getSize();
+	TermCriteria& getCriteria();
+	vector<float> getError();
+
 private:
 	vector<double> parameters;
 	vector<uchar> status;

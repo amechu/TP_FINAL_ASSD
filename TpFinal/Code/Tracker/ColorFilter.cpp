@@ -49,3 +49,29 @@ void ColorFilter::updateASemiAmplitude(double aSemiAmplitude_) {
 void ColorFilter::updateBSemiAmplitude(double bSemiAmplitude_) {
 	this->bSemiAmplitude = bSemiAmplitude_;
 }
+
+void ColorFilter::calculateNewMask(cv::Mat selection)
+{
+	cv::Mat selectionRChannel;
+	cv::Mat selectionGChannel;
+	cv::Mat selectionBChannel;
+	std::array<cv::Mat, 3> selectionChannels = { selectionBChannel, selectionGChannel, selectionRChannel };
+	std::vector<double> selectionVector;
+	std::array<double, 3> channelMediansBGR = { 0, 0, 0 };
+	std::array<double, 3> channelMediansLAB = { 0, 0, 0 };
+
+	for (int i = 2; i >= 0; i--) {
+		selectionVector.clear();
+		cv::extractChannel(selection, selectionChannels[i], i);
+		selectionChannels[i] = selectionChannels[i].reshape(0, 1);
+		selectionChannels[i].copyTo(selectionVector);
+		std::nth_element(selectionVector.begin(), selectionVector.begin() + selectionVector.size() / 2, selectionVector.end());
+		channelMediansBGR[i] = selectionVector[selectionVector.size() / 2];
+	}
+
+	cv::cvtColor(channelMediansBGR, channelMediansLAB, cv::COLOR_BGR2Lab); //Dudoso si le puedo pasar un array comun a cvtColor..
+	this->lColor = channelMediansLAB[0];
+	this->aColor = channelMediansLAB[1];
+	this->bColor = channelMediansLAB[2];
+
+}
