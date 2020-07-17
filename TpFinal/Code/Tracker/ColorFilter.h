@@ -16,6 +16,8 @@ public:
 	void updateASemiAmplitude(double aSemiAmplitude_);
 	void updateBSemiAmplitude(double bSemiAmplitude_);
 
+	void calculateNewMask(cv::Mat selection);
+
 private:
 	double lSemiAmplitude;
 	double aSemiAmplitude;

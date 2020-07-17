@@ -13,7 +13,7 @@ public:
 	void setMinDistance(double md);
 	void setQualityLevel(double ql);
 private:
-	array<vector<cv::Point2f>,2>  features;
+	array<vector<cv::Point2f>, 2>  features ;
 	vector<double> parameters;
 	double qualityLevel = ST_QUALITY_LEVEL_DEFAULT;
 	int maxCorners = MAX_CORNERS_DEFAULT;

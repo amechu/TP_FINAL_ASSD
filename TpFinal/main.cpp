@@ -4,6 +4,10 @@
 #include "Code/FrontEndRelated/cvui.h"
 #include "./Code/OldStuff/motionDetectionOld.h"
 #include "Code/Tracker/Tracker.h"
+<<<<<<< HEAD
+//	//capture_test();
+//}
+>>>>>>> a6bc61cbe377329ac7668242abe3e63191e4f034
 
 #define WINDOW1_NAME "Window 1"
 using namespace cv;
@@ -15,7 +19,12 @@ int main() {
 
     double value = 12.4;
     
+<<<<<<< HEAD
     //namedWindow("Original", WINDOW_AUTOSIZE);
+=======
+    namedWindow("Original", WINDOW_AUTOSIZE);
+    //lucasKandale();//Mierda con la que prob� shi tomasi y lucas kanade
+>>>>>>> a6bc61cbe377329ac7668242abe3e63191e4f034
 
     VideoCapture captRefrnc(CAP_DSHOW);
     // Check if external camera opened successfully, otherwise use internal camera
@@ -35,7 +44,20 @@ int main() {
     tracker.colorFilter->updateLightness(100);
     Mat res;
     while (true) {
+<<<<<<< HEAD
                 
+=======
+        frame2 = cv::Scalar(49, 52, 49);
+        cvui::trackbar(frame2, 40, 30, 220, &value, (double)10.0, (double)15.0);
+
+
+
+
+        cvui::imshow(WINDOW1_NAME, frame2);
+        std::cout << value << std::endl;
+        
+        
+>>>>>>> a6bc61cbe377329ac7668242abe3e63191e4f034
         captRefrnc >> frame;
         tracker.colorFilter->filterFrame(frame).copyTo(frame);
         

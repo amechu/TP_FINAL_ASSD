@@ -41,11 +41,3 @@ cv::Mat& Tracker::getFilteredFrame() {
 cv::Mat& Tracker::filterFrame(cv::Mat frame) {
     return this->colorFilter->filterFrame(frame);
 }
-
-double Tracker::calculateNewColor() {
-    return 1.0;
-}
-
-double Tracker::calculateNewLightness() {
-    return 1.0;
-}
