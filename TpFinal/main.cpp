@@ -3,6 +3,7 @@
 #include "cvinclude.h"
 #include "Code/FrontEndRelated/cvui.h"
 #include "./Code/OldStuff/motionDetectionOld.h"
+#include "Code/Tracker/Tracker.h"
 //#include "lucasKandale.h"
 //#include "playGround.h"
 //int main(void) {	
@@ -34,6 +35,10 @@ int main() {
 
     }
 
+    Tracker tracker = Tracker(frame, frame2);
+    tracker.colorFilter->updateA(50);
+    tracker.colorFilter->updateB(50);
+    tracker.colorFilter->updateLightness(100);
 
     while (true) {
         frame2 = cv::Scalar(49, 52, 49);
@@ -44,12 +49,13 @@ int main() {
         
         
         captRefrnc >> frame;
-        cvui::text(frame, 50, 50, std::to_string(value),2,0xFF0000);
+        frame = tracker.colorFilter->filterFrame(frame);
 
         imshow("Original", frame);
         if (cv::waitKey(20) == 27) {
             break;
         }
+
 
     }
     return 0;

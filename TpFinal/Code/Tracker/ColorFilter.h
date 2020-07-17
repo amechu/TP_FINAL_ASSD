@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include "../cvinclude.h"
 class ColorFilter
 {
@@ -11,14 +12,14 @@ public:
 	void updateA(double a_);
 	void updateB(double b_);
 
-	void updateLightnessThreshold(double lThreshold_);
-	void updateAThreshold(double aThreshold_);
-	void updateBThreshold(double bThreshold_);
+	void updateLightnessSemiAmplitude(double lSemiAmplitude_);
+	void updateASemiAmplitude(double aSemiAmplitude_);
+	void updateBSemiAmplitude(double bSemiAmplitude_);
 
 private:
-	double lThreshold;
-	double aThreshold;
-	double bThreshold;
+	double lSemiAmplitude;
+	double aSemiAmplitude;
+	double bSemiAmplitude;
 
 	double lColor;
 	double aColor;

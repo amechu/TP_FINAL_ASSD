@@ -1,20 +1,29 @@
 #include "ColorFilter.h"
 #include "../Util/Util.h"
 ColorFilter::ColorFilter() {
-	this->lThreshold = L_THRESHOLD_DEFAULT;
-	this->aThreshold = A_THRESHOLD_DEFAULT;
-	this->bThreshold = B_THRESHOLD_DEFAULT;
+	this->lSemiAmplitude = L_THRESHOLD_DEFAULT;
+	this->aSemiAmplitude = A_THRESHOLD_DEFAULT;
+	this->bSemiAmplitude = B_THRESHOLD_DEFAULT;
 	this->lColor = 0;
 	this->aColor = 0;
 	this->bColor = 0;
 	//Falta
 }
 cv::Mat& ColorFilter::filterFrame(cv::Mat frame) {
+
+	cv::Mat mask;
+	cv::Mat frameLab;
+
+	std::array<int, 3> lowerThreshold = { this->lColor - this->lSemiAmplitude, this->aColor - this->aSemiAmplitude, this->bColor - this->bSemiAmplitude };
+	std::array<int, 3> upperThreshold = { this->lColor + this->lSemiAmplitude, this->aColor + this->aSemiAmplitude, this->bColor + this->bSemiAmplitude };
+	cv::cvtColor(frame, frameLab, cv::COLOR_BGR2Lab);
+	cv::inRange(frameLab, lowerThreshold, upperThreshold, mask);
+	cv::bitwise_and(frame, frame, this->filteredFrame, mask);
+
 	return this->filteredFrame;
 }
 
-cv::Mat& ColorFilter::getFilteredFrame()
-{
+cv::Mat& ColorFilter::getFilteredFrame() {
 	return this->filteredFrame;
 }
 
@@ -29,14 +38,14 @@ void ColorFilter::updateB(double b_) {
 	this->bColor = b_;
 }
 
-void ColorFilter::updateLightnessThreshold(double lThreshold_) {
-	this->lThreshold = lThreshold_;
+void ColorFilter::updateLightnessSemiAmplitude(double lSemiAmplitude_) {
+	this->lSemiAmplitude = lSemiAmplitude_;
 }
 
-void ColorFilter::updateAThreshold(double aThreshold_) {
-	this->aThreshold = aThreshold_;
+void ColorFilter::updateASemiAmplitude(double aSemiAmplitude_) {
+	this->aSemiAmplitude = aSemiAmplitude_;
 }
 
-void ColorFilter::updateBThreshold(double bThreshold_) {
-	this->bThreshold = bThreshold_;
+void ColorFilter::updateBSemiAmplitude(double bSemiAmplitude_) {
+	this->bSemiAmplitude = bSemiAmplitude_;
 }

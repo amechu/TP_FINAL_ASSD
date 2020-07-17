@@ -13,6 +13,9 @@ Tracker::Tracker(cv::Mat &  actualFrame_, cv::Mat & prevFrame_) :actualFrame(act
     cv::setIdentity(this->kalmanFilter->measurementNoiseCov, cv::Scalar::all(this->measurementNoiseCovariance));
     cv::setIdentity(this->kalmanFilter->errorCovPost, cv::Scalar::all(1));
     this->kalmanFilter->statePost = 0;
+
+    //Color filter init
+    this->colorFilter = new ColorFilter();
 }
 
 cv::Point2f Tracker::getEstimate() {
