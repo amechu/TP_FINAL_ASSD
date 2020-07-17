@@ -22,8 +22,6 @@ public:
 
 	ColorFilter* colorFilter;//DEBUG cambiar a private
 private:
-	double calculateNewColor();
-	double calculateNewLightness();
 	cv::Mat& actualFrame;
 	cv::Mat& prevFrame;
 
