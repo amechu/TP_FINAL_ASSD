@@ -33,10 +33,10 @@ ROI_color = (255, 0, 0)     #Color de la seleccion
 kalman_color = (0, 130, 255)#Color de la estimacion de kalman
 
 """####################"""
-L_VAR = 80             #Threshold de hue para filtro de color
+L_VAR = 70             #Threshold de hue para filtro de color
 A_VAR = 25           #Threshold de saturacion para filtro de color
 B_VAR = 25          #Threshold de lightness para filtro de color
-LIG_THR_EVERY_FRAMES = 5
+LIG_THR_EVERY_FRAMES = 15
 LIG_THR_CHANGE = 1
 
 COLOR_ALGORITHM = True     #Activa o no el uso del algoritmo de filtrado de color
@@ -45,4 +45,4 @@ SHOW_FEATURES = True         #Activa o no el mostrar los features cuando debug_m
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
-SEARCHING_ENLARGEMENT = 6   #Rapidez con la que se agranda el area de busqueda
+SEARCHING_ENLARGEMENT = 4   #Rapidez con la que se agranda el area de busqueda
