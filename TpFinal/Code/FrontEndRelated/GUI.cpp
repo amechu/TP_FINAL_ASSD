@@ -27,13 +27,21 @@ bool Gui::onWork(void) {
 	frame = Scalar(49, 52, 49);
 
 	//FRAMES
-	cvui::window(frame, 10, 10, 230, 145, "Video Source:");		//Video Source Frame
-	cvui::window(frame, 10, 165, 230, 600, "Settings:");		//Settings Frame
+	cvui::window(frame, 10, 10, 230, 130, "Video Source:");		//Video Source Frame
+	cvui::window(frame, 10, 150, 230, 600, "Settings:");		//Settings Frame
+
 
 	//Text
 	cvui::printf(frame, 20, 35, 0.4, 0xdd97fb, "Current Source:");	//Video Source
 	cvui::printf(frame, 20, 50, 0.4, 0xdd97fb, "%s", CurrentSource.c_str());	//Video Source
 	cvui::printf(frame, 135, 282, 0.4, 0xdd97fb, "%s", DebugModeString.c_str());				//Debug Mode
+	if (verifyInitialCond()) {
+		cvui::printf(frame, 20, 255, 0.4, 0xdd97fb, "Settings Selected By Default");
+	}
+	else {
+		cvui::printf(frame, 20, 255, 0.4, 0xdd97fb, "Changes Saved!");
+	}
+
 
 	//Video Source Buttons
 	if (cvui::button(frame, 20, 70, "Use Video")) {
@@ -50,13 +58,16 @@ bool Gui::onWork(void) {
 		CurrentSource = "Camera On";
 		count++;
 	}
+	if (cvui::button(frame, 60, 760, "Reset Settings")) {
+		resetInitialCond();
+	}
 
 	//Settings Buttons
-	if (cvui::button(frame, 20, 200, "Select New Area")) {
+	if (cvui::button(frame, 20, 180, "Select New Area")) {
 
 		count++;
 	}
-	if (cvui::button(frame, 20, 235, "Start Tracking")) {
+	if (cvui::button(frame, 20, 215, "Start Tracking")) {
 
 		count++;
 	}
@@ -147,6 +158,12 @@ bool Gui::onWork(void) {
 		}
 	}
 
+	//On / Off special parameters:		CHECK WHEN CALLING CALLBACK
+	cvui::checkbox(frame, 140, 340, "CF", &ColorFilterActive);
+	cvui::checkbox(frame, 180, 340, "LR", &LightRecalcActive);
+	cvui::checkbox(frame, 140, 360, "FR", &ShiTPropActive);
+			
+
 	// Show how many times the button has been clicked.
 	// Text at position (250, 90), sized 0.4, in red.
 	cvui::printf(frame, 300, 90, 0.4, 0xdd97fb, "Tatometer! \"Se entiende\" count: %d", count);
@@ -157,8 +174,6 @@ bool Gui::onWork(void) {
 
 	// Show everything on the screen
 	cv::imshow(WINDOW_NAME, frame);
-
-
 
 	// Check if ESC key was pressed
 	if (cv::waitKey(20) == 27) {
@@ -197,4 +212,40 @@ bool Gui::openFile(void) {
 		return true;
 	}
 	return false;
+}
+
+bool Gui::verifyInitialCond(void) {
+	if ((kalman_ptm == INITIAL_KALMAN_PTM) && (kalman_pc == INITIAL_KALMAN_PC) && (kalman_mc == INITIAL_KALMAN_MC) && (lk_mr == INITIAL_LK_MR) &&
+		(colorFilter_LihtThr == COLORFILTER_LIGHTTHR) && (colorFilter_a == COLORFILTER_A) && (colorFilter_b == COLORFILTER_B) && (ligtRec_x == LIGHTTHR_X) &&
+		(ligtRec_maxT == LIGHTTHR_MACT) && (shit_MaxFeat == SHIT_MAXFEAT) && (shit_FeatQual == SHIT_FEATQUAL) && (shit_MinFeat == SHIT_MINFEAT) && 
+		(shit_Rec == SHIT_REC) && (shit_SPix == SHIT_SPIX) && (ColorFilterActive == false) && (LightRecalcActive == false) && (ShiTPropActive == false)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+void Gui::resetInitialCond(void) {
+	kalman_ptm = INITIAL_KALMAN_PTM;
+	kalman_pc = INITIAL_KALMAN_PC;
+	kalman_mc = INITIAL_KALMAN_MC;
+	
+	lk_mr = INITIAL_LK_MR;
+
+	colorFilter_LihtThr = COLORFILTER_LIGHTTHR;
+	colorFilter_a = COLORFILTER_A;
+	colorFilter_b = COLORFILTER_B;
+	ligtRec_x = LIGHTTHR_X;
+	ligtRec_maxT = LIGHTTHR_MACT;
+
+	shit_MaxFeat = SHIT_MAXFEAT;
+	shit_FeatQual = SHIT_FEATQUAL;
+	shit_MinFeat = SHIT_MINFEAT;
+	shit_Rec = SHIT_REC;
+	shit_SPix = SHIT_SPIX;
+
+	ColorFilterActive = false;
+	LightRecalcActive = false;
+	ShiTPropActive = false;
 }
