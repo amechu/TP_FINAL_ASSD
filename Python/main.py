@@ -51,9 +51,9 @@ while cap.isOpened():
         dyn_h, dyn_w = new_dyn_h, new_dyn_w                                                        #al objeto, se realiza una busqueda por cada frame
 
     if prm.COLOR_ALGORITHM is True:
-        error, good_new, good_old, prev_gray, prev= util.measureFeatures(error, frame, prev, prev_gray, kalman)    #Se mide la posicion del objeto
+        error, good_new, good_old, prev_gray, prev, h, w= util.measureFeatures(error, frame, prev, prev_gray, kalman, h, w)    #Se mide la posicion del objeto
     else:                                                                                                           #recalculando el algoritmo de lucas-kanade
-        error, good_new, good_old, prev_gray, prev = util.measureFeatures(error, frame_real, prev, prev_gray, kalman)
+        error, good_new, good_old, prev_gray, prev, h, w = util.measureFeatures(error, frame_real, prev, prev_gray, kalman, h, w)
 
     util.drawEstimate(error, good_new, good_old, frame_real, kalman, dyn_h, dyn_w, h, w, frame)     #Se dibuja en la pantalla la estimacion de la ubicacion del objeto
 

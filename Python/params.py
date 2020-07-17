@@ -4,10 +4,10 @@ import cv2 as cv
 
 """SHI-TOMASI ALGORITHM"""
 
-feature_params = dict(maxCorners=100,    #Maxima cantidad de features
-                      qualityLevel=0.01,   #Nivel de calidad minimo de cada feature entre 0 y 1. En 0 se devuelven TODAS las features no importa la calidad
-                      minDistance=0.01,    #Minima distancia entre features
-                      blockSize=7)
+feature_params = dict(maxCorners=1000,    #Maxima cantidad de features
+                      qualityLevel=0.00000001,   #Nivel de calidad minimo de cada feature entre 0 y 1. En 0 se devuelven TODAS las features no importa la calidad
+                      minDistance=10,    #Minima distancia entre features
+                      blockSize=10)
 RECALC_EVERY_FRAMES = 20
 """####################"""
 """LUCAS-KANADE ALGORITHM"""
@@ -23,8 +23,8 @@ lk_params = dict(winSize=(15, 15),
 
 dt = 1.2                  #delta time para modelo fisico
 INITIAL_STATE_COV = 1
-PROCESS_COV = 0.006      #process covariance, si es chico entonces la estimacion tiene menos ruido pero es menos precisa, si es grande la estimacion tiene mas ruido pero es mas precisa
-MEAS_NOISE_COV = 0.4       #covarianza de medicion, por ahora fija
+PROCESS_COV = 0.0006      #process covariance, si es chico entonces la estimacion tiene menos ruido pero es menos precisa, si es grande la estimacion tiene mas ruido pero es mas precisa
+MEAS_NOISE_COV = 0.6       #covarianza de medicion, por ahora fija
 
 """####################"""
 
@@ -33,10 +33,10 @@ ROI_color = (255, 0, 0)     #Color de la seleccion
 kalman_color = (0, 130, 255)#Color de la estimacion de kalman
 
 """####################"""
-L_VAR = 70             #Threshold de hue para filtro de color
-A_VAR = 20            #Threshold de saturacion para filtro de color
-B_VAR = 20          #Threshold de lightness para filtro de color
-LIG_THR_EVERY_FRAMES = 1
+L_VAR = 80             #Threshold de hue para filtro de color
+A_VAR = 25           #Threshold de saturacion para filtro de color
+B_VAR = 25          #Threshold de lightness para filtro de color
+LIG_THR_EVERY_FRAMES = 5
 LIG_THR_CHANGE = 1
 
 COLOR_ALGORITHM = True     #Activa o no el uso del algoritmo de filtrado de color
@@ -45,4 +45,4 @@ SHOW_FEATURES = True         #Activa o no el mostrar los features cuando debug_m
 
 font = cv.FONT_HERSHEY_SIMPLEX
 
-SEARCHING_ENLARGEMENT = 4   #Rapidez con la que se agranda el area de busqueda
+SEARCHING_ENLARGEMENT = 6   #Rapidez con la que se agranda el area de busqueda
