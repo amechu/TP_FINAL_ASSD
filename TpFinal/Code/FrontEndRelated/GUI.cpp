@@ -20,7 +20,7 @@ Gui::Gui() {
 }
 
 Gui::~Gui() {
-
+	destroyAllWindows();
 }
 
 bool Gui::onWork(void) {
@@ -190,10 +190,11 @@ bool Gui::onWork(void) {
 		cvui::update();
 
 		// Show everything on the screen
-		cv::imshow(WINDOW_NAME, frame);
+		imshow(WINDOW_NAME, frame);
+
 
 		// Check if ESC key was pressed
-		if (cv::waitKey(20) == 27) {
+		if ((waitKey(1) == 27) || (!cvGetWindowHandle(WINDOW_NAME))) {
 			break;
 		}
 	}
