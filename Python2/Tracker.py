@@ -15,16 +15,19 @@ class Tracker:
         self.KM = KalmanFilter.KalmanFilter()
         self.ColF=ColorFilter.ColorFilter()
 
-        self.KM.statePost = np.array([initialPosition[0], initialPosition[1], 0., 0.]).reshape(4, 1)
+        self.KM.setStatePost(np.array([initialPosition[0], initialPosition[1], 0., 0.]).reshape(4, 1))
         self.selectionWidth = initialWidth
-        self.selectionHeigth = initialHeight
+        self.selectionHeight = initialHeight
         self.searchWidth = 0
         self.searchHeight = 0
         self.trackingError = False
         self.prevFrameGray = None
+        self.stdMultiplier = 1
         self.frameCounter = 0
-        self.features = 0
-
+        self.features = 0   #Shape = {tuple}: (x, 1, 2)
+                                    #Por ejemplo: [[[x1 y1]]\n\n [[x2 y2]]\n\n [[x3 y3]]]
+                                    #es decir una matriz de x filas y 1 columna, donde cada elemento
+                                    #de la unica columna es una coordenada [x y].
     def update(self, frame):
 
         self.frameCounter += 1
@@ -43,7 +46,7 @@ class Tracker:
                 self.enlargeSearchArea()
                 return
             else:
-                self.searchHeight = self.selectionHeigth
+                self.searchHeight = self.selectionHeight
                 self.searchWidth = self.selectionWidth
                 self.KM.correct(*np.mean(self.features, axis=0))
 
@@ -53,10 +56,20 @@ class Tracker:
             return
 
         if self.frameCounter != 0 and self.frameCounter % self.ST.frameRecalculationNumber == 0:
-            mux, muy = np.mean(self.features, axis=0)
-            std = np.sqrt(np.power(np.std(self.features, axis = 0), 2), np.power(np.std(self.features, axis=0), 2))
-            #falta eliminar outliers de self.features, volver a calcular la media, y aplicar shitomasi al rededor de esa media
-            #si se encuentran mierdas con shitomasi, hacer un kalman correct y si no poner trackingError en false.
+            medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+            std = np.sqrt((np.std(self.features[:, 0, 0]))**2 + (np.std(self.features[:, 0, 1]))**2)
+            mask = (self.features[:, 0, 0] < medx + self.stdMultiplier * std) & (self.features[:, 0, 0] > medx - self.stdMultiplier * std) & (
+                          self.features[:, 0, 1] < medy + self.stdMultiplier * std) & (self.features[:, 0, 1] > medy - self.stdMultiplier * std)
+            self.features = self.features[mask]
+            mux, muy = np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
+            self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[muy - self.selectionHeight / 2: muy + self.selectionHeight / 2,
+                                                                                                                          mux - self.selectionWidth / 2: mux + self.selectionWidth / 2])
+            if self.trackingError is True:
+                return
+            else:
+                self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
+                return
+
         else:
             self.KM.correct(*np.mean(self.features, axis=0)) #dudosa implementasion
             return
