@@ -3,7 +3,7 @@ import cvui
 import numpy as np
 import tkinter as tk
 from tkinter import filedialog
-
+import Artist
 WINDOW_NAME = "MAGT Video Tracker"
 
 INITIAL_KALMAN_PTM = 1.2
