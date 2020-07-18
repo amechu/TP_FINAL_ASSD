@@ -24,16 +24,27 @@ SHIT_MINFEAT = 0.01
 SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
-X_POS_SOURCE = 250
-Y_POS_SOURCE = 250
+Y_SCREEN = 800
+X_SCREEN = 1280
+
+WINDOW_VS_X = 10
+WINDOW_VS_Y = 10
+WINDOW_VS_WIDTH = 230
+WINDOW_VS_HEIGHT = 130
+
+WINDOW_SET_X = 10
+WINDOW_SET_Y = 150
+WINDOW_SET_WIDTH = 230
+WINDOW_SET_HEIGHT = 605
 
 class cvGui():
 
     def __init__(self, *args, **kw):
 
         #Frames
-        self.frame = np.zeros((800, 1280, 3), np.uint8)
+        self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
         self.source = []
+
 
         #Source names    
         self.VideoLoaded = "None"
@@ -42,11 +53,14 @@ class cvGui():
         self.videoName = ""                 
         self.videoPath = ""                  
         self.videoExtension = ""
-    
-        #Neededs for source
+
+        #Utils for source
+        self.sourceX = 0
+        self.sourceY = 0
+        self.sourceWIDTH = 0
+        self.sourceHEIGHT = 0
         self.usingCamera = False
         self.usingVideo = False
-        #self.capCam = cv.VideoCapture
         self.cap = cv.VideoCapture
     
         #Bools and properties values
@@ -103,8 +117,8 @@ class cvGui():
             self.frame[:] = (49, 52, 49)
 
             #FRAMES
-            cvui.window(self.frame, 10, 10, 230, 130, "Video Source:")  #Video Source Frame
-            cvui.window(self.frame, 10, 150, 230, 605, "Settings:")     #Settings Frame
+            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")  #Video Source Frame
+            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Settings:")     #Settings Frame
 
             #Text
             cvui.printf(self.frame, 20, 35, 0.4, 0xdd97fb, "Current Source:")                      #Video Source
@@ -248,9 +262,8 @@ class cvGui():
             cvui.update()
     
             if ((self.usingCamera) or (self.usingVideo)) and (self.callSource()):       #SOURCE
-                xDim = len(self.source[:, 0]) + X_POS_SOURCE
-                yDim = len(self.source[0, :]) + Y_POS_SOURCE
-                self.frame[X_POS_SOURCE:xDim , Y_POS_SOURCE:yDim ] = self.source
+                #self.frame[X_POS_SOURCE:self.sourceX , Y_POS_SOURCE:self.sourceY ] = self.source
+                self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             #Show everything on the screen
             cv.imshow(WINDOW_NAME, self.frame)
@@ -326,11 +339,23 @@ class cvGui():
         else:
             self.cap = cv.VideoCapture(self.videoPath)
 
-        return self.cap.isOpened()
+        if (self.cap.isOpened()):
+            todoPiola, self.source = self.cap.read()
+            if todoPiola:
+                self.sourceHEIGHT = len(self.source[:, 0])
+                self.sourceWIDTH = len(self.source[0, :])
+                #self.sourceX = WINDOW_VS_WIDTH + 2*WINDOW_VS_Y
+                a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
+                b = X_SCREEN - WINDOW_VS_X
+                c = (b+a)/2
+                self.sourceX = int(c - self.sourceWIDTH/2)
+                self.sourceY = int(2*WINDOW_VS_Y)
+                return True
+
+        return False
 
     def callSource(self) :
         todoPiola, self.source = self.cap.read()
-        #cv.imshow('tuvi', self.source)
         return todoPiola
 
 
