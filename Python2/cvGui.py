@@ -24,6 +24,9 @@ SHIT_MINFEAT = 0.01
 SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
+X_POS_SOURCE = 250
+Y_POS_SOURCE = 250
+
 class cvGui():
 
     def __init__(self, *args, **kw):
@@ -245,11 +248,10 @@ class cvGui():
             cvui.update()
     
             if ((self.usingCamera) or (self.usingVideo)) and (self.callSource()):       #SOURCE
-                pass
-                #self.source = np.zeros(self.frame.shape, dtype=np.bool)
-                #self.source[:100, :100] = True
-                #self.source.copyTo(self.frame(cv.Rect(500, 230, self.source.cols, self.source.rows)))
-                
+                xDim = len(self.source[:, 0]) + X_POS_SOURCE
+                yDim = len(self.source[0, :]) + Y_POS_SOURCE
+                self.frame[X_POS_SOURCE:xDim , Y_POS_SOURCE:yDim ] = self.source
+
             #Show everything on the screen
             cv.imshow(WINDOW_NAME, self.frame)
 
@@ -276,7 +278,7 @@ class cvGui():
                 return True
             else:
                 return False
-        else :
+        else:
             return False
 
     def openFile(self):
@@ -326,10 +328,9 @@ class cvGui():
 
         return self.cap.isOpened()
 
-
     def callSource(self) :
         todoPiola, self.source = self.cap.read()
-        cv.imshow('tuvi', self.source)
+        #cv.imshow('tuvi', self.source)
         return todoPiola
 
 
