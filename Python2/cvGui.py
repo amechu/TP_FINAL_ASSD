@@ -236,7 +236,7 @@ class cvGui():
             cv.imshow(WINDOW_NAME, self.frame)
 
             #Check if ESC key was pressed
-            if ((cv.waitKey(1) == 27)):# or not (cv.GetWindowHandle(WINDOW_NAME))):
+            if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
                 break
                 
         return True
@@ -301,13 +301,16 @@ class cvGui():
 
     def initCamera(self):
 
+        #self.camera = np.zeros((800, 1280, 3), np.uint8)
+
         self.deviceID = 0
         self.apiID = cv.CAP_ANY
 
+        #self.capCam = cv.VideoCapture(0)
         self.capCam.open(self.deviceID, self.apiID)
 
         #check if we succeeded
-        if not cv.capCam.isOpened():
+        if not self.capCam.isOpened():
             error = "ERROR! Unable to open camera"
             return False
         else :
