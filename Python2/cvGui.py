@@ -28,8 +28,9 @@ class cvGui():
 
     def __init__(self, *args, **kw):
 
+        #Frames
         self.frame = np.zeros((800, 1280, 3), np.uint8)
-        self.camera = []
+        self.source = []
 
         #Source names    
         self.VideoLoaded = "None"
@@ -39,17 +40,19 @@ class cvGui():
         self.videoPath = ""                  
         self.videoExtension = ""
     
-        #Neededs for camera
+        #Neededs for source
         self.usingCamera = False
-        self.capCam = cv.VideoCapture
+        self.usingVideo = False
+        #self.capCam = cv.VideoCapture
+        self.cap = cv.VideoCapture
     
         #Bools and properties values
         self.DebugMode = [False]
         self.DebugModeChanged = True
     
         #Using Device
-        self.deviceID = 0   #0 = open default camera
-        self.apiID = cv.CAP_ANY      #0 = autodetect default API
+        self.deviceID = 0               #0 = open default camera
+        self.apiID = cv.CAP_ANY         #0 = autodetect default API
     
         #Kalman Properties
         self.KalmanProp = [False]
@@ -112,16 +115,28 @@ class cvGui():
             #Video Source Buttons
             if (cvui.button(self.frame, 20, 70, "Use Video")):
                 if (self.openFile()):
-                    self.VideoLoaded = self.videoPath                                   #VER QUE HACER CON ESTA VARIABLE GLOBAL
-                    self.CurrentSource = "Video Loaded: " + self.videoName
-                
+                    self.usingCamera = False
+                    self.usingVideo = True
+                    if(self.initSource()):                                                                #Chequear si se inicia bien
+                        self.VideoLoaded = self.videoPath
+                        self.CurrentSource = "Video Loaded: " + self.videoName
+                    else:
+                        self.usingCamera = False
+                        self.usingVideo = False
+
                 elif not self.usingCamera:
                     self.CurrentSource = "No Video Loaded"
             
             if (cvui.button(self.frame, 20, 105, "Use Camera")):
                 if not self.usingCamera:
-                    self.CurrentSource = "Camera On"
-                    self.usingCamera = self.initCamera()
+                    self.usingVideo = False
+                    self.usingCamera = True
+                    if (self.initSource()):                                                           #Chequear si se inicia bien
+                        self.CurrentSource = "Camera On"
+                    else:
+                        self.usingVideo = False
+                        self.usingCamera = False
+
             
             if (cvui.button(self.frame, 60, 760, "Reset Settings")):
                 self.resetInitialCond()
@@ -229,8 +244,11 @@ class cvGui():
             #Update cvui internal stuff
             cvui.update()
     
-            if (self.usingCamera) and (self.callCamera()):       #CAMARA
-                self.camera.copyTo(self.frame(cv.Rect(500, 230, self.camera.cols, self.camera.rows)))
+            if ((self.usingCamera) or (self.usingVideo)) and (self.callSource()):       #SOURCE
+                pass
+                #self.source = np.zeros(self.frame.shape, dtype=np.bool)
+                #self.source[:100, :100] = True
+                #self.source.copyTo(self.frame(cv.Rect(500, 230, self.source.cols, self.source.rows)))
                 
             #Show everything on the screen
             cv.imshow(WINDOW_NAME, self.frame)
@@ -299,34 +317,21 @@ class cvGui():
         self.LightRecalcActive[0] = False
         self.ShiTPropActive[0] = False
 
-    def initCamera(self):
-
-        #self.camera = np.zeros((800, 1280, 3), np.uint8)
-
-        self.deviceID = 0
-        self.apiID = cv.CAP_ANY
-
-        #self.capCam = cv.VideoCapture(0)
-        self.capCam.open(self.deviceID, self.apiID)
-
-        #check if we succeeded
-        if not self.capCam.isOpened():
-            error = "ERROR! Unable to open camera"
-            return False
-        else :
-            return True
-
-    def callCamera(self) :
-        self.capCam.read(self.camera)
-
-        #check if we succeeded
-        if (self.camera.empty()):
-            error = "ERROR! blank frame grabbed"
-            return False
+    def initSource(self):
+        self.source[:] = (49, 52, 49)
+        if self.usingCamera:
+            self.cap = cv.VideoCapture(0)
         else:
-            return True
+            self.cap = cv.VideoCapture(self.videoPath)
 
-  
+        return self.cap.isOpened()
+
+
+    def callSource(self) :
+        todoPiola, self.source = self.cap.read()
+        cv.imshow('tuvi', self.source)
+        return todoPiola
+
 
 def main():
     myGui = cvGui()
