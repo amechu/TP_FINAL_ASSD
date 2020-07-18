@@ -24,8 +24,10 @@ SHIT_MINFEAT = 0.01
 SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
-Y_SCREEN = 1080 #800 #1080
-X_SCREEN = 1920 #1280 #1920
+Y_SCREEN = 1080 #800
+X_SCREEN = 1920 #1280
+
+STANDAR_WIDTH = 720
 
 WINDOW_VS_X = 10
 WINDOW_VS_Y = 10
@@ -36,6 +38,13 @@ WINDOW_SET_X = 10
 WINDOW_SET_Y = 150
 WINDOW_SET_WIDTH = 230
 WINDOW_SET_HEIGHT = 605
+
+WINDOW_SOU_X = WINDOW_VS_X*2 + WINDOW_VS_WIDTH
+WINDOW_SOU_Y = WINDOW_VS_Y
+WINDOW_SOU_WIDTH = X_SCREEN - WINDOW_VS_X - WINDOW_SOU_X
+WINDOW_SOU_HEIGHT = STANDAR_WIDTH
+
+
 
 class cvGui():
 
@@ -109,7 +118,7 @@ class cvGui():
         self.shit_Rec = [SHIT_REC]
         self.shit_SPix = [SHIT_SPIX]
         
-        cv.namedWindow(WINDOW_NAME, cv.WINDOW_NORMAL)
+        cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
         #self.fullScreen = False
         cvui.init(WINDOW_NAME)
 
@@ -118,8 +127,9 @@ class cvGui():
             self.frame[:] = (49, 52, 49)
 
             #FRAMES
-            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")  #Video Source Frame
-            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Settings:")     #Settings Frame
+            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")        #Video Source Frame
+            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Settings:")          #Settings Frame
+            cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SOU_Y, WINDOW_SOU_WIDTH, WINDOW_SOU_HEIGHT, "Source:")
 
             #Text
             cvui.printf(self.frame, 20, 35, 0.4, 0xdd97fb, "Current Source:")                      #Video Source
@@ -263,7 +273,6 @@ class cvGui():
             #cvui.update()
     
             if ((self.usingCamera) or (self.usingVideo)) and (self.callSource()):       #SOURCE
-                #self.frame[X_POS_SOURCE:self.sourceX , Y_POS_SOURCE:self.sourceY ] = self.source
                 self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             #Show everything on the screen
@@ -284,6 +293,8 @@ class cvGui():
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
                 break
 
+        if ((self.usingVideo or self.usingCamera) and self.cap.isOpened()):
+            self.cap.release()
         cv.destroyAllWindows()
 
         return True
@@ -355,7 +366,8 @@ class cvGui():
 
         if (self.cap.isOpened()):
             todoPiola, self.source = self.cap.read()
-            #self.source = cv.resize(self.source, (720,360))
+            self.source = self.rescale_frame_standar(self.source, 720)
+
             if todoPiola:
                 self.sourceHEIGHT = len(self.source[:, 0])
                 self.sourceWIDTH = len(self.source[0, :])
@@ -363,25 +375,32 @@ class cvGui():
                 b = X_SCREEN - WINDOW_VS_X
                 c = (b+a)/2
                 self.sourceX = int(c - self.sourceWIDTH/2)
-                self.sourceY = int(2*WINDOW_VS_Y)
+                a = WINDOW_SOU_Y
+                b = WINDOW_SOU_Y + WINDOW_SOU_HEIGHT
+                c = (b+a)/2
+                self.sourceY = int(c - self.sourceHEIGHT/2)
                 return True
 
         return False
 
     def callSource(self):
         todoPiola, self.source = self.cap.read()
+        if todoPiola:
+            self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
         return todoPiola
 
-    def rescale_frame(frame, percent=75):
-        width = int(frame.shape[1] * percent / 100)
-        height = int(frame.shape[0] * percent / 100)
-        dim = (width, height)
+    def rescale_frame_standar(self, frame, maxWidth):
+        width = int(frame.shape[1])
+        height = int(frame.shape[0])
+        dim = (maxWidth, int(maxWidth*height/width))
+        #dim = (maxWidth, int(maxWidth*self.sourceWIDTH/self.sourceHEIGHT))
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
 
 def main():
     myGui = cvGui()
     myGui.onWork()
+
 
 if __name__ == '__main__':
     main()
