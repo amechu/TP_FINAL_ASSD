@@ -48,7 +48,7 @@ class Tracker:
             else:
                 self.searchHeight = self.selectionHeight
                 self.searchWidth = self.selectionWidth
-                self.KM.correct(*np.mean(self.features, axis=0))
+                self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
 
         self.features, self.trackingError = self.LK.updateFeatures(self.prevFrameGray, frameGray)
 
@@ -71,7 +71,7 @@ class Tracker:
                 return
 
         else:
-            self.KM.correct(*np.mean(self.features, axis=0)) #dudosa implementasion
+            self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
             return
 
 
