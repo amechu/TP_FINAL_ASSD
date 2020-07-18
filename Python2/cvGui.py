@@ -44,6 +44,13 @@ WINDOW_SOU_Y = WINDOW_VS_Y
 WINDOW_SOU_WIDTH = STANDAR_WIDTH + 2*WINDOW_VS_X #X_SCREEN - WINDOW_VS_X - WINDOW_SOU_X
 WINDOW_SOU_HEIGHT = WINDOW_SET_Y + WINDOW_SET_HEIGHT - WINDOW_SOU_Y #STANDAR_WIDTH
 
+WINDOW_FIL_X = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X
+WINDOW_FIL_Y = WINDOW_VS_Y
+WINDOW_FIL_WIDTH = X_SCREEN - WINDOW_FIL_X - WINDOW_SET_X
+WINDOW_FIL_HEIGHT = WINDOW_SOU_HEIGHT
+
+
+
 class cvGui():
 
     def __init__(self, *args, **kw):
@@ -126,12 +133,13 @@ class cvGui():
             cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")        #Video Source Frame
             cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Settings:")          #Settings Frame
             cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SOU_Y, WINDOW_SOU_WIDTH, WINDOW_SOU_HEIGHT, "Source:")
+            cvui.window(self.frame, WINDOW_FIL_X, WINDOW_FIL_Y, WINDOW_FIL_WIDTH, WINDOW_FIL_HEIGHT, "Filters:")
 
             #Text
-            cvui.printf(self.frame, 20, 35, 0.4, 0xdd97fb, "Current Source:")                      #Video Source
+            cvui.printf(self.frame, 20, 35, 0.4, 0xdd97fb, "Current Source:")                #Video Source
             cvui.printf(self.frame, 20, 50, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
             cvui.printf(self.frame, 135, 282, 0.4, 0xdd97fb, self.DebugModeString)           #Debug Mode
-            if self.verifyInitialCond() :
+            if self.verifyInitialCond():
                 cvui.printf(self.frame, 20, 255, 0.4, 0xdd97fb, "Settings Selected By Default")
             else :
                 cvui.printf(self.frame, 20, 255, 0.4, 0xdd97fb, "Changes Saved!")
@@ -249,25 +257,21 @@ class cvGui():
 
 
             #On / Off special parameters: CHECK WHEN CALLING CALLBACK
-            if (cvui.checkbox(self.frame, 140, 340, "CF", self.ColorFilterActive) and (self.CFProp[0])):
-                #Verifico si está activado
-                cvui.printf(self.frame, 135, 402, 0.4, 0xdd97fb, "%s", "On")    #Printeo un on si está en pantalla su configuración
+            if (cvui.checkbox(self.frame, 140, 340, "CF", self.ColorFilterActive) and (self.CFProp[0])):        #Verifico si está activado
+                cvui.printf(self.frame, 120, 402, 0.4, 0xdd97fb, "%s", "On")                                    #Printeo un on si está en pantalla su configuración
             elif (self.CFProp[0]):
-                cvui.printf(self.frame, 135, 402, 0.4, 0xdd97fb, "%s", "Off")   #Solo printeo un off si está en pantalla su configuración
+                cvui.printf(self.frame, 120, 402, 0.4, 0xdd97fb, "%s", "Off")                                   #Solo printeo un off si está en pantalla su configuración
             
             if (cvui.checkbox(self.frame, 180, 340, "LR", self.LightRecalcActive) and (self.CFProp[0])):
-                cvui.printf(self.frame, 200, 422, 0.4, 0xdd97fb, "%s", "On")
+                cvui.printf(self.frame, 195, 422, 0.4, 0xdd97fb, "%s", "On")
             elif (self.CFProp[0]):
-                cvui.printf(self.frame, 200, 422, 0.4, 0xdd97fb, "%s", "Off")
+                cvui.printf(self.frame, 195, 422, 0.4, 0xdd97fb, "%s", "Off")
             
             if (cvui.checkbox(self.frame, 140, 360, "FR", self.ShiTPropActive) and (self.ShiTProp[0])):
-                cvui.printf(self.frame, 200, 672, 0.4, 0xdd97fb, "%s", "On")
+                cvui.printf(self.frame, 185, 672, 0.4, 0xdd97fb, "%s", "On")
             elif (self.ShiTProp[0]):
-                cvui.printf(self.frame, 200, 672, 0.4, 0xdd97fb, "%s", "Off")
+                cvui.printf(self.frame, 185, 672, 0.4, 0xdd97fb, "%s", "Off")
             
-            #Update cvui internal stuff
-            #cvui.update()
-    
             if ((self.usingCamera) or (self.usingVideo)) and (self.callSource()):       #SOURCE
                 self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
@@ -354,6 +358,8 @@ class cvGui():
             todoPiola, self.source = self.cap.read()
             self.source = self.rescale_frame_standar(self.source, 720)
 
+            #ACÁ SE DEBERÍA VER QUE PASAR AL BACK END
+
             if todoPiola:
                 self.sourceHEIGHT = len(self.source[:, 0])
                 self.sourceWIDTH = len(self.source[0, :])
@@ -373,6 +379,7 @@ class cvGui():
         todoPiola, self.source = self.cap.read()
         if todoPiola:
             self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+            # ACÁ SE DEBERÍA VER QUE PASAR AL BACK END
         return todoPiola
 
     def rescale_frame_standar(self, frame, maxWidth):
