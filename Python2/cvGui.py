@@ -128,6 +128,7 @@ class cvGui():
         cvui.init(WINDOW_NAME)
 
         self.parameters = []
+        #self.paramChanged = False
 
     def onWork(self):
 
@@ -423,11 +424,33 @@ class cvGui():
         self.parameters.append(self.shit_SPix[0])
 
     def checkParametersChange(self):
-        if (self.parameters[0] == (self.kalman_ptm[0]) and self.parameters[1] == (self.kalman_pc[0]) and self.parameters[2] == (self.kalman_mc[0]) and self.parameters[3] == (self.lk_mr[0])
-            and self.parameters[4] == (self.ColorFilterActive[0]) and self.parameters[5] == (self.LightRecalcActive[0]) and self.parameters[6] == (self.colorFilter_LihtThr[0])
-            and self.parameters[7] == (self.colorFilter_a[0]) and self.parameters[8] == (self.colorFilter_b[0]) and self.parameters[9] == (self.ligtRec_x[0])
-            and self.parameters[10] == (self.ligtRec_maxT[0]) and self.parameters[11] == (self.ShiTPropActive[0]) and self.parameters[12] == (self.shit_MaxFeat[0])
-            and self.parameters[13] == (self.shit_FeatQual[0]) and self.parameters[14] == (self.shit_MinFeat[0]) and self.parameters[15] == (self.shit_Rec[0]) and self.parameters[16] == (self.shit_SPix[0])):
+        tuvi = []
+
+        tuvi.clear()
+
+        tuvi.append(self.kalman_ptm[0])
+        tuvi.append(self.kalman_pc[0])
+        tuvi.append(self.kalman_mc[0])
+        tuvi.append(self.lk_mr[0])
+
+        tuvi.append(self.ColorFilterActive[0])
+        tuvi.append(self.LightRecalcActive[0])
+
+        tuvi.append(self.colorFilter_LihtThr[0])
+        tuvi.append(self.colorFilter_a[0])
+        tuvi.append(self.colorFilter_b[0])
+        tuvi.append(self.ligtRec_x[0])
+        tuvi.append(self.ligtRec_maxT[0])
+
+        tuvi.append(self.ShiTPropActive[0])
+
+        tuvi.append(self.shit_MaxFeat[0])
+        tuvi.append(self.shit_FeatQual[0])
+        tuvi.append(self.shit_MinFeat[0])
+        tuvi.append(self.shit_Rec[0])
+        tuvi.append(self.shit_SPix[0])
+
+        if tuvi == self.parameters:
             return False
         else:
             return True
