@@ -55,6 +55,9 @@ class cvGui():
 
     def __init__(self, *args, **kw):
 
+        #Trackers
+        self.trackers = []
+
         #Frames
         self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
         self.source = []
@@ -126,19 +129,23 @@ class cvGui():
         cvui.init(WINDOW_NAME)
 
     def onWork(self):
+
         while True:
+
             self.frame[:] = (49, 52, 49)
 
-            #FRAMES
-            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")        #Video Source Frame
-            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Settings:")          #Settings Frame
+            # FRAMES
+            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT,
+                        "Video Source:")  # Video Source Frame
+            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT,
+                        "Settings:")  # Settings Frame
             cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SOU_Y, WINDOW_SOU_WIDTH, WINDOW_SOU_HEIGHT, "Source:")
             cvui.window(self.frame, WINDOW_FIL_X, WINDOW_FIL_Y, WINDOW_FIL_WIDTH, WINDOW_FIL_HEIGHT, "Filters:")
 
             #Text
             cvui.printf(self.frame, 20, 35, 0.4, 0xdd97fb, "Current Source:")                #Video Source
             cvui.printf(self.frame, 20, 50, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
-            cvui.printf(self.frame, 135, 282, 0.4, 0xdd97fb, self.DebugModeString)           #Debug Mode
+            #cvui.printf(self.frame, 135, 282, 0.4, 0xdd97fb, self.DebugModeString)           #Debug Mode
             if self.verifyInitialCond():
                 cvui.printf(self.frame, 20, 255, 0.4, 0xdd97fb, "Settings Selected By Default")
             else :
@@ -174,23 +181,23 @@ class cvGui():
                 self.resetInitialCond()
             
             #Settings Buttons 
-            if (cvui.button(self.frame, 20, 180, "Select New Area")):
-                pass
-                #Hacer algo
+            if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
+                bBox = cv.selectROI('Select New Area', self.source)
+                cv.destroyWindow('Select New Area')
 
-            if (cvui.button(self.frame, 20, 215, "Start Tracking")):
-                pass
-                #Hacer algo
+            # if (cvui.button(self.frame, 20, 215, "Delete Selected Trackers")):
+            #     pass
+            #     #Hacer algo
 
-            if (cvui.checkbox(self.frame, 20, 280, "Debug Mode", self.DebugMode)):
-                if (self.DebugModeChanged):
-                    self.DebugMode[0] = True
-                    self.DebugModeString = "On"
-                    self.DebugModeChanged = False
-            else:
-                self.DebugMode[0] = False
-                self.DebugModeString = "Off"
-                self.DebugModeChanged = True
+            # if (cvui.checkbox(self.frame, 20, 280, "Debug Mode", self.DebugMode)):
+            #     if (self.DebugModeChanged):
+            #         self.DebugMode[0] = True
+            #         self.DebugModeString = "On"
+            #         self.DebugModeChanged = False
+            # else:
+            #     self.DebugMode[0] = False
+            #     self.DebugModeString = "Off"
+            #     self.DebugModeChanged = True
             
             #Settings Poperties
             if (cvui.checkbox(self.frame, 20, 300, "Kalman", self.KalmanProp)):
@@ -229,7 +236,7 @@ class cvGui():
                 
                 if (cvui.checkbox(self.frame, 20, 420, "Lightness Recalculation", self.CFLRPropOnOff)):
                     self.CFPropOnOff[0] = False
-                    cvui.printf(self.frame, 20, 460, 0.4, 0xdd97fb, "Every X self.frames")
+                    cvui.printf(self.frame, 20, 460, 0.4, 0xdd97fb, "Every X Frames")
                     cvui.trackbar(self.frame, 20, 475, 210, self.ligtRec_x, 0.0, 150.0)
                     cvui.printf(self.frame, 20, 530, 0.4, 0xdd97fb, "Maximum Threshold Change")
                     cvui.trackbar(self.frame, 20, 545, 210, self.ligtRec_maxT, 0.0, 30.0)
@@ -252,7 +259,7 @@ class cvGui():
                 cvui.trackbar(self.frame, 20, 625, 210, self.shit_SPix, 0.0, 10.0)
                 
                 if (cvui.checkbox(self.frame, 20, 670, "Feature Recalculation", self.ShiTPropOnOff)):
-                    cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Every X self.frames")
+                    cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Every X Frames")
                     cvui.trackbar(self.frame, 20, 705, 210, self.shit_Rec, 1.0, 100.0)
 
 
@@ -364,7 +371,7 @@ class cvGui():
                 self.sourceHEIGHT = len(self.source[:, 0])
                 self.sourceWIDTH = len(self.source[0, :])
                 a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
-                b = a + WINDOW_SOU_WIDTH      #X_SCREEN - WINDOW_VS_X
+                b = a + WINDOW_SOU_WIDTH
                 c = (b+a)/2
                 self.sourceX = int(c - self.sourceWIDTH/2)
                 a = WINDOW_SOU_Y
