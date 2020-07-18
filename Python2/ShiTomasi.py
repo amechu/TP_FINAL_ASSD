@@ -6,7 +6,8 @@ class ShiTomasi:
     qLevel=0.00000001
     minDist = 10
     blockSize_ = 10
-    RECALC_EVERY_FRAMES = 20
+    frameRecalculationNumber = 20
+    searchEnlargementThreshold = 4
 
     feature_params = dict(maxCorners=maxcorners,  # Maxima cantidad de features
                           qualityLevel=qLevel,
@@ -15,14 +16,15 @@ class ShiTomasi:
                           blockSize=blockSize_)
 
     def __init__(self):
-        self.features = None
-
-    def getFeatures(self):
-        return self.features
+        pass
 
     def recalculateFeatures(self, selection): #selection = prev_gray[y:y + h, x:x + w]
-        self.features = cv.goodFeaturesToTrack(selection, mask=None, **self.feature_params)
-        return self.features
+        features = cv.goodFeaturesToTrack(selection, mask=None, **self.feature_params)
+        if features is not None:
+            error = False
+        else:
+            error = True
+        return features, error
 
 
 

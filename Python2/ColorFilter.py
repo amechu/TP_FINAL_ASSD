@@ -2,10 +2,12 @@ import cv2 as cv
 
 
 class ColorFilter:
+    colorFilterUse = True
     hSemiAmp = 0
     SemiAmp = 0
     vSemiAmp = 0
     LIG_THR_CHANGE = 1
+
 
     def __init__(self):
         self.filteredFrame = 0
