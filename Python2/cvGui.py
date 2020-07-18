@@ -24,8 +24,8 @@ SHIT_MINFEAT = 0.01
 SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
-Y_SCREEN = 800
-X_SCREEN = 1280
+Y_SCREEN = 1080 #800 #1080
+X_SCREEN = 1920 #1280 #1920
 
 WINDOW_VS_X = 10
 WINDOW_VS_Y = 10
@@ -109,7 +109,8 @@ class cvGui():
         self.shit_Rec = [SHIT_REC]
         self.shit_SPix = [SHIT_SPIX]
         
-        cv.namedWindow(WINDOW_NAME)
+        cv.namedWindow(WINDOW_NAME, cv.WINDOW_NORMAL)
+        #self.fullScreen = False
         cvui.init(WINDOW_NAME)
 
     def onWork(self):
@@ -239,9 +240,9 @@ class cvGui():
                 if (cvui.checkbox(self.frame, 20, 670, "Feature Recalculation", self.ShiTPropOnOff)):
                     cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Every X self.frames")
                     cvui.trackbar(self.frame, 20, 705, 210, self.shit_Rec, 1.0, 100.0)
-            
+
+
             #On / Off special parameters: CHECK WHEN CALLING CALLBACK
-            
             if (cvui.checkbox(self.frame, 140, 340, "CF", self.ColorFilterActive) and (self.CFProp[0])):
                 #Verifico si está activado
                 cvui.printf(self.frame, 135, 402, 0.4, 0xdd97fb, "%s", "On")    #Printeo un on si está en pantalla su configuración
@@ -259,7 +260,7 @@ class cvGui():
                 cvui.printf(self.frame, 200, 672, 0.4, 0xdd97fb, "%s", "Off")
             
             #Update cvui internal stuff
-            cvui.update()
+            #cvui.update()
     
             if ((self.usingCamera) or (self.usingVideo)) and (self.callSource()):       #SOURCE
                 #self.frame[X_POS_SOURCE:self.sourceX , Y_POS_SOURCE:self.sourceY ] = self.source
@@ -268,10 +269,23 @@ class cvGui():
             #Show everything on the screen
             cv.imshow(WINDOW_NAME, self.frame)
 
+            # if (cv.waitKey(1) == 97):
+            #     if(self.fullScreen):
+            #         self.fullScreen = False
+            #         cv.setWindowProperty(WINDOW_NAME, cv.WND_PROP_AUTOSIZE, cv.WINDOW_NORMAL)
+            #         self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
+            #     else:
+            #         self.fullScreen = True
+            #         cv.setWindowProperty(WINDOW_NAME, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
+
+            cvui.update()
+
             #Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
                 break
-                
+
+        cv.destroyAllWindows()
+
         return True
                     
     def verifyInitialCond(self):
@@ -333,7 +347,7 @@ class cvGui():
         self.ShiTPropActive[0] = False
 
     def initSource(self):
-        self.source[:] = (49, 52, 49)
+        #self.source[:] = (49, 52, 49)
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
         else:
@@ -341,10 +355,10 @@ class cvGui():
 
         if (self.cap.isOpened()):
             todoPiola, self.source = self.cap.read()
+            #self.source = cv.resize(self.source, (720,360))
             if todoPiola:
                 self.sourceHEIGHT = len(self.source[:, 0])
                 self.sourceWIDTH = len(self.source[0, :])
-                #self.sourceX = WINDOW_VS_WIDTH + 2*WINDOW_VS_Y
                 a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
                 b = X_SCREEN - WINDOW_VS_X
                 c = (b+a)/2
@@ -354,9 +368,15 @@ class cvGui():
 
         return False
 
-    def callSource(self) :
+    def callSource(self):
         todoPiola, self.source = self.cap.read()
         return todoPiola
+
+    def rescale_frame(frame, percent=75):
+        width = int(frame.shape[1] * percent / 100)
+        height = int(frame.shape[0] * percent / 100)
+        dim = (width, height)
+        return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
 
 def main():
