@@ -83,6 +83,7 @@ class Tracker:
 
 
 
+
     def enlargeSearchArea(self):
         self.searchWidth += self.ST.searchEnlargementThreshold
         self.searchHeight += self.ST.searchEnlargementThreshold
