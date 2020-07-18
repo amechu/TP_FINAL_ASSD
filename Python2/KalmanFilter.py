@@ -35,6 +35,9 @@ class KalmanFilter:
     def correct(self, measured_x, measured_y):
         self.kalman.correct((measured_x, measured_y))
 
+    def setStatePost(self, statePost_):
+        self.kalman.statePost = statePost_
+
     @property
     def statePost(self):
         return self.kalman.statePost

@@ -12,19 +12,21 @@ class OpticalFlow:
                      maxLevel=lkMaxLevel,  # Niveles del arbol maximos
                      criteria=lkCriteria)
     def __init__(self):
-        self.prevFeaturesLK = None
+        self.prevFeatures = None
 
     def updateFeatures(self, prevFrameGray, frameGray):
 
-        newFeaturesLK, status, error  = cv.calcOpticalFlowPyrLK(prevFrameGray, frameGray, self.prevFeaturesLK, None, **self.lk_params)
+        if self.prevFeatures is not None:
 
-        if np.any(status):  # Se verifica si se perdio al objeto
-            error = False
-            newFeatures = newFeaturesLK[status == 1]
-            self.prevFeaturesLK = newFeatures.reshape(-1, 1, 2)
+            features, status, error  = cv.calcOpticalFlowPyrLK(prevFrameGray, frameGray, self.prevFeatures, None, **self.lk_params)
+
+            if np.any(status):  # Se verifica si se perdio al objeto
+                error = False
+            else:
+                error = True
+                features = None
+                self.prevFeatures = None
         else:
             error = True
-            newFeatures = 0
-            self.prevFeaturesLK = 0
-
-        return newFeatures, error
+            features = None
+        return features, error
