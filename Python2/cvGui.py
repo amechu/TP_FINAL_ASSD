@@ -75,16 +75,13 @@ class cvGui():
         self.sourceY = 0
         self.sourceWIDTH = 0
         self.sourceHEIGHT = 0
+
         self.usingCamera = False
         self.usingVideo = False
+        self.pause = False
+
         self.cap = cv.VideoCapture
 
-        self.pause = False
-    
-        #Bools and properties values
-        self.DebugMode = [False]
-        self.DebugModeChanged = True
-    
         #Using Device
         self.deviceID = 0               #0 = open default camera
         self.apiID = cv.CAP_ANY         #0 = autodetect default API
@@ -130,9 +127,13 @@ class cvGui():
         cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
 
+        self.parameters = []
+
     def onWork(self):
 
         while True:
+
+            self.updateParameters()
 
             self.frame[:] = (49, 52, 49)
 
@@ -298,18 +299,12 @@ class cvGui():
         return True
                     
     def verifyInitialCond(self):
-        if ((self.kalman_ptm == INITIAL_KALMAN_PTM) and (self.kalman_pc == INITIAL_KALMAN_PC) and (
-                self.kalman_mc == INITIAL_KALMAN_MC) and (self.lk_mr == INITIAL_LK_MR) and
-                (self.colorFilter_LihtThr == COLORFILTER_LIGHTTHR) and (self.colorFilter_a == COLORFILTER_A) and (
-                        self.colorFilter_b == COLORFILTER_B) and (self.ligtRec_x == LIGHTTHR_X) and
-                (self.ligtRec_maxT == LIGHTTHR_MACT) and (self.shit_MaxFeat == SHIT_MAXFEAT) and (
-                        self.shit_FeatQual == SHIT_FEATQUAL) and (self.shit_MinFeat == SHIT_MINFEAT) and
-                (self.shit_Rec == SHIT_REC) and (self.shit_SPix == SHIT_SPIX) and (self.ColorFilterActive == False) and (
-                        self.LightRecalcActive == False) and (self.ShiTPropActive == False)) :
+        if ((self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and
+                (self.colorFilter_LihtThr[0] == COLORFILTER_LIGHTTHR) and (self.colorFilter_a[0] == COLORFILTER_A) and (self.colorFilter_b[0] == COLORFILTER_B) and (self.ligtRec_x[0] == LIGHTTHR_X) and
+                (self.ligtRec_maxT[0] == LIGHTTHR_MACT) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and
+                (self.shit_Rec[0] == SHIT_REC) and (self.shit_SPix[0] == SHIT_SPIX) and (self.ColorFilterActive[0] == False) and (self.LightRecalcActive[0] == False) and (self.ShiTPropActive[0] == False)):
             return True
-        elif ((self.colorFilter_LihtThr != COLORFILTER_LIGHTTHR) or (self.colorFilter_a != COLORFILTER_A) or (
-                self.colorFilter_b != COLORFILTER_B) or (self.ligtRec_x != LIGHTTHR_X) or
-            (self.ligtRec_maxT != LIGHTTHR_MACT) or (self.shit_SPix != SHIT_SPIX)):
+        elif ((self.colorFilter_LihtThr[0] != COLORFILTER_LIGHTTHR) or (self.colorFilter_a[0] != COLORFILTER_A) or (self.colorFilter_b[0] != COLORFILTER_B) or (self.ligtRec_x[0] != LIGHTTHR_X) or (self.ligtRec_maxT[0] != LIGHTTHR_MACT) or (self.shit_SPix[0] != SHIT_SPIX)):
             if ((self.ColorFilterActive[0] == False) and (self.LightRecalcActive[0] == False) and (self.ShiTPropActive[0] == False)):
                 return True
             else:
@@ -330,7 +325,6 @@ class cvGui():
             justName = file_path.split('/')[-1]  # Con extension
             self.videoName = justName[0:len(justName) - 4]  # Sin extension
             return True
-
 
     def resetInitialCond(self):
         self.kalman_ptm[0] = INITIAL_KALMAN_PTM
@@ -388,7 +382,10 @@ class cvGui():
         if todoPiola:
             self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
 
-            #PASO PARAMETROS A TRACKER
+            if self.checkParametersChange():
+                pass
+                #PASO LOS NUEVOS PARAMETROS A TRACKER
+
             #LLAMO TRACKER
 
             # ACÁ SE DEBERÍA VER QUE PASAR AL BACK END
@@ -400,6 +397,40 @@ class cvGui():
         dim = (maxWidth, int(maxWidth*height/width))
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
+    def updateParameters(self):
+        self.parameters.clear()
+
+        self.parameters.append(self.kalman_ptm[0])
+        self.parameters.append(self.kalman_pc[0])
+        self.parameters.append(self.kalman_mc[0])
+        self.parameters.append(self.lk_mr[0])
+
+        self.parameters.append(self.ColorFilterActive[0])
+        self.parameters.append(self.LightRecalcActive[0])
+
+        self.parameters.append(self.colorFilter_LihtThr[0])
+        self.parameters.append(self.colorFilter_a[0])
+        self.parameters.append(self.colorFilter_b[0])
+        self.parameters.append(self.ligtRec_x[0])
+        self.parameters.append(self.ligtRec_maxT[0])
+
+        self.parameters.append(self.ShiTPropActive[0])
+
+        self.parameters.append(self.shit_MaxFeat[0])
+        self.parameters.append(self.shit_FeatQual[0])
+        self.parameters.append(self.shit_MinFeat[0])
+        self.parameters.append(self.shit_Rec[0])
+        self.parameters.append(self.shit_SPix[0])
+
+    def checkParametersChange(self):
+        if (self.parameters[0] == (self.kalman_ptm[0]) and self.parameters[1] == (self.kalman_pc[0]) and self.parameters[2] == (self.kalman_mc[0]) and self.parameters[3] == (self.lk_mr[0])
+            and self.parameters[4] == (self.ColorFilterActive[0]) and self.parameters[5] == (self.LightRecalcActive[0]) and self.parameters[6] == (self.colorFilter_LihtThr[0])
+            and self.parameters[7] == (self.colorFilter_a[0]) and self.parameters[8] == (self.colorFilter_b[0]) and self.parameters[9] == (self.ligtRec_x[0])
+            and self.parameters[10] == (self.ligtRec_maxT[0]) and self.parameters[11] == (self.ShiTPropActive[0]) and self.parameters[12] == (self.shit_MaxFeat[0])
+            and self.parameters[13] == (self.shit_FeatQual[0]) and self.parameters[14] == (self.shit_MinFeat[0]) and self.parameters[15] == (self.shit_Rec[0]) and self.parameters[16] == (self.shit_SPix[0])):
+            return False
+        else:
+            return True
 
 def main():
     myGui = cvGui()
