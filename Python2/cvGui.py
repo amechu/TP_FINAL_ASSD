@@ -24,8 +24,8 @@ SHIT_MINFEAT = 0.01
 SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
-Y_SCREEN = 1080 #800
-X_SCREEN = 1920 #1280
+Y_SCREEN = 960
+X_SCREEN = 1280
 
 STANDAR_WIDTH = 720
 
@@ -41,10 +41,8 @@ WINDOW_SET_HEIGHT = 605
 
 WINDOW_SOU_X = WINDOW_VS_X*2 + WINDOW_VS_WIDTH
 WINDOW_SOU_Y = WINDOW_VS_Y
-WINDOW_SOU_WIDTH = X_SCREEN - WINDOW_VS_X - WINDOW_SOU_X
-WINDOW_SOU_HEIGHT = STANDAR_WIDTH
-
-
+WINDOW_SOU_WIDTH = STANDAR_WIDTH + 2*WINDOW_VS_X #X_SCREEN - WINDOW_VS_X - WINDOW_SOU_X
+WINDOW_SOU_HEIGHT = WINDOW_SET_Y + WINDOW_SET_HEIGHT - WINDOW_SOU_Y #STANDAR_WIDTH
 
 class cvGui():
 
@@ -53,7 +51,6 @@ class cvGui():
         #Frames
         self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
         self.source = []
-
 
         #Source names    
         self.VideoLoaded = "None"
@@ -119,7 +116,6 @@ class cvGui():
         self.shit_SPix = [SHIT_SPIX]
         
         cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
-        #self.fullScreen = False
         cvui.init(WINDOW_NAME)
 
     def onWork(self):
@@ -276,26 +272,16 @@ class cvGui():
                 self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             #Show everything on the screen
-            cv.imshow(WINDOW_NAME, self.frame)
-
-            # if (cv.waitKey(1) == 97):
-            #     if(self.fullScreen):
-            #         self.fullScreen = False
-            #         cv.setWindowProperty(WINDOW_NAME, cv.WND_PROP_AUTOSIZE, cv.WINDOW_NORMAL)
-            #         self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
-            #     else:
-            #         self.fullScreen = True
-            #         cv.setWindowProperty(WINDOW_NAME, cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
-
-            cvui.update()
+            cvui.imshow(WINDOW_NAME, self.frame)
 
             #Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
                 break
 
-        if ((self.usingVideo or self.usingCamera) and self.cap.isOpened()):
+        if (self.usingVideo or self.usingCamera):
             self.cap.release()
         cv.destroyAllWindows()
+
 
         return True
                     
@@ -372,7 +358,7 @@ class cvGui():
                 self.sourceHEIGHT = len(self.source[:, 0])
                 self.sourceWIDTH = len(self.source[0, :])
                 a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
-                b = X_SCREEN - WINDOW_VS_X
+                b = a + WINDOW_SOU_WIDTH      #X_SCREEN - WINDOW_VS_X
                 c = (b+a)/2
                 self.sourceX = int(c - self.sourceWIDTH/2)
                 a = WINDOW_SOU_Y
@@ -393,7 +379,6 @@ class cvGui():
         width = int(frame.shape[1])
         height = int(frame.shape[0])
         dim = (maxWidth, int(maxWidth*height/width))
-        #dim = (maxWidth, int(maxWidth*self.sourceWIDTH/self.sourceHEIGHT))
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
 
