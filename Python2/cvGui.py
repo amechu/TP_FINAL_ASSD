@@ -3,7 +3,9 @@ import cvui
 import numpy as np
 import tkinter as tk
 from tkinter import filedialog
+import Tracker
 import Artist
+
 WINDOW_NAME = "MAGT Video Tracker"
 
 INITIAL_KALMAN_PTM = 1.2
@@ -191,10 +193,12 @@ class cvGui():
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
                 bBox = cv.selectROI('Select New Area', self.source)
                 cv.destroyWindow('Select New Area')
+                self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3]))
+
+                #VERIFICAR GUI TRACKER
 
             if (cvui.button(self.frame, 20, 215, "Pause Source")):
                 self.pause = not self.pause
-
 
             #Settings Poperties
             if (cvui.checkbox(self.frame, 20, 300, "Kalman", self.KalmanProp)):
@@ -385,11 +389,13 @@ class cvGui():
 
             if self.checkParametersChange():
                 pass
-                #PASO LOS NUEVOS PARAMETROS A TRACKER
 
-            #LLAMO TRACKER
+            for tracker in self.trackers:
+                tracker.update(self.source)
 
-            # ACÁ SE DEBERÍA VER QUE PASAR AL BACK END
+            for tracker in self.trackers:
+                self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.searchHeight, (165, 3, 129))
+
         return todoPiola
 
     def rescale_frame_standar(self, frame, maxWidth):

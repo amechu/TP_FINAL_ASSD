@@ -44,8 +44,8 @@ class Tracker:
         #Tacking error?
         if self.trackingError is True:
             #Yes, then apply ST algorithm around estimate
-            self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[self.KM.statePost[1] - self.searchHeight/2 : self.KM.statePost[1] + self.searchHeight/2,
-                                                                                                                          self.KM.statePost[0] - self.searchWidth/2 : self.KM.statePost[0] + self.searchWidth/2])
+            self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[ int( self.KM.statePost[1][0] - self.searchHeight/2) : int(self.KM.statePost[1][0] + self.searchHeight/2),
+                                                                                                                          int(self.KM.statePost[0][0] - self.searchWidth/2 ): int(self.KM.statePost[0][0] + self.searchWidth/2)])
             #did i found it?
             if self.trackingError is True:
                 #No, then enlarge search area
@@ -92,10 +92,10 @@ class Tracker:
         self.searchHeight += self.ST.searchEnlargementThreshold
 
     def getEstimatedPosition(self):
-        return self.KM.statePost[0], self.KM.statePost[1]
+        return self.KM.statePost[0][0], self.KM.statePost[1][0]
 
     def getEstimatedVelocity(self):
-        return self.KM.statePost[2], self.KM.statePost[3]
+        return self.KM.statePost[2][0], self.KM.statePost[3][0]
 
     def getFilteredFrame(self):
         pass

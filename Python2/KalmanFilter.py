@@ -33,7 +33,7 @@ class KalmanFilter:
         self.kalman.predict()
 
     def correct(self, measured_x, measured_y):
-        self.kalman.correct((measured_x, measured_y))
+        self.kalman.correct((float(measured_x), float(measured_y)))
 
     def setStatePost(self, statePost_):
         self.kalman.statePost = statePost_
