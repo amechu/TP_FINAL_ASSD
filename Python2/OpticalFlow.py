@@ -13,6 +13,6 @@ class OpticalFlow:
     def __init__(self):
         pass
 
-    def updateFeatures(self,prevFrameGray,frameGray,STFeatures):
-        next_, status, error  = cv.calcOpticalFlowPyrLK(prevFrameGray, frameGray, STFeatures, None, **self.lk_params)
+    def updateFeatures(self, prevFrameGray, frameGray, features):
+        next_, status, error  = cv.calcOpticalFlowPyrLK(prevFrameGray, frameGray, features, None, **self.lk_params)
         return [next_, status, error ]

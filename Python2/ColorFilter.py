@@ -16,4 +16,7 @@ class ColorFilter:
     def calculateNewMask(self, selection):
         pass
 
+    def filterFrame(self, frame):
+        pass
+
 

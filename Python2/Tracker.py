@@ -1,5 +1,5 @@
 import cv2 as cv
-import kalman
+import KalmanFilter
 import ColorFilter
 import ShiTomasi
 import OpticalFlow
@@ -9,19 +9,22 @@ class Tracker:
     SEARCHING_ENLARGEMENT = 4  # Rapidez con la que se agranda el area de busqueda
 
     def __init__(self):
-        LK= OpticalFlow
-        ST= ShiTomasi
-        KM= kalman
-        ColF=ColorFilter
+        self.LK= OpticalFlow.OpticalFlow()
+        self.ST= ShiTomasi.ShiTomasi()
+        self.KM = KalmanFilter.KalmanFilter()
+        self.ColF=ColorFilter.ColorFilter()
 
-    def update(self):
+    def update(self, prevFrame, frame):
         pass
 
-    def getEstimate(self):
-        pass
+    def getEstimatedPosition(self):
+        return self.KM.statePost[0], self.KM.statePost[1]
+
+    def getEstimatedVelocity(self):
+        return self.KM.statePost[2], self.KM.statePost[3]
 
     def getFeatures(self):
-        pass
+        return self.ST.getFeatures()
 
     def getFilteredFrame(self):
         pass
