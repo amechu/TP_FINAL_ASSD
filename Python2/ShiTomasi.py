@@ -15,13 +15,13 @@ class ShiTomasi:
                           blockSize=blockSize_)
 
     def __init__(self):
-        pass
+        self.features = None
 
     def getFeatures(self):
         return self.features
 
-    def recalculateFeatures(self,prev_gray,y,x,h,w):
-        self.features = cv.goodFeaturesToTrack(prev_gray[y:y + h, x:x + w], mask=None, **self.feature_params)
+    def recalculateFeatures(self, selection): #selection = prev_gray[y:y + h, x:x + w]
+        self.features = cv.goodFeaturesToTrack(selection, mask=None, **self.feature_params)
         return self.features
 
 

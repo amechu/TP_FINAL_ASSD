@@ -1,7 +1,7 @@
 import cv2 as cv
 import params as prm
 import util as util
-import kalman
+import KalmanFilter as kalman
 
 kalman = kalman.KalmanFilter() #Se inicializa la clase del filtro de Kalman
 
