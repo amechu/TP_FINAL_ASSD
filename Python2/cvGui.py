@@ -78,6 +78,8 @@ class cvGui():
         self.usingCamera = False
         self.usingVideo = False
         self.cap = cv.VideoCapture
+
+        self.pause = False
     
         #Bools and properties values
         self.DebugMode = [False]
@@ -135,21 +137,24 @@ class cvGui():
             self.frame[:] = (49, 52, 49)
 
             # FRAMES
-            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT,
-                        "Video Source:")  # Video Source Frame
-            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT,
-                        "Settings:")  # Settings Frame
+            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")  # Video Source Frame
+            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Settings:")  # Settings Frame
             cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SOU_Y, WINDOW_SOU_WIDTH, WINDOW_SOU_HEIGHT, "Source:")
             cvui.window(self.frame, WINDOW_FIL_X, WINDOW_FIL_Y, WINDOW_FIL_WIDTH, WINDOW_FIL_HEIGHT, "Filters:")
 
             #Text
             cvui.printf(self.frame, 20, 35, 0.4, 0xdd97fb, "Current Source:")                #Video Source
             cvui.printf(self.frame, 20, 50, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
-            #cvui.printf(self.frame, 135, 282, 0.4, 0xdd97fb, self.DebugModeString)           #Debug Mode
+
             if self.verifyInitialCond():
-                cvui.printf(self.frame, 20, 255, 0.4, 0xdd97fb, "Settings Selected By Default")
+                cvui.printf(self.frame, 20, 275, 0.4, 0xdd97fb, "Settings Selected By Default")
             else :
-                cvui.printf(self.frame, 20, 255, 0.4, 0xdd97fb, "Changes Saved!")
+                cvui.printf(self.frame, 20, 275, 0.4, 0xdd97fb, "Changes Saved!")
+
+            if self.pause:
+                cvui.printf(self.frame, 20, 255, 0.4, 0xca380e, "Source Paused!")
+            else :
+                cvui.printf(self.frame, 20, 255, 0.4, 0x2db50c, "Source Playing!")
 
             #Video Source Buttons
             if (cvui.button(self.frame, 20, 70, "Use Video")):
@@ -185,20 +190,10 @@ class cvGui():
                 bBox = cv.selectROI('Select New Area', self.source)
                 cv.destroyWindow('Select New Area')
 
-            # if (cvui.button(self.frame, 20, 215, "Delete Selected Trackers")):
-            #     pass
-            #     #Hacer algo
+            if (cvui.button(self.frame, 20, 215, "Pause Source")):
+                self.pause = not self.pause
 
-            # if (cvui.checkbox(self.frame, 20, 280, "Debug Mode", self.DebugMode)):
-            #     if (self.DebugModeChanged):
-            #         self.DebugMode[0] = True
-            #         self.DebugModeString = "On"
-            #         self.DebugModeChanged = False
-            # else:
-            #     self.DebugMode[0] = False
-            #     self.DebugModeString = "Off"
-            #     self.DebugModeChanged = True
-            
+
             #Settings Poperties
             if (cvui.checkbox(self.frame, 20, 300, "Kalman", self.KalmanProp)):
                 self.LKProp[0] = False
@@ -207,8 +202,10 @@ class cvGui():
 
                 cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Process Time Multiplier")
                 cvui.trackbar(self.frame, 20, 415, 210, self.kalman_ptm, 0.0, 2.0)
+
                 cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Process Covariance")
                 cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 1.0)
+
                 cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Measurement Covariance")
                 cvui.trackbar(self.frame, 20, 555, 210, self.kalman_mc, 0.0, 1.0)
 
@@ -262,7 +259,6 @@ class cvGui():
                     cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Every X Frames")
                     cvui.trackbar(self.frame, 20, 705, 210, self.shit_Rec, 1.0, 100.0)
 
-
             #On / Off special parameters: CHECK WHEN CALLING CALLBACK
             if (cvui.checkbox(self.frame, 140, 340, "CF", self.ColorFilterActive) and (self.CFProp[0])):        #Verifico si está activado
                 cvui.printf(self.frame, 120, 402, 0.4, 0xdd97fb, "%s", "On")                                    #Printeo un on si está en pantalla su configuración
@@ -279,8 +275,14 @@ class cvGui():
             elif (self.ShiTProp[0]):
                 cvui.printf(self.frame, 185, 672, 0.4, 0xdd97fb, "%s", "Off")
             
-            if ((self.usingCamera) or (self.usingVideo)) and (self.callSource()):       #SOURCE
-                self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+            if (self.usingCamera) or (self.usingVideo):
+                if not self.pause:
+                    if self.callSource():
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+                    else:
+                        pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
+                else:
+                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -292,7 +294,6 @@ class cvGui():
         if (self.usingVideo or self.usingCamera):
             self.cap.release()
         cv.destroyAllWindows()
-
 
         return True
                     
@@ -365,7 +366,7 @@ class cvGui():
             todoPiola, self.source = self.cap.read()
             self.source = self.rescale_frame_standar(self.source, 720)
 
-            #ACÁ SE DEBERÍA VER QUE PASAR AL BACK END
+            #VER SI DEBERÍA HABER ALGÚN UPDATE AL BACK END
 
             if todoPiola:
                 self.sourceHEIGHT = len(self.source[:, 0])
@@ -386,6 +387,10 @@ class cvGui():
         todoPiola, self.source = self.cap.read()
         if todoPiola:
             self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+
+            #PASO PARAMETROS A TRACKER
+            #LLAMO TRACKER
+
             # ACÁ SE DEBERÍA VER QUE PASAR AL BACK END
         return todoPiola
 
