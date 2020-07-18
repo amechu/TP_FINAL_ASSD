@@ -59,7 +59,9 @@ class Tracker:
             #Apply LK algorithm
             self.features, self.trackingError = self.LK.updateFeatures(self.prevFrameGray, frameGray)
             if self.trackingError is False: #Tracking error?
+                #recaulculate features?
                 if self.frameCounter != 0 and self.frameCounter % self.ST.frameRecalculationNumber == 0:
+                    #yes
                     medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
                     std = np.sqrt((np.std(self.features[:, 0, 0]))**2 + (np.std(self.features[:, 0, 1]))**2)
                     #calculate mean and std of features
@@ -71,7 +73,8 @@ class Tracker:
                     self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[muy - self.selectionHeight / 2: muy + self.selectionHeight / 2,
                                                                                     mux - self.selectionWidth / 2: mux + self.selectionWidth / 2])
                     #apply st algorithm
-                    if self.trackingError is False:
+
+                    if self.trackingError is False:#did i found features?
                         #found, then KM correct.
                         self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
                     #else would be Features not found.
