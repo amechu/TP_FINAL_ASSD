@@ -251,7 +251,7 @@ class cvGui():
                 cvui.trackbar(self.frame, 20, 415, 210, self.kalman_ptm, 0.0, 2.0)
 
                 cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Process Covariance")
-                cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 1.0)                       #Ver como poner más presición en la barra
+                cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 0.1, 1, "%0.3Lf", )
 
                 cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Measurement Covariance")
                 cvui.trackbar(self.frame, 20, 555, 210, self.kalman_mc, 0.0, 1.0)
@@ -307,7 +307,6 @@ class cvGui():
                 else:
                     cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
                     cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
-
                 
             if (cvui.checkbox(self.frame, 20, 360, "Shi-Tomasi", self.ShiTProp)):
                 self.KalmanProp[0] = False
@@ -315,10 +314,11 @@ class cvGui():
                 self.CFProp[0] = False
                 
                 cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Feature Quantity")
-                cvui.trackbar(self.frame, 20, 415, 210, self.shit_MaxFeat, 1, 100)         #, theDiscreteStep=1                       #Ver como poner paso discreto
+                cvui.trackbar(self.frame, 20, 415, 210, self.shit_MaxFeat, 1.0, 100.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                self.shit_MaxFeat[0] = int(self.shit_MaxFeat[0])
 
                 cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Feature Quality Level")
-                cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.0, 1.0)
+                cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.0, 1)
                 
                 cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Minimum Feature Distance")
                 cvui.trackbar(self.frame, 20, 555, 210, self.shit_MinFeat, 0.0, 1.0)
@@ -326,12 +326,12 @@ class cvGui():
                 cvui.printf(self.frame, 20, 610, 0.4, 0xdd97fb, "Search Pixel Enlargement")
                 cvui.trackbar(self.frame, 20, 625, 210, self.shit_SPix, 0.0, 10.0)
                 
-                if (cvui.checkbox(self.frame, 20, 670, "Feature Recalculation", self.ShiTPropOnOff)):
-                    cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Recalculation Number")
-                    cvui.trackbar(self.frame, 20, 705, 210, self.shit_Rec, 1.0, 100.0)
-                    cvui.printf(self.frame, 185, 672, 0.4, 0x10dcA1, "%s", "On")
+                if (cvui.checkbox(self.frame, 20, 680, "Feature Recalculation", self.ShiTPropOnOff)):
+                    cvui.printf(self.frame, 20, 710, 0.4, 0xdd97fb, "Recalculation Number")
+                    cvui.trackbar(self.frame, 20, 725, 210, self.shit_Rec, 1.0, 100.0)
+                    cvui.printf(self.frame, 185, 682, 0.4, 0x10dcA1, "%s", "On")
                 else:
-                    cvui.printf(self.frame, 185, 672, 0.4, 0xdc1076, "%s", "Off")
+                    cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
             
             if (self.usingCamera) or (self.usingVideo):
                 if not self.pause:
