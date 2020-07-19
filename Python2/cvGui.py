@@ -445,8 +445,8 @@ class cvGui():
             self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
 
             if self.checkParametersChange():
-                for tracker in self.trackers:
-                    pass
+                pass
+                #for tracker in self.trackers:
                     #tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
@@ -524,55 +524,36 @@ class cvGui():
         self.parametersNew.append(self.ShiTPropOnOff[0])               #
         self.parametersNew.append(self.shit_SPix[0])
 
-        if self.parametersNew[0] == self.parametersNew[0] and self.parametersNew[1] == self.parametersNew[1] and self.parametersNew[2] == self.parametersNew[2] :
-            bool1 = False        #Chequeo Kalman
-        else:
-            bool1 = True
+        if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
+            return True         #Chequeo Kalman
 
-        if self.parametersNew[3] == self.parametersNew[3]:
-            bool2 = False        #Chequeo Lucas-Kanade
-        else:
-            bool2 = True
+        if not(self.parametersNew[3] == self.parameters[3]):
+            return True         #Chequeo Lucas-Kanade
 
-        if self.parametersNew[4] == self.parametersNew[4]:
-            bool3 = False        #Color Filter On/Off
-        else:
-            if self.parametersNew[5] == self.parametersNew[5] and self.parametersNew[6] == self.parametersNew[6] and self.parametersNew[7] == self.parametersNew[7]:
-                bool3 = False   #Chequeo Params de CF
-            else:
-                bool3 = True
+        if not(self.parametersNew[4] == self.parameters[4]):
+            return True        #Color Filter On/Off
+        elif not( self.parametersNew[5] == self.parametersNew[5] and self.parametersNew[6] == self.parameters[6] and self.parametersNew[7] == self.parameters[7]):
+            return True      #Chequeo Params de CF
 
-        if self.parametersNew[8] == self.parametersNew[8]:
-            bool4 = False        #LR On/Off
-        else:
-            if self.parametersNew[9] == self.parametersNew[9] and self.parametersNew[10] == self.parametersNew[10]:
-                bool4 = False   #Chequeo Params de CF
-            else:
-                bool4 = True
+        if not(self.parametersNew[8] == self.parameters[8]):
+            return True        #LR On/Off
+        elif not(self.parametersNew[9] == self.parameters[9] and self.parametersNew[10] == self.parameters[10]):
+            return True   #Chequeo Params de CF
 
-        if self.parametersNew[11] == self.parametersNew[11]:
-            bool5 = False        #Cam Shift On/Off
-        else:
-            bool5 = True
-            # if self.parametersNew[5] == self.parametersNew[5] and self.parametersNew[6] == self.parametersNew[6] and self.parametersNew[7] == self.parametersNew[7]:
-            #     bool5 = False   #Chequeo Params de CF
-            # else:
-            #     bool5 = True
+        if not(self.parametersNew[11] == self.parameters[11]):
+            return True        #Cam Shift On/Off
+        #elif not(False):
+        #    return True
 
-        if self.parametersNew[12] == self.parametersNew[12] and self.parametersNew[13] == self.parametersNew[13] and self.parametersNew[14] == self.parametersNew[14] :
-            bool6 = False        #Chequeo Shi-Tomasi
-        else:
-            bool6 = True
+        if not(self.parametersNew[12] == self.parameters[12] and self.parametersNew[13] == self.parameters[13] and self.parametersNew[14] == self.parameters[14]):
+            return True         #Chequeo Shi-Tomasi
 
-        if self.parametersNew[15] == self.parametersNew[15]:
-            bool7 = False        #Shi-Tomasi On/Off
-        else:
-            if self.parametersNew[16] == self.parametersNew[16]:
-                bool7 = False   #Chequeo Params Shi
-            else:
-                bool7 = True
+        if not(self.parametersNew[15] == self.parameters[15]):
+            return True        #Shi-Tomasi On/Off
+        elif not(self.parametersNew[16] == self.parameters[16]):
+            return True   #Chequeo Params Shi
 
-        return bool1 and bool2 and bool3 and bool4 and bool5 and bool6 and bool7
+        return False
 
 def main():
     myGui = cvGui()
