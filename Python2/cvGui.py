@@ -68,7 +68,6 @@ class cvGui():
         #Frames
         self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
         self.source = []
-        self.sourceWithoutChange = []
 
         #Source names    
         self.VideoLoaded = "None"
@@ -137,8 +136,6 @@ class cvGui():
 
         self.parameters = []
 
-        self.boolTracker = []
-
 
     def onWork(self):
 
@@ -177,7 +174,6 @@ class cvGui():
                     if(self.initSource()):                                                                #Chequear si se inicia bien
                         self.VideoLoaded = self.videoPath
                         self.CurrentSource = "Video Loaded: " + self.videoName
-                        self.boolTracker.clear()
                         self.trackers.clear()
                     else:
                         self.usingCamera = False
@@ -187,6 +183,7 @@ class cvGui():
                     self.CurrentSource = "No Video Loaded"
             
             if (cvui.button(self.frame, 20, 105, "Use Camera")):
+                self.trackers.clear()
                 if not self.usingCamera:
                     self.usingVideo = False
                     self.usingCamera = True
@@ -204,27 +201,21 @@ class cvGui():
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
 
                 if len(self.trackers) < MAX_TRACKERS:
-                    bBox = cv.selectROI('Select New Area', self.source)
-                    cv.destroyWindow('Select New Area')
+                    bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.source)
+                    cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
                     self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
 
             a = len(self.trackers)
-            b = len(self.boolTracker)
-
-            if b < a:
-                for i in range(a-b):
-                    self.boolTracker.append([False])
 
             for i in range(a):
-                xCh = WINDOW_TRK_X + 5 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
-                yCh = WINDOW_TRK_Y + 50
+                xTx = WINDOW_TRK_X + 15 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
+                yTx = WINDOW_TRK_Y + 60
                 xB = WINDOW_TRK_X + 10 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
                 yB = WINDOW_TRK_Y + 80
 
-                if (cvui.checkbox(self.frame, xCh, yCh, "Tracker Number " + str(i+1), self.boolTracker[i])):
-                    self.boolTracker[i][0] = True
+                cvui.printf(self.frame, xTx, yTx, 0.4, 0xdd97fb,"Tracker Number " + str(i+1))
                 if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
-                    del self.boolTracker[i]
+
                     del self.trackers[i]
                     break
 
@@ -350,18 +341,14 @@ class cvGui():
         return True
                     
     def verifyInitialCond(self):
-        if ((self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and
-                (self.colorFilter_LihtThr[0] == COLORFILTER_LIGHTTHR) and (self.colorFilter_a[0] == COLORFILTER_A) and (self.colorFilter_b[0] == COLORFILTER_B) and (self.ligtRec_x[0] == LIGHTTHR_X) and
-                (self.ligtRec_maxT[0] == LIGHTTHR_MACT) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and
-                (self.shit_Rec[0] == SHIT_REC) and (self.shit_SPix[0] == SHIT_SPIX) and (self.ColorFilterActive[0] == False) and (self.LightRecalcActive[0] == False) and (self.ShiTPropActive[0] == False)):
+        if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
+                self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (
+                self.CFPropOnOff[0] == False) and (self.CFLRPropOnOff[0] == False) and (self.ShiTPropOnOff[0] == False):
             return True
-        elif ((self.colorFilter_LihtThr[0] != COLORFILTER_LIGHTTHR) or (self.colorFilter_a[0] != COLORFILTER_A) or (self.colorFilter_b[0] != COLORFILTER_B) or (self.ligtRec_x[0] != LIGHTTHR_X) or (self.ligtRec_maxT[0] != LIGHTTHR_MACT) or (self.shit_SPix[0] != SHIT_SPIX)):
-            if ((self.ColorFilterActive[0] == False) and (self.LightRecalcActive[0] == False) and (self.ShiTPropActive[0] == False)):
-                return True
-            else:
+        elif ((self.ColorFilterActive[0] == True) or (self.LightRecalcActive[0] == True) or (self.ShiTPropActive[0] == True)):
                 return False
         else:
-            return False
+            return True
 
     def openFile(self):
         root = tk.Tk()
@@ -410,7 +397,6 @@ class cvGui():
         if (self.cap.isOpened()):
             todoPiola, self.source = self.cap.read()
             self.source = self.rescale_frame_standar(self.source, 720)
-            self.sourceWithoutChange = self.source
 
             #VER SI DEBERÍA HABER ALGÚN UPDATE AL BACK END
 
@@ -433,7 +419,6 @@ class cvGui():
         todoPiola, self.source = self.cap.read()
         if todoPiola:
             self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
-            self.sourceWithoutChange = self.source
 
             if self.checkParametersChange():
                 pass
