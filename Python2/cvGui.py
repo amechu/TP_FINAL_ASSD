@@ -432,6 +432,7 @@ class cvGui():
         todoPiola, self.source = self.cap.read()
         if todoPiola:
             self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+            self.sourceWithoutChange = self.source
 
             if self.checkParametersChange():
                 pass
