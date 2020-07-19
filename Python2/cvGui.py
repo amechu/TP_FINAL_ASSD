@@ -68,6 +68,7 @@ class cvGui():
         #Frames
         self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
         self.source = []
+        self.sourceWithoutChange = []
 
         #Source names    
         self.VideoLoaded = "None"
@@ -176,6 +177,8 @@ class cvGui():
                     if(self.initSource()):                                                                #Chequear si se inicia bien
                         self.VideoLoaded = self.videoPath
                         self.CurrentSource = "Video Loaded: " + self.videoName
+                        self.boolTracker.clear()
+                        self.trackers.clear()
                     else:
                         self.usingCamera = False
                         self.usingVideo = False
@@ -200,7 +203,7 @@ class cvGui():
             #Settings Buttons 
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
                 if len(self.trackers) < MAX_TRACKERS:
-                    bBox = cv.selectROI('Select New Area', self.source)
+                    bBox = cv.selectROI('Select New Area', self.sourceWithoutChange)
                     cv.destroyWindow('Select New Area')
                     self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3]))
 
@@ -227,7 +230,7 @@ class cvGui():
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No trackers added. Try selecting a new area!")
             elif a == 1:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x79d85, "Using 1 tracker of 5!")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x79d805, "Using 1 tracker of 5!")
             elif a == 2:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xa0d805, "Using 2 trackers of 5!")
             elif a == 3:
@@ -330,7 +333,7 @@ class cvGui():
                     else:
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                 else:
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.sourceWithoutChange
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -406,6 +409,7 @@ class cvGui():
         if (self.cap.isOpened()):
             todoPiola, self.source = self.cap.read()
             self.source = self.rescale_frame_standar(self.source, 720)
+            self.sourceWithoutChange = self.source
 
             #VER SI DEBERÍA HABER ALGÚN UPDATE AL BACK END
 
