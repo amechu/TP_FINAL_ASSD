@@ -28,8 +28,11 @@ class Tracker:
                                     #Por ejemplo: [[[x1 y1]]\n\n [[x2 y2]]\n\n [[x3 y3]]]
                                     #es decir una matriz de x filas y 1 columna, donde cada elemento
                                     #de la unica columna es una coordenada [x y].
-        self.features, self.trackingError = self.ST.recalculateFeatures(cv.cvtColor(frame, cv.COLOR_BGR2GRAY)[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
+        self.prevFrameGray=cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        self.features, self.trackingError = self.ST.recalculateFeatures(self.prevFrameGray[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
         self.featureTranslate(initialPosition[0]-initialWidth/2, initialPosition[1]-initialHeight/2)
+        self.LK.prevFeatures=self.features
+
 
     def featureTranslate(self,x, y):
         if self.features is None:
@@ -65,32 +68,29 @@ class Tracker:
                 self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
         else:
             #Apply LK algorithm
-            if self.prevFrameGray is not None :
-                self.features, self.trackingError = self.LK.updateFeatures(self.prevFrameGray, frameGray)
-                if self.trackingError is False: #Tracking error?
-                    #recaulculate features?
-                    if self.frameCounter != 0 and self.frameCounter % self.ST.frameRecalculationNumber == 0:
-                        #yes
-                        medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
-                        std = np.sqrt((np.std(self.features[:, 0, 0]))**2 + (np.std(self.features[:, 0, 1]))**2)
-                        #calculate mean and std of features
-                        mask = (self.features[:, 0, 0] < medx + self.stdMultiplier * std) & (self.features[:, 0, 0] > medx - self.stdMultiplier * std) & (
-                                self.features[:, 0, 1] < medy + self.stdMultiplier * std) & (self.features[:, 0, 1] > medy - self.stdMultiplier * std)
-                        self.features = self.features[mask]
-                        #remove outliers.
-                        mux, muy = np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
-                        self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[muy - self.selectionHeight / 2: muy + self.selectionHeight / 2,mux - self.selectionWidth / 2: mux + self.selectionWidth / 2])
-                        self.featureTranslate(mux- self.selectionWidth / 2, muy - self.selectionHeight / 2)
-                        #apply st algorithm
+            self.features, self.trackingError = self.LK.updateFeatures(self.prevFrameGray, frameGray)
+            if self.trackingError is False: #Tracking error?
+                #recaulculate features?
+                if self.frameCounter != 0 and self.frameCounter % self.ST.frameRecalculationNumber == 0:
+                    #yes
+                    medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+                    std = np.sqrt((np.std(self.features[:, 0, 0]))**2 + (np.std(self.features[:, 0, 1]))**2)
+                    #calculate mean and std of features
+                    mask = (self.features[:, 0, 0] < medx + self.stdMultiplier * std) & (self.features[:, 0, 0] > medx - self.stdMultiplier * std) & (
+                            self.features[:, 0, 1] < medy + self.stdMultiplier * std) & (self.features[:, 0, 1] > medy - self.stdMultiplier * std)
+                    self.features = self.features[mask]
+                    #remove outliers.
+                    mux, muy = np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
+                    self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(muy - self.selectionHeight / 2): int(muy + self.selectionHeight / 2),int(mux - self.selectionWidth / 2): int(mux + self.selectionWidth / 2)])
+                    self.featureTranslate(mux- self.selectionWidth / 2, muy - self.selectionHeight / 2)
+                    #apply st algorithm
 
-                        if self.trackingError is False:#did i found features?
-                            #found, then KM correct.
-                            self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
-                        #else would be Features not found.
-                    else:#NO, then kalman correct estimate.
+                    if self.trackingError is False:#did i found features?
+                        #found, then KM correct.
                         self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
-            else:
-                self.prevFrameGray = frameGray
+                    #else would be Features not found.
+                else:#NO, then kalman correct estimate.
+                    self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
 # Recalculate features?
 #           else would be tracking error true
 

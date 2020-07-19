@@ -2,11 +2,11 @@ import cv2 as cv
 
 
 class ShiTomasi:
-    maxcorners=1000
+    maxcorners=5
     qLevel=0.00000001
     minDist = 10
     blockSize_ = 10
-    frameRecalculationNumber = 20
+    frameRecalculationNumber = 200
     searchEnlargementThreshold = 4
 
     feature_params = dict(maxCorners=maxcorners,  # Maxima cantidad de features
