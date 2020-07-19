@@ -208,7 +208,8 @@ class cvGui():
                 if len(self.trackers) < MAX_TRACKERS:
                     bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.source)
                     cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
-                    self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
+                    if not ((bBox[0] == 0) or (bBox[1] == 0) or (bBox[2] == 0) or (bBox[3] == 0)):
+                        self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
 
             a = len(self.trackers)
 
