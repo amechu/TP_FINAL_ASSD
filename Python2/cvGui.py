@@ -150,6 +150,9 @@ class cvGui():
         self.parameters = []
         self.parametersNew = []
 
+        self.boolVideoLoaded = False
+        self.arrayVideoLoaded = []
+
     def onWork(self):
 
         while True:
@@ -157,7 +160,6 @@ class cvGui():
             self.updateParameters()
 
             self.frame[:] = (49, 52, 49)
-            #self.source[:] = (49, 52, 49)
 
             # FRAMES
             cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")  # Video Source Frame
@@ -398,6 +400,12 @@ class cvGui():
                 if not self.pause:
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+                    elif self.boolVideoLoaded:
+                        if len(self.arrayVideoLoaded) == 0:
+                            self.boolVideoLoaded = False
+                        else:
+                            self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT,self.sourceX:self.sourceX + self.sourceWIDTH] = self.arrayVideoLoaded[0]
+                            del self.arrayVideoLoaded[0]
                     else:
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                 else:
@@ -481,11 +489,15 @@ class cvGui():
             if todoPiola:
 
                 if int(self.source.shape[1]) > STANDAR_WIDTH:
-                    self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+                    if(self.usingVideo):
+                        self.boolVideoLoaded = True
+                        self.loadFullVideo()
+                    else:
+                        self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
                 else:
                     self.sourceWIDTH = int(self.source.shape[1])
                     self.sourceHEIGHT = int(self.source.shape[0])
-    
+
                 #VER SI DEBERÍA HABER ALGÚN UPDATE AL BACK END
 
                 a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
@@ -624,9 +636,40 @@ class cvGui():
 
         return False
 
+    def loadFullVideo(self):
+        # WINDOW_NAME_LOADING = 'Loading'
+        # cvui.init(WINDOW_NAME_LOADING)
+        # frame = np.zeros((200, 500, 3), np.uint8)
+        # loading = [0]
+
+        todoPiola, someCrazyShit = self.cap.read()
+
+        while todoPiola:
+            # Clear the frame.
+            # frame[:] = (49, 52, 49)
+            #
+            # cvui.text(frame, 175, 50, 'Loading. Please Wait.')
+            # cvui.trackbar(frame, 100, 100, 300, loading, 0.0, 1000, 1, "%1.Lf",
+            #              cvui.TRACKBAR_HIDE_STEP_SCALE | cvui.TRACKBAR_HIDE_LABELS)
+
+            someCrazyShit = self.rescale_frame_standar(someCrazyShit, STANDAR_WIDTH)
+            self.arrayVideoLoaded.append(someCrazyShit)
+            todoPiola, someCrazyShit = self.cap.read()
+
+            # loading[0] = loading[0] + 1
+
+            # cvui.imshow(WINDOW_NAME_LOADING, frame)
+
+        # cv.destroyWindow(WINDOW_NAME_LOADING)
+
+        self.sourceWIDTH = int(self.arrayVideoLoaded[0].shape[1])
+        self.sourceHEIGHT = int(self.arrayVideoLoaded[0].shape[0])
+
 def main():
     myGui = cvGui()
     myGui.onWork()
+
+
 
 
 if __name__ == '__main__':
