@@ -201,9 +201,12 @@ class cvGui():
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
 
                 if len(self.trackers) < MAX_TRACKERS:
-                    bBox = cv.selectROI('Select New Area', self.sourceWithoutChange)
-                    cv.destroyWindow('Select New Area')
-                    self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
+                    bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.sourceWithoutChange)
+                    cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
+                    if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', cv.WND_PROP_VISIBLE))):
+                        pass
+                    else:
+                        self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
 
             a = len(self.trackers)
 
