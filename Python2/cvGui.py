@@ -487,7 +487,10 @@ class cvGui():
 
     def initSource(self):
         self.source = []
+        self.arrayVideoLoaded.clear()
         self.source[:] = (49, 52, 49)
+        self.boolVideoLoaded = False
+
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
         else:
@@ -497,18 +500,15 @@ class cvGui():
             todoPiola, self.source = self.cap.read()
 
             if todoPiola:
-
-                if int(self.source.shape[1]) > STANDAR_WIDTH:
-                    if(self.usingVideo):
-                        self.boolVideoLoaded = True
-                        self.loadFullVideo()
-                    else:
-                        self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+                if self.usingVideo:
+                    self.boolVideoLoaded = True
+                    self.loadFullVideo()
                 else:
-                    self.sourceWIDTH = int(self.source.shape[1])
-                    self.sourceHEIGHT = int(self.source.shape[0])
-
-                #VER SI DEBERÍA HABER ALGÚN UPDATE AL BACK END
+                    if not int(self.source.shape[1]) > STANDAR_WIDTH:
+                       self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+                    else:
+                        self.sourceWIDTH = int(self.source.shape[1])
+                        self.sourceHEIGHT = int(self.source.shape[0])
 
                 a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
                 b = a + WINDOW_SOU_WIDTH
