@@ -22,6 +22,9 @@ class OpticalFlow:
 
             if np.any(status):  # Se verifica si se perdio al objeto
                 error = False
+                good_new = features[status == 1]
+                features = good_new.reshape(-1, 1, 2)
+                self.prevFeatures=features
             else:
                 error = True
                 features = None
