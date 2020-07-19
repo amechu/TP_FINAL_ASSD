@@ -21,15 +21,15 @@ class OpticalFlow:
             features, status, error  = cv.calcOpticalFlowPyrLK(prevFrameGray, frameGray, self.prevFeatures, None, **self.lk_params)
 
             if np.any(status):  # Se verifica si se perdio al objeto
-                error = False
+                trackerror = False
                 good_new = features[status == 1]
                 features = good_new.reshape(-1, 1, 2)
                 self.prevFeatures=features
             else:
-                error = True
+                trackerror = True
                 features = None
                 self.prevFeatures = None
         else:
-            error = True
+            trackerror = True
             features = None
-        return features, error
+        return features, trackerror
