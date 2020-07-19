@@ -78,13 +78,13 @@ class Tracker:
                     medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
                     std = np.sqrt((np.std(self.features[:, 0, 0]))**2 + (np.std(self.features[:, 0, 1]))**2)
                     #calculate mean and std of features
-                    mask = (self.features[:, 0, 0] < medx + self.stdMultiplier * std) & (self.features[:, 0, 0] > medx - self.stdMultiplier * std) & (
-                            self.features[:, 0, 1] < medy + self.stdMultiplier * std) & (self.features[:, 0, 1] > medy - self.stdMultiplier * std)
+                    mask = (self.features[:, 0, 0] < medx + self.stdMultiplier * std + 0.1) & (self.features[:, 0, 0] > medx - self.stdMultiplier * std - 0.1) & (
+                            self.features[:, 0, 1] < medy + self.stdMultiplier * std + 0.1) & (self.features[:, 0, 1] > medy - self.stdMultiplier * std - 0.1)
                     self.features = self.features[mask]
                     #remove outliers.
-                    mux, muy = np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
-                    self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(muy - self.selectionHeight / 2): int(muy + self.selectionHeight / 2),int(mux - self.selectionWidth / 2): int(mux + self.selectionWidth / 2)])
-                    self.features = self.featureTranslate(mux- self.selectionWidth / 2, muy - self.selectionHeight / 2, self.features)
+                    medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+                    self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(medy - self.selectionHeight / 2): int(medy + self.selectionHeight / 2),int(medx - self.selectionWidth / 2): int(medx + self.selectionWidth / 2)])
+                    self.features = self.featureTranslate(medx- self.selectionWidth / 2, medy - self.selectionHeight / 2, self.features)
                     self.LK.prevFeatures = self.features
                     #apply st algorithm
 
