@@ -137,8 +137,6 @@ class cvGui():
 
         self.parameters = []
 
-        self.boolTracker = []
-
 
     def onWork(self):
 
@@ -177,7 +175,6 @@ class cvGui():
                     if(self.initSource()):                                                                #Chequear si se inicia bien
                         self.VideoLoaded = self.videoPath
                         self.CurrentSource = "Video Loaded: " + self.videoName
-                        self.boolTracker.clear()
                         self.trackers.clear()
                     else:
                         self.usingCamera = False
@@ -204,27 +201,23 @@ class cvGui():
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
 
                 if len(self.trackers) < MAX_TRACKERS:
-                    bBox = cv.selectROI('Select New Area', self.source)
+                    bBox = cv.selectROI('Select New Area', self.sourceWithoutChange)
                     cv.destroyWindow('Select New Area')
                     self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
 
             a = len(self.trackers)
-            b = len(self.boolTracker)
 
-            if b < a:
-                for i in range(a-b):
-                    self.boolTracker.append([False])
+
 
             for i in range(a):
-                xCh = WINDOW_TRK_X + 5 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
-                yCh = WINDOW_TRK_Y + 50
+                xTx = WINDOW_TRK_X + 15 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
+                yTx = WINDOW_TRK_Y + 60
                 xB = WINDOW_TRK_X + 10 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
                 yB = WINDOW_TRK_Y + 80
 
-                if (cvui.checkbox(self.frame, xCh, yCh, "Tracker Number " + str(i+1), self.boolTracker[i])):
-                    self.boolTracker[i][0] = True
+                cvui.printf(self.frame, xTx, yTx, 0.4, 0xdd97fb,"Tracker Number " + str(i+1))
                 if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
-                    del self.boolTracker[i]
+
                     del self.trackers[i]
                     break
 
