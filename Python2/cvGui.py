@@ -193,7 +193,7 @@ class cvGui():
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
                 bBox = cv.selectROI('Select New Area', self.source)
                 cv.destroyWindow('Select New Area')
-                self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3]))
+                self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
 
                 #VERIFICAR GUI TRACKER
 
@@ -394,8 +394,9 @@ class cvGui():
                 tracker.update(self.source)
 
             for tracker in self.trackers:
-                self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.searchHeight, (165, 3, 129))
-
+                if tracker.trackingError is False:
+                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.searchHeight, (165, 3, 129))
+                    self.source = Artist.Artist.features(self.source,tracker.features)
         return todoPiola
 
     def rescale_frame_standar(self, frame, maxWidth):
