@@ -139,6 +139,7 @@ class cvGui():
                                         0x972AF1,
                                         0xF12A33]
         self.parameters = []
+        self.parametersNew = []
 
 
     def onWork(self):
@@ -348,8 +349,8 @@ class cvGui():
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
                 self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
                 self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
-                self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == False) and (self.CFLRPropOnOff[0] == False) and (
-                self.ShiTPropOnOff[0] == False):
+                self.shit_SPix[0] == SHIT_SPIX) and (self.ColorFilterActive[0] == False) and (self.LightRecalcActive[0] == False) and (
+                self.ShiTPropActive[0] == False):
             return True
         else:
             return False
@@ -451,6 +452,7 @@ class cvGui():
         self.parameters.append(self.kalman_ptm[0])
         self.parameters.append(self.kalman_pc[0])
         self.parameters.append(self.kalman_mc[0])
+
         self.parameters.append(self.lk_mr[0])
 
         self.parameters.append(self.ColorFilterActive[0])
@@ -471,33 +473,32 @@ class cvGui():
         self.parameters.append(self.shit_SPix[0])
 
     def checkParametersChange(self):
-        tuvi = []
+        self.parametersNew.clear()
 
-        tuvi.clear()
+        self.parametersNew.append(self.kalman_ptm[0])
+        self.parametersNew.append(self.kalman_pc[0])
+        self.parametersNew.append(self.kalman_mc[0])
 
-        tuvi.append(self.kalman_ptm[0])
-        tuvi.append(self.kalman_pc[0])
-        tuvi.append(self.kalman_mc[0])
-        tuvi.append(self.lk_mr[0])
+        self.parametersNew.append(self.lk_mr[0])
 
-        tuvi.append(self.ColorFilterActive[0])
-        tuvi.append(self.LightRecalcActive[0])
+        self.parametersNew.append(self.ColorFilterActive[0])
+        self.parametersNew.append(self.LightRecalcActive[0])
 
-        tuvi.append(self.colorFilter_LihtThr[0])
-        tuvi.append(self.colorFilter_a[0])
-        tuvi.append(self.colorFilter_b[0])
-        tuvi.append(self.ligtRec_x[0])
-        tuvi.append(self.ligtRec_maxT[0])
+        self.parametersNew.append(self.colorFilter_LihtThr[0])
+        self.parametersNew.append(self.colorFilter_a[0])
+        self.parametersNew.append(self.colorFilter_b[0])
+        self.parametersNew.append(self.ligtRec_x[0])
+        self.parametersNew.append(self.ligtRec_maxT[0])
 
-        tuvi.append(self.ShiTPropActive[0])
+        self.parametersNew.append(self.ShiTPropActive[0])
 
-        tuvi.append(self.shit_MaxFeat[0])
-        tuvi.append(self.shit_FeatQual[0])
-        tuvi.append(self.shit_MinFeat[0])
-        tuvi.append(self.shit_Rec[0])
-        tuvi.append(self.shit_SPix[0])
+        self.parametersNew.append(self.shit_MaxFeat[0])
+        self.parametersNew.append(self.shit_FeatQual[0])
+        self.parametersNew.append(self.shit_MinFeat[0])
+        self.parametersNew.append(self.shit_Rec[0])
+        self.parametersNew.append(self.shit_SPix[0])
 
-        if tuvi == self.parameters:
+        if self.parametersNew == self.parameters:
             return False
         else:
             return True
