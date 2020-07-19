@@ -6,13 +6,13 @@ class Artist:
     def estimate(frame, x, y, width, height, color): #color (255, 255, 255)
 
         cv.rectangle(frame, (int(x - (width / 2)), int(y - (height / 2))),
-                     (int(x + (width / 2)), int(y + (height / 2))), color, 4)
+                     (int(x + (width / 2)), int(y + (height / 2))), color, 2)
         return frame
 
     @staticmethod
     def features(frame, features, color):
         for i in range(np.shape(features)[0]):
-            cv.circle(frame, (features[i,0,0], features[i, 0, 1]), 3, color, -1)
+            cv.circle(frame, (features[i,0,0], features[i, 0, 1]), 2, color, -1)
         return frame
 
     @staticmethod
@@ -25,7 +25,7 @@ class Artist:
     @staticmethod
     def searchArea(frame, x, y, width, height, color):
         cv.rectangle(frame, (int(x - (width / 2)), int(y - (height / 2))),
-                     (int(x + (width / 2)), int(y + (height / 2))), color, 4)
+                     (int(x + (width / 2)), int(y + (height / 2))), color, 1)
         return frame
 
     @staticmethod
