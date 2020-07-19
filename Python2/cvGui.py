@@ -503,11 +503,11 @@ class cvGui():
                     self.boolVideoLoaded = True
                     self.loadFullVideo()
                 else:
-                    #if not int(self.source.shape[1]) > STANDAR_WIDTH:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
 
-                    #self.sourceWIDTH = int(self.source.shape[1])
-                    #self.sourceHEIGHT = int(self.source.shape[0])
+                if not self.boolVideoLoaded:
+                    self.sourceWIDTH = int(self.source.shape[1])
+                    self.sourceHEIGHT = int(self.source.shape[0])
 
                 a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
                 b = a + WINDOW_SOU_WIDTH
@@ -519,7 +519,6 @@ class cvGui():
                 c = (b+a)/2
                 self.sourceY = int(c - self.sourceHEIGHT/2)
                 return True
-
         return False
 
     def callSource(self):
