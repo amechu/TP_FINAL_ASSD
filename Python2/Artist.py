@@ -5,8 +5,9 @@ class Artist:
     @staticmethod
     def estimate(frame, x, y, width, height, color): #color (255, 255, 255)
 
-        cv.rectangle(frame, (int(x - (width / 2)), int(y - (height / 2))),
-                     (int(x + (width / 2)), int(y + (height / 2))), color, 2)
+        #cv.rectangle(frame, (int(x - (width / 2)), int(y - (height / 2))),
+                     #(int(x + (width / 2)), int(y + (height / 2))), color, 2)
+        cv.circle(frame, (int(x), int(y)), np.max([int(height/2), int(width/2)]), color, 2)
         return frame
 
     @staticmethod
@@ -16,10 +17,14 @@ class Artist:
         return frame
 
     @staticmethod
-    def trajectory(frame, pointArray):
-
+    def trajectory(frame, pointArray, color):
+        #pointArray = pointArray[-99:] #descomentar esto para que la linea dure como maximo 99 frames
         for i in range(np.shape(pointArray)[0]): #[[x y],[x y],[x y]]
-            cv.circle(frame, pointArray[i], 3, (0, 0, 255), -1)
+            if i is 0:
+                cv.circle(frame, pointArray[i], 4, color, -1)
+            else:
+                cv.line(frame, pointArray[i-1], pointArray[i], color, 1)
+            #cv.circle(frame, pointArray[i], 3, color, -1)
         return frame
 
     @staticmethod
