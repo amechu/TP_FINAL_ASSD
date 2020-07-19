@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import filedialog
 import Tracker
 import Artist
+import MaskingFilter
 
 WINDOW_NAME = "MAGT Video Tracker"
 
@@ -55,7 +56,7 @@ WINDOW_SOU_HEIGHT = WINDOW_SET_Y + 605 - WINDOW_SOU_Y #STANDAR_WIDTH
 WINDOW_FIL_X = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X
 WINDOW_FIL_Y = WINDOW_VS_Y
 WINDOW_FIL_WIDTH = X_SCREEN - WINDOW_FIL_X - WINDOW_SET_X
-WINDOW_FIL_HEIGHT = WINDOW_SOU_HEIGHT
+WINDOW_FIL_HEIGHT = Y_SCREEN - WINDOW_FIL_Y - WINDOW_VS_Y#WINDOW_SOU_HEIGHT
 
 WINDOW_TRK_X = WINDOW_SOU_X
 WINDOW_TRK_Y = WINDOW_SOU_WIDTH + 2*WINDOW_VS_Y
@@ -137,10 +138,13 @@ class cvGui():
         cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
 
+        #cv.namedWindow('Source', cv.WINDOW_NORMAL)
+        #cvui.init('Source')
+
         #Filter Edit
-        self.ColorFilter = [True]
-        self.CamShiftFilter = [True]
-        self.CorrFilter = [True]
+        self.ColorFilter = [False]
+        self.CamShiftFilter = [False]
+        self.CorrFilter = [False]
 
         self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
         self.parameters = []
@@ -153,6 +157,7 @@ class cvGui():
             self.updateParameters()
 
             self.frame[:] = (49, 52, 49)
+            #self.source[:] = (49, 52, 49)
 
             # FRAMES
             cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")  # Video Source Frame
@@ -347,12 +352,49 @@ class cvGui():
 
             #Filters: Correlation, Cam shift, Color
 
-            cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 30, "Color Filter", self.ColorFilter)
-            cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 60, "Cam Shift", self.CamShiftFilter)
-            cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 90, "Correlation Filter", self.CorrFilter)
+            # cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_FIL_Y + 115, WINDOW_FIL_WIDTH - 10, WINDOW_FIL_WIDTH - 50, 0x5c585a, 0x242223)
+            if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 30, "Color Filter", self.ColorFilter) :
+                self.CamShiftFilter[0] = False
+                self.CorrFilter[0] = False
+                # if (self.usingVideo or self.usingCamera):
+                #     toShow = self.source
+                #     toShow = self.rescale_frame_standar(toShow, WINDOW_FIL_WIDTH - 15)
+                #     x0 = WINDOW_FIL_X + 7
+                #     x1 = x0 + int(toShow.shape[1])
+                #     y0 = WINDOW_FIL_Y + 130
+                #     y1 = y0 + int(toShow.shape[0])
+                #     self.frame[y0:y1, x0:x1] = toShow
 
 
-            if (self.usingCamera) or (self.usingVideo):
+            if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 60, "Cam Shift", self.CamShiftFilter) :
+                self.ColorFilter[0] = False
+                self.CorrFilter[0] = False
+                # if (self.usingVideo or self.usingCamera):
+                #     toShow = self.source
+                #     toShow = self.rescale_frame_standar(toShow, WINDOW_FIL_WIDTH - 15)
+                #     x0 = WINDOW_FIL_X + 7
+                #     x1 = x0 + int(toShow.shape[1])
+                #     y0 = WINDOW_FIL_Y + 130
+                #     y1 = y0 + int(toShow.shape[0])
+                #     self.frame[y0:y1, x0:x1] = toShow
+
+
+            if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 90, "Correlation Filter", self.CorrFilter) :
+                self.CamShiftFilter[0] = False
+                self.ColorFilter[0] = False
+                # if (self.usingVideo or self.usingCamera):
+                #     toShow = self.source
+                #     toShow = self.rescale_frame_standar(toShow, WINDOW_FIL_WIDTH - 15)
+                #     x0 = WINDOW_FIL_X + 7
+                #     x1 = x0 + int(toShow.shape[1])
+                #     y0 = WINDOW_FIL_Y + 130
+                #     y1 = y0 + int(toShow.shape[0])
+                #     self.frame[y0:y1, x0:x1] = toShow
+
+
+
+            cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 40, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 80, 0x5c585a, 0x242223)
+            if ((self.usingCamera) or (self.usingVideo)):
                 if not self.pause:
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
@@ -360,6 +402,7 @@ class cvGui():
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                 else:
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -426,7 +469,7 @@ class cvGui():
 
 
     def initSource(self):
-        #self.source[:] = (49, 52, 49)
+        self.source[:] = (49, 52, 49)
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
         else:
@@ -434,17 +477,22 @@ class cvGui():
 
         if (self.cap.isOpened()):
             todoPiola, self.source = self.cap.read()
-            self.source = self.rescale_frame_standar(self.source, 720)
-
-            #VER SI DEBERÍA HABER ALGÚN UPDATE AL BACK END
 
             if todoPiola:
-                self.sourceHEIGHT = len(self.source[:, 0])
-                self.sourceWIDTH = len(self.source[0, :])
+
+                if int(self.source.shape[1]) > STANDAR_WIDTH:
+                    self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+                else:
+                    self.sourceWIDTH = int(self.source.shape[1])
+                    self.sourceHEIGHT = int(self.source.shape[0])
+    
+                #VER SI DEBERÍA HABER ALGÚN UPDATE AL BACK END
+
                 a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
                 b = a + WINDOW_SOU_WIDTH
                 c = (b+a)/2
                 self.sourceX = int(c - self.sourceWIDTH/2)
+
                 a = WINDOW_SOU_Y
                 b = WINDOW_SOU_Y + WINDOW_SOU_HEIGHT
                 c = (b+a)/2
@@ -456,17 +504,22 @@ class cvGui():
     def callSource(self):
         todoPiola, self.source = self.cap.read()
         if todoPiola:
-            self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+            if int(self.source.shape[1]) > STANDAR_WIDTH:
+                self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+            else:
+                self.sourceWIDTH = int(self.source.shape[1])
+                self.sourceHEIGHT = int(self.source.shape[0])
 
             if self.checkParametersChange():
                 pass
-                #for tracker in self.trackers:
-                    #tracker.changeSettings(self.parametersNew)
+      #          for tracker in self.trackers:
+       #             tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)
             i = 0
             for tracker in self.trackers:
+#                    [b,g,r] = tracker.MF.bgrmask
                 r = (self.trackerColors[i] >> 16) & 0xff
                 g = (self.trackerColors[i] >> 8) & 0xff
                 b = self.trackerColors[i] & 0xff

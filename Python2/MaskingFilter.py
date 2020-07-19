@@ -26,7 +26,7 @@ class MaskingFilter:
         #CIE LAB INIT
         self.lowerThreshold = 0
         self.upperThreshold = 0
-
+        self.bgrmask =[0,0,0]
         #CAMSHIFT INIT
 
         #CORRELATION INIT
@@ -38,6 +38,7 @@ class MaskingFilter:
 
             medb, medg, medr = np.median(selection[:, :, 0]), np.median(selection[:, :, 1]), np.median(selection[:, :, 2])
             bgr_mask = np.uint8([[[medb, medg, medr]]])
+            self.bgrmask = [medb, medg, medr]
             lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
 
             if self.init is True:
