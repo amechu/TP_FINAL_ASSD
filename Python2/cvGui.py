@@ -213,9 +213,9 @@ class cvGui():
 
             for i in range(a):
                 xCh = WINDOW_TRK_X + 5 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
-                yCh = WINDOW_TRK_Y + 40
+                yCh = WINDOW_TRK_Y + 50
                 xB = WINDOW_TRK_X + 10 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
-                yB = WINDOW_TRK_Y + 70
+                yB = WINDOW_TRK_Y + 80
 
                 if (cvui.checkbox(self.frame, xCh, yCh, "Tracker Number " + str(i+1), self.boolTracker[i])):
                     self.boolTracker[i][0] = True
@@ -223,6 +223,21 @@ class cvGui():
                     del self.boolTracker[i]
                     del self.trackers[i]
                     break
+
+            if a == 0:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No trackers added. Try selecting a new area!")
+            elif a == 1:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x79d85, "Using 1 tracker of 5!")
+            elif a == 2:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xa0d805, "Using 2 trackers of 5!")
+            elif a == 3:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xcfd805, "Using 3 trackers of 5!")
+            elif a == 4:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdcce10, "Using 4 trackers of 5!")
+            else:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 trackers of 5! No more trackers can be added. Try deleting one.")
+
+
 
             if (cvui.button(self.frame, 20, 215, "Pause Source")):
                 self.pause = not self.pause
