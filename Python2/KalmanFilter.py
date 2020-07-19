@@ -28,7 +28,6 @@ class KalmanFilter:
         self.kalman.statePost = np.array([0., 0., 0., 0.]).reshape(4, 1)  # Matriz de estado inicial
 
 
-
     def predict(self):
         self.kalman.predict()
 
@@ -37,6 +36,19 @@ class KalmanFilter:
 
     def setStatePost(self, statePost_):
         self.kalman.statePost = statePost_
+
+    def updateParams(self):
+        self.kalman.processNoiseCov = self.PROCESS_COV * np.identity(4)  # Matriz Q
+
+        self.kalman.measurementNoiseCov = self.MEAS_NOISE_COV * np.identity(2)  # Matriz R
+
+        self.kalman.transitionMatrix = np.array([[1., 0., self.dt, 0.],
+                                                 [0., 1., 0., self.dt],
+                                                 [0., 0., 1., 0.],
+                                                 [0., 0., 0., 1.]])  # Matriz A
+
+
+
 
     @property
     def statePost(self):

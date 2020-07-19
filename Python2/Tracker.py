@@ -99,7 +99,32 @@ class Tracker:
         self.prevFrameGray = frameGray
 
 
+    def changeSettings(self, parametersNew):
 
+        self.KM.dt = parametersNew[0]                 #kalman_ptm
+        self.KM.PROCESS_COV = parametersNew[1]        #kalman_pc
+        self.KM.MEAS_NOISE_COV = parametersNew[2]     #kalman_mc
+
+        self.LK.lkMaxLevel = parametersNew[3]           #lk_mr
+
+        #parametersNew[4]              #ColorFilterActive
+        #ColorFilter.ColorFilter.LIG_THR_CHANGE = parametersNew[6]  #colorFilter_LihtThr
+        #ColorFilter.ColorFilter.
+        #parametersNew[7]  # .append(self.colorFilter_a[0])
+        #parametersNew[8]  # .append(self.colorFilter_b[0])
+
+        #parametersNew[5]    #.append(self.LightRecalcActive[0])
+        #parametersNew[9]    #.append(self.ligtRec_x[0])
+        #parametersNew[10]   #.append(self.ligtRec_maxT[0])
+
+        self.ST.maxcorners = parametersNew[12]                       #shit_MaxFeat
+        self.ST.qLevel = parametersNew[13]                           #shit_FeatQual
+        self.ST.minDist = parametersNew[14]                          #shit_MinFeat
+        self.ST.searchEnlargementThreshold = parametersNew[15]       #shit_Rec
+        # parametersNew[11]   #.ShiTPropActive
+        self.ST.frameRecalculationNumber = parametersNew[16]        #shit_SPix[0]
+
+        self.KM.updateParams()
 
 
     def enlargeSearchArea(self):

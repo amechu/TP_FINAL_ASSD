@@ -136,7 +136,7 @@ class cvGui():
         self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
         self.parameters = []
         self.parametersNew = []
-        
+
     def onWork(self):
 
         while True:
@@ -247,7 +247,7 @@ class cvGui():
                 cvui.trackbar(self.frame, 20, 415, 210, self.kalman_ptm, 0.0, 2.0)
 
                 cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Process Covariance")
-                cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 1.0)
+                cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 1.0)                       #Ver como poner más presición en la barra
 
                 cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Measurement Covariance")
                 cvui.trackbar(self.frame, 20, 555, 210, self.kalman_mc, 0.0, 1.0)
@@ -287,7 +287,7 @@ class cvGui():
                 self.CFProp[0] = False
                 
                 cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Feature Quantity")
-                cvui.trackbar(self.frame, 20, 415, 210, self.shit_MaxFeat, 1.0, 1000.0)
+                cvui.trackbar(self.frame, 20, 415, 210, self.shit_MaxFeat, 1, 100)         #, theDiscreteStep=1                       #Ver como poner paso discreto
 
                 cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Feature Quality Level")
                 cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.0, 1.0)
@@ -299,7 +299,7 @@ class cvGui():
                 cvui.trackbar(self.frame, 20, 625, 210, self.shit_SPix, 0.0, 10.0)
                 
                 if (cvui.checkbox(self.frame, 20, 670, "Feature Recalculation", self.ShiTPropOnOff)):
-                    cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Every X Frames")
+                    cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Recalculation Number")
                     cvui.trackbar(self.frame, 20, 705, 210, self.shit_Rec, 1.0, 100.0)
 
             #On / Off special parameters: CHECK WHEN CALLING CALLBACK
@@ -423,7 +423,7 @@ class cvGui():
             if self.checkParametersChange():
                 for tracker in self.trackers:
                     tracker.changeSettings(self.parametersNew)
-                pass
+
 
             for tracker in self.trackers:
                 tracker.update(self.source)
