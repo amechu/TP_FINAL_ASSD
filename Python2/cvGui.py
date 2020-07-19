@@ -166,9 +166,16 @@ class cvGui():
                 cvui.printf(self.frame, 20, 275, 0.4, 0xdd97fb, "Changes Saved!")
 
             if self.pause:
-                cvui.printf(self.frame, 20, 255, 0.4, 0xca380e, "Source Paused!")
-            else :
-                cvui.printf(self.frame, 20, 255, 0.4, 0x2db50c, "Source Playing!")
+                if (self.usingVideo or self.usingCamera):
+                    cvui.printf(self.frame, 20, 255, 0.4, 0xdc1076, "Source Paused!")
+                else:
+                    cvui.printf(self.frame, 20, 255, 0.4, 0xdc1076, "Source Will Be Paused.")
+            else:
+                if (self.usingVideo or self.usingCamera):
+                    cvui.printf(self.frame, 20, 255, 0.4, 0x10dca1, "Source Playing!")
+                else:
+                    cvui.printf(self.frame, 20, 255, 0.4, 0x10dca1, "Source Will Be Playing.")
+
 
             #Video Source Buttons
             if (cvui.button(self.frame, 20, 70, "Use Video")):
