@@ -12,22 +12,18 @@ class MaskingFilter:
     )
     mask = maskingType["FILTER_LAB"]
 
-    LSemiAmp = 0
-    aSemiAmp = 0
-    bSemiAmp = 0
+    LSemiAmp = 60
+    aSemiAmp = 20
+    bSemiAmp = 20
     CIELabRecalculationNumber = 1
 
     def __init__(self):
         self.mask = self.maskingType["FILTER_LAB"]
         self.filteredFrame = None
-
         #CIE LAB INIT
-        self.L = 0
-        self.a = 0
-        self.b = 0
-
         self.lowerThreshold = 0
         self.upperThreshold = 0
+        self.bgrmask =[0,0,0]
         #CAMSHIFT INIT
 
         #CORRELATION INIT
@@ -39,12 +35,11 @@ class MaskingFilter:
 
             medb, medg, medr = np.median(selection[:, :, 0]), np.median(selection[:, :, 1]), np.median(selection[:, :, 2])
             bgr_mask = np.uint8([[[medb, medg, medr]]])
+            self.bgrmask = [medb, medg, medr]
             lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
-
             L_low = np.clip(np.int32(lab_mask[0, 0, :])[0] - self.LSemiAmp, 1, 255)
             a_low = np.clip(np.int32(lab_mask[0, 0, :])[1] - self.aSemiAmp, 1, 255)
             b_low = np.clip(np.int32(lab_mask[0, 0, :])[2] - self.bSemiAmp, 1, 255)
-
             L_high = np.clip(np.int32(lab_mask[0, 0, :])[0] + self.LSemiAmp, 1, 255)
             a_high = np.clip(np.int32(lab_mask[0, 0, :])[1] + self.aSemiAmp, 1, 255)
             b_high = np.clip(np.int32(lab_mask[0, 0, :])[2] + self.bSemiAmp, 1, 255)
@@ -65,7 +60,6 @@ class MaskingFilter:
             frameLab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
             mask = cv.inRange(frameLab, self.lowerThreshold, self.upperThreshold)
             self.filteredFrame = cv.bitwise_and(frame, frame, mask=mask)
-
 
         elif self.mask is self.maskingType["FILTER_CSHIFT"]:
             pass

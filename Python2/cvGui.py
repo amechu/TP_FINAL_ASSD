@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import filedialog
 import Tracker
 import Artist
+import MaskingFilter
 
 WINDOW_NAME = "MAGT Video Tracker"
 
@@ -503,19 +504,22 @@ class cvGui():
 
             if self.checkParametersChange():
                 pass
-                #for tracker in self.trackers:
-                    #tracker.changeSettings(self.parametersNew)
+      #          for tracker in self.trackers:
+       #             tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)
             i = 0
             for tracker in self.trackers:
+#                    [b,g,r] = tracker.MF.bgrmask
+                r = (self.trackerColors[i] >> 16) & 0xff
+                g = (self.trackerColors[i] >> 8) & 0xff
+                b = self.trackerColors[i] & 0xff
                 if tracker.trackingError is False:
-                    r = (self.trackerColors[i] >> 16) & 0xff
-                    g = (self.trackerColors[i] >> 8) & 0xff
-                    b = self.trackerColors[i] & 0xff
                     self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                    self.source = Artist.Artist.features(self.source, tracker.features, (b, g, r))
+                    #self.source = Artist.Artist.features(self.source, tracker.features, (b, g, r))
+                else:
+                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.searchWidth, tracker.searchHeight, (b, g, r))
                 i +=1
         return todoPiola
 
