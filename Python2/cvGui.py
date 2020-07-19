@@ -504,8 +504,6 @@ class cvGui():
                     self.loadFullVideo()
                 else:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
-
-                if not self.boolVideoLoaded:
                     self.sourceWIDTH = int(self.source.shape[1])
                     self.sourceHEIGHT = int(self.source.shape[0])
 
@@ -529,7 +527,7 @@ class cvGui():
             todoPiola, self.source = self.cap.read()
 
         if todoPiola:
-            if int(self.source.shape[1]) > STANDAR_WIDTH:
+            if self.usingCamera: #int(self.source.shape[1]) > STANDAR_WIDTH:
                 self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
             else:
                 self.sourceWIDTH = int(self.source.shape[1])
