@@ -269,17 +269,17 @@ class cvGui():
                 self.LKProp[0] = False
                 self.ShiTProp[0] = False
                 
-                if (cvui.checkbox(self.frame, 20, 400, "Color Filter", self.CFPropOnOff)):
+                if (cvui.checkbox(self.frame, 20, 400, "CIE-Lab Filter", self.CFPropOnOff)):
                     self.CFLRPropOnOff[0] = False
                     self.CFCamShiftOnOff[0] = False
 
-                    cvui.printf(self.frame, 20, 480, 0.4, 0xdd97fb, "Lightness Threshold")
+                    cvui.printf(self.frame, 20, 480, 0.4, 0xdd97fb, "L Semi-amplitude")
                     cvui.trackbar(self.frame, 20, 495, 210, self.colorFilter_LihtThr, 0.0, 150.0)
 
-                    cvui.printf(self.frame, 20, 550, 0.4, 0xdd97fb, "A Threshold")
+                    cvui.printf(self.frame, 20, 550, 0.4, 0xdd97fb, "A Semi-amplitude")
                     cvui.trackbar(self.frame, 20, 565, 210, self.colorFilter_a, 0.0, 30.0)
 
-                    cvui.printf(self.frame, 20, 620, 0.4, 0xdd97fb, "B Threshold")
+                    cvui.printf(self.frame, 20, 620, 0.4, 0xdd97fb, "B Semi-amplitude")
                     cvui.trackbar(self.frame, 20, 635, 210, self.colorFilter_b, 0.0, 30.0)
                 
                 if (cvui.checkbox(self.frame, 20, 420, "Lightness Recalculation", self.CFLRPropOnOff)):
@@ -292,7 +292,7 @@ class cvGui():
                     cvui.printf(self.frame, 20, 550, 0.4, 0xdd97fb, "Maximum Threshold Change")
                     cvui.trackbar(self.frame, 20, 565, 210, self.ligtRec_maxT, 0.0, 30.0)
 
-                if (cvui.checkbox(self.frame, 20, 440, "Cam Shift", self.CFCamShiftOnOff)):
+                if (cvui.checkbox(self.frame, 20, 440, "Camshift Filter", self.CFCamShiftOnOff)):
                     self.CFPropOnOff[0] = False
                     self.CFLRPropOnOff[0] = False
 
