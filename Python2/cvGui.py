@@ -136,9 +136,11 @@ class cvGui():
         
         cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
+
         self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
         self.parameters = []
         self.parametersNew = []
+        self.updatedParams = []
 
     def onWork(self):
 
@@ -469,8 +471,6 @@ class cvGui():
     def updateParameters(self):
         self.parameters.clear()
 
-
-
         self.parameters.append(self.kalman_ptm[0])
         self.parameters.append(self.kalman_pc[0])
         self.parameters.append(self.kalman_mc[0])
@@ -523,6 +523,34 @@ class cvGui():
             return False
         else:
             return True
+
+    def prepareUpdate(self):
+        self.updatedParams.clear()
+
+        self.updatedParams.append(self.kalman_ptm[0])
+        self.updatedParams.append(self.kalman_pc[0])
+        self.updatedParams.append(self.kalman_mc[0])
+
+        self.updatedParams.append(self.lk_mr[0])
+
+        self.updatedParams.append(self.CFPropOnOff[0])
+        self.updatedParams.append(self.colorFilter_LihtThr[0])
+        self.updatedParams.append(self.colorFilter_a[0])
+        self.updatedParams.append(self.colorFilter_b[0])
+
+        self.updatedParams.append(self.CFLRPropOnOff[0])
+        self.updatedParams.append(self.ligtRec_x[0])
+        self.updatedParams.append(self.ligtRec_maxT[0])
+
+        self.updatedParams.append(self.CFCamShiftOnOff[0])
+
+        self.updatedParams.append(self.shit_MaxFeat[0])
+        self.updatedParams.append(self.shit_FeatQual[0])
+        self.updatedParams.append(self.shit_MinFeat[0])
+        self.updatedParams.append(self.shit_Rec[0])
+
+        self.updatedParams.append(self.ShiTPropOnOff[0])
+        self.updatedParams.append(self.shit_SPix[0])
 
 
 def main():
