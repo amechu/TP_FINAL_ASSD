@@ -225,13 +225,13 @@ class cvGui():
 
                 if len(self.trackers) < MAX_TRACKERS:
                     if self.boolVideoLoaded:
-                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded)
+                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[0])
                     else:
                         bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.source)
                     cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
                     if not ((bBox[0] == 0) or (bBox[1] == 0) or (bBox[2] == 0) or (bBox[3] == 0)):
                         if self.boolVideoLoaded:
-                            self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded))
+                            self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded[0]))
                         else:
                             self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
 
@@ -406,12 +406,6 @@ class cvGui():
                 if not self.pause:
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
-                    elif self.boolVideoLoaded:
-                        if len(self.arrayVideoLoaded) == 0:
-                            self.boolVideoLoaded = False
-                        else:
-                            self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT,self.sourceX:self.sourceX + self.sourceWIDTH] = self.arrayVideoLoaded[0]
-                            del self.arrayVideoLoaded[0]
                     else:
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                 else:
@@ -423,6 +417,11 @@ class cvGui():
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
+
+            if self.boolVideoLoaded:
+                del self.arrayVideoLoaded[0]
+                if len(self.arrayVideoLoaded) == 0:
+                    self.boolVideoLoaded = False
 
             #Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
@@ -504,11 +503,11 @@ class cvGui():
                     self.boolVideoLoaded = True
                     self.loadFullVideo()
                 else:
-                    if not int(self.source.shape[1]) > STANDAR_WIDTH:
-                       self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
-                    else:
-                        self.sourceWIDTH = int(self.source.shape[1])
-                        self.sourceHEIGHT = int(self.source.shape[0])
+                    #if not int(self.source.shape[1]) > STANDAR_WIDTH:
+                    self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+
+                    #self.sourceWIDTH = int(self.source.shape[1])
+                    #self.sourceHEIGHT = int(self.source.shape[0])
 
                 a = WINDOW_VS_WIDTH + 2*WINDOW_VS_X
                 b = a + WINDOW_SOU_WIDTH
@@ -524,7 +523,12 @@ class cvGui():
         return False
 
     def callSource(self):
-        todoPiola, self.source = self.cap.read()
+        if self.boolVideoLoaded:
+            self.source = self.arrayVideoLoaded[0]
+            todoPiola = True
+        else:
+            todoPiola, self.source = self.cap.read()
+
         if todoPiola:
             if int(self.source.shape[1]) > STANDAR_WIDTH:
                 self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
@@ -534,14 +538,15 @@ class cvGui():
 
             if self.checkParametersChange():
                 pass
-      #          for tracker in self.trackers:
-       #             tracker.changeSettings(self.parametersNew)
+                #for tracker in self.trackers:
+                #tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)
+
             i = 0
             for tracker in self.trackers:
-#                    [b,g,r] = tracker.MF.bgrmask
+                #[b,g,r] = tracker.MF.bgrmask
                 r = (self.trackerColors[i] >> 16) & 0xff
                 g = (self.trackerColors[i] >> 8) & 0xff
                 b = self.trackerColors[i] & 0xff
