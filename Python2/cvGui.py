@@ -408,20 +408,20 @@ class cvGui():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
+                    if self.boolVideoLoaded:
+                        del self.arrayVideoLoaded[0]
+                        if len(self.arrayVideoLoaded) == 0:
+                            self.boolVideoLoaded = False
                 else:
                     if self.boolVideoLoaded:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.arrayVideoLoaded[0]
                     else:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
-
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
 
-            if self.boolVideoLoaded:
-                del self.arrayVideoLoaded[0]
-                if len(self.arrayVideoLoaded) == 0:
-                    self.boolVideoLoaded = False
+
 
             #Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
