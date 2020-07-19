@@ -480,6 +480,7 @@ class cvGui():
 
 
     def initSource(self):
+        self.source = []
         self.source[:] = (49, 52, 49)
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
