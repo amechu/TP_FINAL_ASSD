@@ -11,7 +11,6 @@ class Artist:
 
     @staticmethod
     def features(frame, features):
-
         for i in range(np.shape(features)[0]):
             cv.circle(frame, (features[i,0,0], features[i, 0, 1]), 3, (0, 255, 0), -1)
         return frame
