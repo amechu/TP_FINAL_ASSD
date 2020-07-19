@@ -140,7 +140,6 @@ class cvGui():
         self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
         self.parameters = []
         self.parametersNew = []
-        self.updatedParams = []
 
     def onWork(self):
 
@@ -447,7 +446,8 @@ class cvGui():
 
             if self.checkParametersChange():
                 for tracker in self.trackers:
-                    tracker.changeSettings(self.parametersNew)
+                    pass
+                    #tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)
@@ -477,19 +477,22 @@ class cvGui():
 
         self.parameters.append(self.lk_mr[0])
 
-        self.parameters.append(self.ColorFilterOnOff[0])
-        self.parameters.append(self.LightRecalcActive[0])
-
+        self.parameters.append(self.CFPropOnOff[0])
         self.parameters.append(self.colorFilter_LihtThr[0])
         self.parameters.append(self.colorFilter_a[0])
         self.parameters.append(self.colorFilter_b[0])
+
+        self.parameters.append(self.CFLRPropOnOff[0])
         self.parameters.append(self.ligtRec_x[0])
         self.parameters.append(self.ligtRec_maxT[0])
+
+        self.parameters.append(self.CFCamShiftOnOff[0])
 
         self.parameters.append(self.shit_MaxFeat[0])
         self.parameters.append(self.shit_FeatQual[0])
         self.parameters.append(self.shit_MinFeat[0])
         self.parameters.append(self.shit_Rec[0])
+
         self.parameters.append(self.ShiTPropOnOff[0])
         self.parameters.append(self.shit_SPix[0])
 
@@ -502,56 +505,74 @@ class cvGui():
 
         self.parametersNew.append(self.lk_mr[0])
 
-        #self.parametersNew.append(self.ColorFilterActive[0])
-        #self.parametersNew.append(self.LightRecalcActive[0])
-
+        self.parametersNew.append(self.CFPropOnOff[0])              #
         self.parametersNew.append(self.colorFilter_LihtThr[0])
         self.parametersNew.append(self.colorFilter_a[0])
         self.parametersNew.append(self.colorFilter_b[0])
+
+        self.parametersNew.append(self.CFLRPropOnOff[0])            #
         self.parametersNew.append(self.ligtRec_x[0])
         self.parametersNew.append(self.ligtRec_maxT[0])
 
-        self.parametersNew.append(self.ShiTPropActive[0])
+        self.parametersNew.append(self.CFCamShiftOnOff[0])          #
 
         self.parametersNew.append(self.shit_MaxFeat[0])
         self.parametersNew.append(self.shit_FeatQual[0])
         self.parametersNew.append(self.shit_MinFeat[0])
         self.parametersNew.append(self.shit_Rec[0])
+
+        self.parametersNew.append(self.ShiTPropOnOff[0])               #
         self.parametersNew.append(self.shit_SPix[0])
 
-        if self.parametersNew == self.parameters:
-            return False
+        if self.parametersNew[0] == self.parametersNew[0] and self.parametersNew[1] == self.parametersNew[1] and self.parametersNew[2] == self.parametersNew[2] :
+            bool1 = False        #Chequeo Kalman
         else:
-            return True
+            bool1 = True
 
-    def prepareUpdate(self):
-        self.updatedParams.clear()
+        if self.parametersNew[3] == self.parametersNew[3]:
+            bool2 = False        #Chequeo Lucas-Kanade
+        else:
+            bool2 = True
 
-        self.updatedParams.append(self.kalman_ptm[0])
-        self.updatedParams.append(self.kalman_pc[0])
-        self.updatedParams.append(self.kalman_mc[0])
+        if self.parametersNew[4] == self.parametersNew[4]:
+            bool3 = False        #Color Filter On/Off
+        else:
+            if self.parametersNew[5] == self.parametersNew[5] and self.parametersNew[6] == self.parametersNew[6] and self.parametersNew[7] == self.parametersNew[7]:
+                bool3 = False   #Chequeo Params de CF
+            else:
+                bool3 = True
 
-        self.updatedParams.append(self.lk_mr[0])
+        if self.parametersNew[8] == self.parametersNew[8]:
+            bool4 = False        #LR On/Off
+        else:
+            if self.parametersNew[9] == self.parametersNew[9] and self.parametersNew[10] == self.parametersNew[10]:
+                bool4 = False   #Chequeo Params de CF
+            else:
+                bool4 = True
 
-        self.updatedParams.append(self.CFPropOnOff[0])
-        self.updatedParams.append(self.colorFilter_LihtThr[0])
-        self.updatedParams.append(self.colorFilter_a[0])
-        self.updatedParams.append(self.colorFilter_b[0])
+        if self.parametersNew[11] == self.parametersNew[11]:
+            bool5 = False        #Cam Shift On/Off
+        else:
+            bool5 = True
+            # if self.parametersNew[5] == self.parametersNew[5] and self.parametersNew[6] == self.parametersNew[6] and self.parametersNew[7] == self.parametersNew[7]:
+            #     bool5 = False   #Chequeo Params de CF
+            # else:
+            #     bool5 = True
 
-        self.updatedParams.append(self.CFLRPropOnOff[0])
-        self.updatedParams.append(self.ligtRec_x[0])
-        self.updatedParams.append(self.ligtRec_maxT[0])
+        if self.parametersNew[12] == self.parametersNew[12] and self.parametersNew[13] == self.parametersNew[13] and self.parametersNew[14] == self.parametersNew[14] :
+            bool6 = False        #Chequeo Shi-Tomasi
+        else:
+            bool6 = True
 
-        self.updatedParams.append(self.CFCamShiftOnOff[0])
+        if self.parametersNew[15] == self.parametersNew[15]:
+            bool7 = False        #Shi-Tomasi On/Off
+        else:
+            if self.parametersNew[16] == self.parametersNew[16]:
+                bool7 = False   #Chequeo Params Shi
+            else:
+                bool7 = True
 
-        self.updatedParams.append(self.shit_MaxFeat[0])
-        self.updatedParams.append(self.shit_FeatQual[0])
-        self.updatedParams.append(self.shit_MinFeat[0])
-        self.updatedParams.append(self.shit_Rec[0])
-
-        self.updatedParams.append(self.ShiTPropOnOff[0])
-        self.updatedParams.append(self.shit_SPix[0])
-
+        return bool1 and bool2 and bool3 and bool4 and bool5 and bool6 and bool7
 
 def main():
     myGui = cvGui()
