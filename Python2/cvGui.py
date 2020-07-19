@@ -133,7 +133,11 @@ class cvGui():
         
         cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
-
+        self.trackerColors = [0xF5741B,
+                                        0x6CF12A,
+                                        0x2AACF1,
+                                        0x972AF1,
+                                        0xF12A33]
         self.parameters = []
 
 
@@ -213,7 +217,7 @@ class cvGui():
                 xB = WINDOW_TRK_X + 10 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
                 yB = WINDOW_TRK_Y + 80
 
-                cvui.printf(self.frame, xTx, yTx, 0.4, 0xdd97fb,"Tracker Number " + str(i+1))
+                cvui.printf(self.frame, xTx, yTx, 0.4, self.trackerColors[i],"Tracker Number " + str(i+1))
                 if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
 
                     del self.trackers[i]
@@ -421,15 +425,18 @@ class cvGui():
             self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
 
             if self.checkParametersChange():
+                #for tracker in self.trackers:
+                    #tracker.changeSettings()
                 pass
 
             for tracker in self.trackers:
                 tracker.update(self.source)
-
-            for i in range(np.size(self.trackers)):
-                if self.trackers[i].trackingError is False:
-                    self.source = Artist.Artist.estimate(self.source, *self.trackers[i].getEstimatedPosition(), self.trackers[i].selectionWidth, self.trackers[i].selectionHeight, (165, 3, 129))
-                    self.source = Artist.Artist.features(self.source,self.trackers[i].features, (0, 255, 0))
+            i = 0
+            for tracker in self.trackers:
+                if tracker.trackingError is False:
+                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, self.trackerColors[i])
+                    self.source = Artist.Artist.features(self.source, tracker.features, self.trackerColors[i])
+                i +=1
         return todoPiola
 
     def rescale_frame_standar(self, frame, maxWidth):

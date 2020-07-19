@@ -67,6 +67,7 @@ class Tracker:
                 self.searchHeight = self.selectionHeight
                 self.searchWidth = self.selectionWidth
                 self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
+                self.LK.prevFeatures = self.features
         else:
             #Apply LK algorithm
             self.features, self.trackingError = self.LK.updateFeatures(self.prevFrameGray, frameGray)
@@ -84,6 +85,7 @@ class Tracker:
                     mux, muy = np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
                     self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(muy - self.selectionHeight / 2): int(muy + self.selectionHeight / 2),int(mux - self.selectionWidth / 2): int(mux + self.selectionWidth / 2)])
                     self.features = self.featureTranslate(mux- self.selectionWidth / 2, muy - self.selectionHeight / 2, self.features)
+                    self.LK.prevFeatures = self.features
                     #apply st algorithm
 
                     if self.trackingError is False:#did i found features?
