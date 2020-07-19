@@ -30,16 +30,17 @@ class Tracker:
                                     #de la unica columna es una coordenada [x y].
         self.prevFrameGray=cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         self.features, self.trackingError = self.ST.recalculateFeatures(self.prevFrameGray[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
-        self.featureTranslate(initialPosition[0]-initialWidth/2, initialPosition[1]-initialHeight/2)
+        self.features = self.featureTranslate(initialPosition[0]-initialWidth/2, initialPosition[1]-initialHeight/2, self.features)
         self.LK.prevFeatures=self.features
 
 
-    def featureTranslate(self,x, y):
-        if self.features is None:
+    def featureTranslate(self,x, y, features):
+        if features is None:
             return None
-        for i in range(self.features.shape[0]):
-            self.features[i][0][0] = self.features[i][0][0] + x
-            self.features[i][0][1] = self.features[i][0][1] + y
+        for i in range(features.shape[0]):
+            features[i][0][0] += x
+            features[i][0][1] += y
+        return features
 
 
     def update(self, frame):
@@ -56,8 +57,8 @@ class Tracker:
         if self.trackingError is True:
             #Yes, then apply ST algorithm around estimate
             self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[ int( self.KM.statePost[1][0] - self.searchHeight/2) : int(self.KM.statePost[1][0] + self.searchHeight/2),int(self.KM.statePost[0][0] - self.searchWidth/2 ): int(self.KM.statePost[0][0] + self.searchWidth/2)])
-            self.featureTranslate(self.KM.statePost[0][0]-self.searchWidth/2,self.KM.statePost[1][0]-self.searchHeight/2)
-            #did i found it?
+            self.features = self.featureTranslate(self.KM.statePost[0][0]-self.searchWidth/2,self.KM.statePost[1][0]-self.searchHeight/2, self.features)
+            #did i find it?
             if self.trackingError is True:
                 #No, then enlarge search area
                 self.enlargeSearchArea()
@@ -82,7 +83,7 @@ class Tracker:
                     #remove outliers.
                     mux, muy = np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
                     self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(muy - self.selectionHeight / 2): int(muy + self.selectionHeight / 2),int(mux - self.selectionWidth / 2): int(mux + self.selectionWidth / 2)])
-                    self.featureTranslate(mux- self.selectionWidth / 2, muy - self.selectionHeight / 2)
+                    self.features = self.featureTranslate(mux- self.selectionWidth / 2, muy - self.selectionHeight / 2, self.features)
                     #apply st algorithm
 
                     if self.trackingError is False:#did i found features?
@@ -93,6 +94,7 @@ class Tracker:
                     self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
 # Recalculate features?
 #           else would be tracking error true
+        self.prevFrameGray = frameGray
 
 
 

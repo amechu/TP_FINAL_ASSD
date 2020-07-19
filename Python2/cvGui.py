@@ -441,10 +441,10 @@ class cvGui():
             for tracker in self.trackers:
                 tracker.update(self.source)
 
-            for tracker in self.trackers:
-                if tracker.trackingError is False:
-                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (165, 3, 129))
-                    self.source = Artist.Artist.features(self.source,tracker.features)
+            for i in range(np.size(self.trackers)):
+                if self.trackers[i].trackingError is False:
+                    self.source = Artist.Artist.estimate(self.source, *self.trackers[i].getEstimatedPosition(), self.trackers[i].selectionWidth, self.trackers[i].selectionHeight, (165, 3, 129))
+                    self.source = Artist.Artist.features(self.source,self.trackers[i].features, (0, 255, 0))
         return todoPiola
 
     def rescale_frame_standar(self, frame, maxWidth):
