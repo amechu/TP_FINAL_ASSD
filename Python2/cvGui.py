@@ -51,7 +51,12 @@ WINDOW_FIL_Y = WINDOW_VS_Y
 WINDOW_FIL_WIDTH = X_SCREEN - WINDOW_FIL_X - WINDOW_SET_X
 WINDOW_FIL_HEIGHT = WINDOW_SOU_HEIGHT
 
+WINDOW_TRK_X = WINDOW_SOU_X
+WINDOW_TRK_Y = WINDOW_SOU_WIDTH + 2*WINDOW_VS_Y
+WINDOW_TRK_WIDTH = WINDOW_SOU_WIDTH
+WINDOW_TRK_HEIGHT = Y_SCREEN - WINDOW_TRK_Y - WINDOW_VS_Y
 
+MAX_TRACKERS = 5
 
 class cvGui():
 
@@ -63,6 +68,7 @@ class cvGui():
         #Frames
         self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
         self.source = []
+        self.sourceWithoutChange = []
 
         #Source names    
         self.VideoLoaded = "None"
@@ -130,7 +136,9 @@ class cvGui():
         cvui.init(WINDOW_NAME)
 
         self.parameters = []
-        #self.paramChanged = False
+
+        self.boolTracker = []
+
 
     def onWork(self):
 
@@ -145,6 +153,7 @@ class cvGui():
             cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Settings:")  # Settings Frame
             cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SOU_Y, WINDOW_SOU_WIDTH, WINDOW_SOU_HEIGHT, "Source:")
             cvui.window(self.frame, WINDOW_FIL_X, WINDOW_FIL_Y, WINDOW_FIL_WIDTH, WINDOW_FIL_HEIGHT, "Filters:")
+            cvui.window(self.frame, WINDOW_TRK_X, WINDOW_TRK_Y, WINDOW_TRK_WIDTH, WINDOW_TRK_HEIGHT, "Trackers:")
 
             #Text
             cvui.printf(self.frame, 20, 35, 0.4, 0xdd97fb, "Current Source:")                #Video Source
@@ -168,6 +177,8 @@ class cvGui():
                     if(self.initSource()):                                                                #Chequear si se inicia bien
                         self.VideoLoaded = self.videoPath
                         self.CurrentSource = "Video Loaded: " + self.videoName
+                        self.boolTracker.clear()
+                        self.trackers.clear()
                     else:
                         self.usingCamera = False
                         self.usingVideo = False
@@ -191,11 +202,46 @@ class cvGui():
             
             #Settings Buttons 
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
-                bBox = cv.selectROI('Select New Area', self.source)
-                cv.destroyWindow('Select New Area')
-                self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
 
-                #VERIFICAR GUI TRACKER
+                if len(self.trackers) < MAX_TRACKERS:
+                    bBox = cv.selectROI('Select New Area', self.sourceWithoutChange)
+                    cv.destroyWindow('Select New Area')
+                    self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3]),self.source)
+
+            a = len(self.trackers)
+            b = len(self.boolTracker)
+
+            if b < a:
+                for i in range(a-b):
+                    self.boolTracker.append([False])
+
+            for i in range(a):
+                xCh = WINDOW_TRK_X + 5 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
+                yCh = WINDOW_TRK_Y + 50
+                xB = WINDOW_TRK_X + 10 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
+                yB = WINDOW_TRK_Y + 80
+
+                if (cvui.checkbox(self.frame, xCh, yCh, "Tracker Number " + str(i+1), self.boolTracker[i])):
+                    self.boolTracker[i][0] = True
+                if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
+                    del self.boolTracker[i]
+                    del self.trackers[i]
+                    break
+
+            if a == 0:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No trackers added. Try selecting a new area!")
+            elif a == 1:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x79d805, "Using 1 tracker of 5!")
+            elif a == 2:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xa0d805, "Using 2 trackers of 5!")
+            elif a == 3:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xcfd805, "Using 3 trackers of 5!")
+            elif a == 4:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdcce10, "Using 4 trackers of 5!")
+            else:
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 trackers of 5! No more trackers can be added. Try deleting one.")
+
+
 
             if (cvui.button(self.frame, 20, 215, "Pause Source")):
                 self.pause = not self.pause
@@ -364,6 +410,7 @@ class cvGui():
         if (self.cap.isOpened()):
             todoPiola, self.source = self.cap.read()
             self.source = self.rescale_frame_standar(self.source, 720)
+            self.sourceWithoutChange = self.source
 
             #VER SI DEBERÍA HABER ALGÚN UPDATE AL BACK END
 
