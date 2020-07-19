@@ -409,7 +409,10 @@ class cvGui():
                     else:
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                 else:
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+                    if self.boolVideoLoaded:
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.arrayVideoLoaded[0]
+                    else:
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
 
             #Show everything on the screen
@@ -638,30 +641,13 @@ class cvGui():
         return False
 
     def loadFullVideo(self):
-        # WINDOW_NAME_LOADING = 'Loading'
-        # cvui.init(WINDOW_NAME_LOADING)
-        # frame = np.zeros((200, 500, 3), np.uint8)
-        # loading = [0]
 
         todoPiola, someCrazyShit = self.cap.read()
 
         while todoPiola:
-            # Clear the frame.
-            # frame[:] = (49, 52, 49)
-            #
-            # cvui.text(frame, 175, 50, 'Loading. Please Wait.')
-            # cvui.trackbar(frame, 100, 100, 300, loading, 0.0, 1000, 1, "%1.Lf",
-            #              cvui.TRACKBAR_HIDE_STEP_SCALE | cvui.TRACKBAR_HIDE_LABELS)
-
             someCrazyShit = self.rescale_frame_standar(someCrazyShit, STANDAR_WIDTH)
             self.arrayVideoLoaded.append(someCrazyShit)
             todoPiola, someCrazyShit = self.cap.read()
-
-            # loading[0] = loading[0] + 1
-
-            # cvui.imshow(WINDOW_NAME_LOADING, frame)
-
-        # cv.destroyWindow(WINDOW_NAME_LOADING)
 
         self.sourceWIDTH = int(self.arrayVideoLoaded[0].shape[1])
         self.sourceHEIGHT = int(self.arrayVideoLoaded[0].shape[0])
