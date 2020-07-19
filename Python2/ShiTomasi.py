@@ -2,7 +2,7 @@ import cv2 as cv
 
 
 class ShiTomasi:
-    maxcorners=5
+    maxcorners=50
     qLevel=0.00000001
     minDist = 10
     blockSize_ = 10
@@ -24,7 +24,6 @@ class ShiTomasi:
                               # Nivel de calidad minimo de cada feature entre 0 y 1. En 0 se devuelven TODAS las features no importa la calidad
                               minDistance=int(self.minDist),  # Minima distancia entre features
                               blockSize=int(self.blockSize_))
-        print(feature_params['maxCorners'])
         features = cv.goodFeaturesToTrack(selection, mask=None, **feature_params)
         if features is not None:
             error = False

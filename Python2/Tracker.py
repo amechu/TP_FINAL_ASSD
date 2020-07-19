@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import KalmanFilter
-import ColorFilter
+from MaskingFilter import MaskingFilter
 import ShiTomasi
 import OpticalFlow
 
@@ -13,7 +13,7 @@ class Tracker:
         self.LK= OpticalFlow.OpticalFlow()
         self.ST= ShiTomasi.ShiTomasi()
         self.KM = KalmanFilter.KalmanFilter()
-        self.ColF=ColorFilter.ColorFilter()
+        self.MF= MaskingFilter()
 
         self.KM.setStatePost(np.array([initialPosition[0], initialPosition[1], 0., 0.]).reshape(4, 1))
         self.selectionWidth = initialWidth
@@ -32,6 +32,7 @@ class Tracker:
         self.features, self.trackingError = self.ST.recalculateFeatures(self.prevFrameGray[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
         self.features = self.featureTranslate(initialPosition[0]-initialWidth/2, initialPosition[1]-initialHeight/2, self.features)
         self.LK.prevFeatures=self.features
+        self.MF.calculateNewMask(frame, frame[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
 
 
     def featureTranslate(self,x, y, features):
@@ -48,9 +49,14 @@ class Tracker:
         self.frameCounter += 1
         self.KM.predict()
 
-        if self.ColF.colorFilterUse is True:
+        if self.MF.mask is self.MF.maskingType["FILTER_OFF"]:
             pass
-        #falta toddo lo de filtro de color
+        elif self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
+            frame = self.MF.filterFrame(frame)
+        elif self.MF.mask is self.MF.maskingType["FILTER_CSHIFT"]:
+            pass
+        elif self.MF.mask is self.MF.maskingType["FILTER_CORR"]:
+            pass
 
         frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         #Tacking error?
@@ -123,6 +129,8 @@ class Tracker:
         self.ST.searchEnlargementThreshold = parametersNew[15]       #shit_Rec
         # parametersNew[11]   #.ShiTPropActive
         self.ST.frameRecalculationNumber = parametersNew[16]        #shit_SPix[0]
+
+        #self.MF.mask = self.MF.maskingType[parametersNew[??]] #MENSAJE PARA TOMI: tiene que ser un string parametersNew[??] fijate en la clase
 
         self.KM.updateParams()
 
