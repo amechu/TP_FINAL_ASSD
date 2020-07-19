@@ -137,6 +137,11 @@ class cvGui():
         cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
 
+        #Filter Edit
+        self.ColorFilter = [True]
+        self.CamShiftFilter = [True]
+        self.CorrFilter = [True]
+
         self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
         self.parameters = []
         self.parametersNew = []
@@ -339,7 +344,14 @@ class cvGui():
                     cvui.printf(self.frame, 185, 682, 0.4, 0x10dcA1, "%s", "On")
                 else:
                     cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
-            
+
+            #Filters: Correlation, Cam shift, Color
+
+            cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 30, "Color Filter", self.ColorFilter)
+            cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 60, "Cam Shift", self.CamShiftFilter)
+            cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 90, "Correlation Filter", self.CorrFilter)
+
+
             if (self.usingCamera) or (self.usingVideo):
                 if not self.pause:
                     if self.callSource():
