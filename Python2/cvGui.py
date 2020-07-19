@@ -14,6 +14,10 @@ INITIAL_KALMAN_MC = 0.4
 
 INITIAL_LK_MR = 4.0
 
+INITIAL_CF_ONOFF = False
+INITIAL_LR_ONOFF = False
+INITIAL_CS_ONOFF = False
+
 COLORFILTER_LIGHTTHR = 70.0
 COLORFILTER_A = 20.0
 COLORFILTER_B = 20.0
@@ -107,11 +111,11 @@ class cvGui():
     
         #CF Properties
         self.CFProp = [False]
-        self.CFPropOnOff = [False]
-        self.CFLRPropOnOff = [False]
+        self.CFPropOnOff = [INITIAL_CF_ONOFF]
+        self.CFLRPropOnOff = [INITIAL_LR_ONOFF]
+        self.CFCamShiftOnOff = [INITIAL_CS_ONOFF]
     
-        self.ColorFilterActive = [False]
-        self.LightRecalcActive = [False]
+
     
         self.colorFilter_LihtThr = [COLORFILTER_LIGHTTHR]
         self.colorFilter_a = [COLORFILTER_A]
@@ -260,26 +264,55 @@ class cvGui():
                 cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")
                 cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0)
             
-            if (cvui.checkbox(self.frame, 20, 340, "Color Filter", self.CFProp)):
+            if (cvui.checkbox(self.frame, 20, 340, "Mask Filter", self.CFProp)):
                 self.KalmanProp[0] = False
                 self.LKProp[0] = False
                 self.ShiTProp[0] = False
                 
                 if (cvui.checkbox(self.frame, 20, 400, "Color Filter", self.CFPropOnOff)):
                     self.CFLRPropOnOff[0] = False
-                    cvui.printf(self.frame, 20, 460, 0.4, 0xdd97fb, "Lightness Threshold")
-                    cvui.trackbar(self.frame, 20, 475, 210, self.colorFilter_LihtThr, 0.0, 150.0)
-                    cvui.printf(self.frame, 20, 530, 0.4, 0xdd97fb, "A Threshold")
-                    cvui.trackbar(self.frame, 20, 545, 210, self.colorFilter_a, 0.0, 30.0)
-                    cvui.printf(self.frame, 20, 600, 0.4, 0xdd97fb, "B Threshold")
-                    cvui.trackbar(self.frame, 20, 615, 210, self.colorFilter_b, 0.0, 30.0)
+                    self.CFCamShiftOnOff[0] = False
+
+                    cvui.printf(self.frame, 20, 480, 0.4, 0xdd97fb, "Lightness Threshold")
+                    cvui.trackbar(self.frame, 20, 495, 210, self.colorFilter_LihtThr, 0.0, 150.0)
+
+                    cvui.printf(self.frame, 20, 550, 0.4, 0xdd97fb, "A Threshold")
+                    cvui.trackbar(self.frame, 20, 565, 210, self.colorFilter_a, 0.0, 30.0)
+
+                    cvui.printf(self.frame, 20, 620, 0.4, 0xdd97fb, "B Threshold")
+                    cvui.trackbar(self.frame, 20, 635, 210, self.colorFilter_b, 0.0, 30.0)
                 
                 if (cvui.checkbox(self.frame, 20, 420, "Lightness Recalculation", self.CFLRPropOnOff)):
                     self.CFPropOnOff[0] = False
-                    cvui.printf(self.frame, 20, 460, 0.4, 0xdd97fb, "Every X Frames")
-                    cvui.trackbar(self.frame, 20, 475, 210, self.ligtRec_x, 0.0, 150.0)
-                    cvui.printf(self.frame, 20, 530, 0.4, 0xdd97fb, "Maximum Threshold Change")
-                    cvui.trackbar(self.frame, 20, 545, 210, self.ligtRec_maxT, 0.0, 30.0)
+                    self.CFCamShiftOnOff[0] = False
+
+                    cvui.printf(self.frame, 20, 480, 0.4, 0xdd97fb, "Every X Frames")
+                    cvui.trackbar(self.frame, 20, 495, 210, self.ligtRec_x, 0.0, 150.0)
+
+                    cvui.printf(self.frame, 20, 550, 0.4, 0xdd97fb, "Maximum Threshold Change")
+                    cvui.trackbar(self.frame, 20, 565, 210, self.ligtRec_maxT, 0.0, 30.0)
+
+                if (cvui.checkbox(self.frame, 20, 440, "Cam Shift", self.CFCamShiftOnOff)):
+                    self.CFPropOnOff[0] = False
+                    self.CFLRPropOnOff[0] = False
+
+                #Printeo ONS/OFFS
+                if (self.CFPropOnOff[0]):
+                    cvui.printf(self.frame, 120, 402, 0.4, 0x10dcA1, "On")
+                    cvui.printf(self.frame, 200, 422, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 120, 442, 0.4, 0xdc1076, "Off")
+                elif (self.CFLRPropOnOff[0]):
+                    cvui.printf(self.frame, 120, 402, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 200, 422, 0.4, 0x10dcA1, "On")
+                    cvui.printf(self.frame, 120, 442, 0.4, 0xdc1076, "Off")
+                elif (self.CFCamShiftOnOff[0]):
+                    cvui.printf(self.frame, 120, 402, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 200, 422, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 120, 442, 0.4, 0x10dcA1, "On")
+                else:
+                    cvui.printf(self.frame, 120, 402, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 200, 422, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 120, 442, 0.4, 0xdc1076, "Off")
                 
             if (cvui.checkbox(self.frame, 20, 360, "Shi-Tomasi", self.ShiTProp)):
                 self.KalmanProp[0] = False
@@ -302,17 +335,6 @@ class cvGui():
                     cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Recalculation Number")
                     cvui.trackbar(self.frame, 20, 705, 210, self.shit_Rec, 1.0, 100.0)
 
-            #On / Off special parameters: CHECK WHEN CALLING CALLBACK
-            if (cvui.checkbox(self.frame, 140, 340, "CF", self.ColorFilterActive) and (self.CFProp[0])):        #Verifico si está activado
-                cvui.printf(self.frame, 120, 402, 0.4, 0xdd97fb, "%s", "On")                                    #Printeo un on si está en pantalla su configuración
-            elif (self.CFProp[0]):
-                cvui.printf(self.frame, 120, 402, 0.4, 0xdd97fb, "%s", "Off")                                   #Solo printeo un off si está en pantalla su configuración
-            
-            if (cvui.checkbox(self.frame, 180, 340, "LR", self.LightRecalcActive) and (self.CFProp[0])):
-                cvui.printf(self.frame, 195, 422, 0.4, 0xdd97fb, "%s", "On")
-            elif (self.CFProp[0]):
-                cvui.printf(self.frame, 195, 422, 0.4, 0xdd97fb, "%s", "Off")
-            
             if (cvui.checkbox(self.frame, 140, 360, "FR", self.ShiTPropActive) and (self.ShiTProp[0])):
                 cvui.printf(self.frame, 185, 672, 0.4, 0xdd97fb, "%s", "On")
             elif (self.ShiTProp[0]):
@@ -344,8 +366,8 @@ class cvGui():
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
                 self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
                 self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
-                self.shit_SPix[0] == SHIT_SPIX) and (self.ColorFilterActive[0] == False) and (self.LightRecalcActive[0] == False) and (
-                self.ShiTPropActive[0] == False):
+                self.shit_SPix[0] == SHIT_SPIX) and (self.ShiTPropActive[0] == False) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (
+                self.CFLRPropOnOff[0] == INITIAL_LR_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF):
             return True
         else:
             return False
@@ -383,8 +405,10 @@ class cvGui():
         self.shit_Rec[0] = SHIT_REC
         self.shit_SPix[0] = SHIT_SPIX
 
-        self.ColorFilterActive[0] = False
-        self.LightRecalcActive[0] = False
+        self.CFPropOnOff[0] = INITIAL_CF_ONOFF
+        self.CFLRPropOnOff[0] = INITIAL_LR_ONOFF
+        self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF
+
         self.ShiTPropActive[0] = False
 
     def initSource(self):
@@ -453,8 +477,8 @@ class cvGui():
 
         self.parameters.append(self.lk_mr[0])
 
-        self.parameters.append(self.ColorFilterActive[0])
-        self.parameters.append(self.LightRecalcActive[0])
+        #self.parameters.append(self.ColorFilterActive[0])
+        #self.parameters.append(self.LightRecalcActive[0])
 
         self.parameters.append(self.colorFilter_LihtThr[0])
         self.parameters.append(self.colorFilter_a[0])
@@ -479,8 +503,8 @@ class cvGui():
 
         self.parametersNew.append(self.lk_mr[0])
 
-        self.parametersNew.append(self.ColorFilterActive[0])
-        self.parametersNew.append(self.LightRecalcActive[0])
+        #self.parametersNew.append(self.ColorFilterActive[0])
+        #self.parametersNew.append(self.LightRecalcActive[0])
 
         self.parametersNew.append(self.colorFilter_LihtThr[0])
         self.parametersNew.append(self.colorFilter_a[0])
