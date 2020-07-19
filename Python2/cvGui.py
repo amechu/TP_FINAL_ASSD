@@ -18,6 +18,8 @@ INITIAL_CF_ONOFF = False
 INITIAL_LR_ONOFF = False
 INITIAL_CS_ONOFF = False
 
+INITIAL_ST_ONOFF = False
+
 COLORFILTER_LIGHTTHR = 70.0
 COLORFILTER_A = 20.0
 COLORFILTER_B = 20.0
@@ -114,7 +116,6 @@ class cvGui():
         self.CFPropOnOff = [INITIAL_CF_ONOFF]
         self.CFLRPropOnOff = [INITIAL_LR_ONOFF]
         self.CFCamShiftOnOff = [INITIAL_CS_ONOFF]
-    
 
     
         self.colorFilter_LihtThr = [COLORFILTER_LIGHTTHR]
@@ -126,9 +127,7 @@ class cvGui():
         #Shi - Tomasi Properties
         self.ShiTProp = [False]
         self.ShiTPropOnOff = [False]
-    
-        self.ShiTPropActive = [False]
-    
+
         self.shit_MaxFeat = [SHIT_MAXFEAT]
         self.shit_FeatQual = [SHIT_FEATQUAL]
         self.shit_MinFeat = [SHIT_MINFEAT]
@@ -334,11 +333,9 @@ class cvGui():
                 if (cvui.checkbox(self.frame, 20, 670, "Feature Recalculation", self.ShiTPropOnOff)):
                     cvui.printf(self.frame, 20, 690, 0.4, 0xdd97fb, "Recalculation Number")
                     cvui.trackbar(self.frame, 20, 705, 210, self.shit_Rec, 1.0, 100.0)
-
-            if (cvui.checkbox(self.frame, 140, 360, "FR", self.ShiTPropActive) and (self.ShiTProp[0])):
-                cvui.printf(self.frame, 185, 672, 0.4, 0xdd97fb, "%s", "On")
-            elif (self.ShiTProp[0]):
-                cvui.printf(self.frame, 185, 672, 0.4, 0xdd97fb, "%s", "Off")
+                    cvui.printf(self.frame, 185, 672, 0.4, 0x10dcA1, "%s", "On")
+                else:
+                    cvui.printf(self.frame, 185, 672, 0.4, 0xdc1076, "%s", "Off")
             
             if (self.usingCamera) or (self.usingVideo):
                 if not self.pause:
@@ -366,8 +363,8 @@ class cvGui():
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
                 self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
                 self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
-                self.shit_SPix[0] == SHIT_SPIX) and (self.ShiTPropActive[0] == False) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (
-                self.CFLRPropOnOff[0] == INITIAL_LR_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF):
+                self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (
+                self.CFLRPropOnOff[0] == INITIAL_LR_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF)and (self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF):
             return True
         else:
             return False
@@ -393,23 +390,25 @@ class cvGui():
 
         self.lk_mr[0] = INITIAL_LK_MR
 
+        self.CFPropOnOff[0] = INITIAL_CF_ONOFF
         self.colorFilter_LihtThr[0] = COLORFILTER_LIGHTTHR
         self.colorFilter_a[0] = COLORFILTER_A
         self.colorFilter_b[0] = COLORFILTER_B
+
+        self.CFLRPropOnOff[0] = INITIAL_LR_ONOFF
         self.ligtRec_x[0] = LIGHTTHR_X
         self.ligtRec_maxT[0] = LIGHTTHR_MACT
+
+        self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF
 
         self.shit_MaxFeat[0] = SHIT_MAXFEAT
         self.shit_FeatQual[0] = SHIT_FEATQUAL
         self.shit_MinFeat[0] = SHIT_MINFEAT
         self.shit_Rec[0] = SHIT_REC
+
+        self.ShiTPropOnOff[0] = INITIAL_ST_ONOFF
         self.shit_SPix[0] = SHIT_SPIX
 
-        self.CFPropOnOff[0] = INITIAL_CF_ONOFF
-        self.CFLRPropOnOff[0] = INITIAL_LR_ONOFF
-        self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF
-
-        self.ShiTPropActive[0] = False
 
     def initSource(self):
         #self.source[:] = (49, 52, 49)
@@ -448,7 +447,6 @@ class cvGui():
                 for tracker in self.trackers:
                     tracker.changeSettings(self.parametersNew)
 
-
             for tracker in self.trackers:
                 tracker.update(self.source)
             i = 0
@@ -471,14 +469,16 @@ class cvGui():
     def updateParameters(self):
         self.parameters.clear()
 
+
+
         self.parameters.append(self.kalman_ptm[0])
         self.parameters.append(self.kalman_pc[0])
         self.parameters.append(self.kalman_mc[0])
 
         self.parameters.append(self.lk_mr[0])
 
-        #self.parameters.append(self.ColorFilterActive[0])
-        #self.parameters.append(self.LightRecalcActive[0])
+        self.parameters.append(self.ColorFilterOnOff[0])
+        self.parameters.append(self.LightRecalcActive[0])
 
         self.parameters.append(self.colorFilter_LihtThr[0])
         self.parameters.append(self.colorFilter_a[0])
@@ -486,12 +486,11 @@ class cvGui():
         self.parameters.append(self.ligtRec_x[0])
         self.parameters.append(self.ligtRec_maxT[0])
 
-        self.parameters.append(self.ShiTPropActive[0])
-
         self.parameters.append(self.shit_MaxFeat[0])
         self.parameters.append(self.shit_FeatQual[0])
         self.parameters.append(self.shit_MinFeat[0])
         self.parameters.append(self.shit_Rec[0])
+        self.parameters.append(self.ShiTPropOnOff[0])
         self.parameters.append(self.shit_SPix[0])
 
     def checkParametersChange(self):
