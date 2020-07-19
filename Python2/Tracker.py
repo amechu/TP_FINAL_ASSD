@@ -113,22 +113,24 @@ class Tracker:
 
         self.LK.lkMaxLevel = parametersNew[3]           #lk_mr
 
-        #parametersNew[4]              #ColorFilterActive
-        #ColorFilter.ColorFilter.LIG_THR_CHANGE = parametersNew[6]  #colorFilter_LihtThr
-        #ColorFilter.ColorFilter.
-        #parametersNew[7]  # .append(self.colorFilter_a[0])
-        #parametersNew[8]  # .append(self.colorFilter_b[0])
+        # = parametersNew[4]              #Color Filter OnOff
+        #ColorFilter.ColorFilter.LIG_THR_CHANGE = parametersNew[5]  #colorFilter_LihtThr
+        #= parametersNew[6]     #colorFilter_a
+        #= parametersNew[7]     #colorFilter_b
 
-        #parametersNew[5]    #.append(self.LightRecalcActive[0])
-        #parametersNew[9]    #.append(self.ligtRec_x[0])
-        #parametersNew[10]   #.append(self.ligtRec_maxT[0])
+        #= parametersNew[8]     #Light R OnOff
+        #= parametersNew[9]    #ligtRec_x)
+        #= parametersNew[10]   #ligtRec_maxT
+
+        #= parametersNew[11]    #Cam shift On/Off
 
         self.ST.maxcorners = parametersNew[12]                       #shit_MaxFeat
         self.ST.qLevel = parametersNew[13]                           #shit_FeatQual
         self.ST.minDist = parametersNew[14]                          #shit_MinFeat
         self.ST.searchEnlargementThreshold = parametersNew[15]       #shit_Rec
-        # parametersNew[11]   #.ShiTPropActive
-        self.ST.frameRecalculationNumber = parametersNew[16]        #shit_SPix[0]
+
+        #= parametersNew[16]                #ShiTomasiOn/ Off
+        self.ST.frameRecalculationNumber = parametersNew[17]        #shit_SPix
 
         #self.MF.mask = self.MF.maskingType[parametersNew[??]] #MENSAJE PARA TOMI: tiene que ser un string parametersNew[??] fijate en la clase
 
