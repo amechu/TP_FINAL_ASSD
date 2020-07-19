@@ -333,7 +333,7 @@ class cvGui():
                     else:
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                 else:
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.sourceWithoutChange
+                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
