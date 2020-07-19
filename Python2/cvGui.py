@@ -133,15 +133,10 @@ class cvGui():
         
         cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
-        self.trackerColors = [0xF5741B,
-                                        0x6CF12A,
-                                        0x2AACF1,
-                                        0x972AF1,
-                                        0xF12A33]
+        self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
         self.parameters = []
         self.parametersNew = []
-
-
+        
     def onWork(self):
 
         while True:
@@ -221,7 +216,6 @@ class cvGui():
 
                 cvui.printf(self.frame, xTx, yTx, 0.4, self.trackerColors[i],"Tracker Number " + str(i+1))
                 if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
-
                     del self.trackers[i]
                     break
 
@@ -427,8 +421,8 @@ class cvGui():
             self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
 
             if self.checkParametersChange():
-                #for tracker in self.trackers:
-                    #tracker.changeSettings()
+                for tracker in self.trackers:
+                    tracker.changeSettings(self.parametersNew)
                 pass
 
             for tracker in self.trackers:
@@ -506,6 +500,7 @@ class cvGui():
             return False
         else:
             return True
+
 
 def main():
     myGui = cvGui()
