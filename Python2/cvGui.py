@@ -288,7 +288,7 @@ class cvGui():
                 
                 cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Feature Quantity")
                 cvui.trackbar(self.frame, 20, 415, 210, self.shit_MaxFeat, 1.0, 1000.0)
-                
+
                 cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Feature Quality Level")
                 cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.0, 1.0)
                 
@@ -342,13 +342,13 @@ class cvGui():
                     
     def verifyInitialCond(self):
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
-                self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (
-                self.CFPropOnOff[0] == False) and (self.CFLRPropOnOff[0] == False) and (self.ShiTPropOnOff[0] == False):
+                self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
+                self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
+                self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == False) and (self.CFLRPropOnOff[0] == False) and (
+                self.ShiTPropOnOff[0] == False):
             return True
-        elif ((self.ColorFilterActive[0] == True) or (self.LightRecalcActive[0] == True) or (self.ShiTPropActive[0] == True)):
-                return False
         else:
-            return True
+            return False
 
     def openFile(self):
         root = tk.Tk()
