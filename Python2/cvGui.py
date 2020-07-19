@@ -45,12 +45,12 @@ WINDOW_VS_HEIGHT = 130
 WINDOW_SET_X = 10
 WINDOW_SET_Y = 150
 WINDOW_SET_WIDTH = 230
-WINDOW_SET_HEIGHT = 605
+WINDOW_SET_HEIGHT = Y_SCREEN - WINDOW_SET_Y - WINDOW_VS_Y
 
 WINDOW_SOU_X = WINDOW_VS_X*2 + WINDOW_VS_WIDTH
 WINDOW_SOU_Y = WINDOW_VS_Y
 WINDOW_SOU_WIDTH = STANDAR_WIDTH + 2*WINDOW_VS_X #X_SCREEN - WINDOW_VS_X - WINDOW_SOU_X
-WINDOW_SOU_HEIGHT = WINDOW_SET_Y + WINDOW_SET_HEIGHT - WINDOW_SOU_Y #STANDAR_WIDTH
+WINDOW_SOU_HEIGHT = WINDOW_SET_Y + 605 - WINDOW_SOU_Y #STANDAR_WIDTH
 
 WINDOW_FIL_X = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X
 WINDOW_FIL_Y = WINDOW_VS_Y
@@ -198,7 +198,7 @@ class cvGui():
                         self.usingCamera = False
 
             
-            if (cvui.button(self.frame, 60, 760, "Reset Settings")):
+            if (cvui.button(self.frame, 60, 875, "Reset Settings")):
                 self.resetInitialCond()
             
             #Settings Buttons 
@@ -270,49 +270,44 @@ class cvGui():
                 self.ShiTProp[0] = False
                 
                 if (cvui.checkbox(self.frame, 20, 400, "CIE-Lab Filter", self.CFPropOnOff)):
-                    self.CFLRPropOnOff[0] = False
                     self.CFCamShiftOnOff[0] = False
 
-                    cvui.printf(self.frame, 20, 480, 0.4, 0xdd97fb, "L Semi-amplitude")
-                    cvui.trackbar(self.frame, 20, 495, 210, self.colorFilter_LihtThr, 0.0, 150.0)
+                    cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "L Semi-amplitude")
+                    cvui.trackbar(self.frame, 20, 465, 210, self.colorFilter_LihtThr, 0.0, 150.0)
 
-                    cvui.printf(self.frame, 20, 550, 0.4, 0xdd97fb, "A Semi-amplitude")
-                    cvui.trackbar(self.frame, 20, 565, 210, self.colorFilter_a, 0.0, 30.0)
+                    cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "A Semi-amplitude")
+                    cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 30.0)
 
-                    cvui.printf(self.frame, 20, 620, 0.4, 0xdd97fb, "B Semi-amplitude")
-                    cvui.trackbar(self.frame, 20, 635, 210, self.colorFilter_b, 0.0, 30.0)
+                    cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B Semi-amplitude")
+                    cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 30.0)
                 
-                if (cvui.checkbox(self.frame, 20, 420, "Lightness Recalculation", self.CFLRPropOnOff)):
-                    self.CFPropOnOff[0] = False
-                    self.CFCamShiftOnOff[0] = False
+                    if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
 
-                    cvui.printf(self.frame, 20, 480, 0.4, 0xdd97fb, "Every X Frames")
-                    cvui.trackbar(self.frame, 20, 495, 210, self.ligtRec_x, 0.0, 150.0)
+                        cvui.printf(self.frame, 20, 695, 0.4, 0xdd97fb, "Every X Frames")
+                        cvui.trackbar(self.frame, 20, 710, 210, self.ligtRec_x, 0.0, 150.0)
 
-                    cvui.printf(self.frame, 20, 550, 0.4, 0xdd97fb, "Maximum Threshold Change")
-                    cvui.trackbar(self.frame, 20, 565, 210, self.ligtRec_maxT, 0.0, 30.0)
+                        cvui.printf(self.frame, 20, 765, 0.4, 0xdd97fb, "Maximum Threshold Change")
+                        cvui.trackbar(self.frame, 20, 780, 210, self.ligtRec_maxT, 0.0, 30.0)
 
-                if (cvui.checkbox(self.frame, 20, 440, "Camshift Filter", self.CFCamShiftOnOff)):
+                if (cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff)):
                     self.CFPropOnOff[0] = False
                     self.CFLRPropOnOff[0] = False
 
                 #Printeo ONS/OFFS
                 if (self.CFPropOnOff[0]):
-                    cvui.printf(self.frame, 120, 402, 0.4, 0x10dcA1, "On")
-                    cvui.printf(self.frame, 200, 422, 0.4, 0xdc1076, "Off")
-                    cvui.printf(self.frame, 120, 442, 0.4, 0xdc1076, "Off")
-                elif (self.CFLRPropOnOff[0]):
-                    cvui.printf(self.frame, 120, 402, 0.4, 0xdc1076, "Off")
-                    cvui.printf(self.frame, 200, 422, 0.4, 0x10dcA1, "On")
-                    cvui.printf(self.frame, 120, 442, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 140, 402, 0.4, 0x10dcA1, "On")
+                    cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
                 elif (self.CFCamShiftOnOff[0]):
-                    cvui.printf(self.frame, 120, 402, 0.4, 0xdc1076, "Off")
-                    cvui.printf(self.frame, 200, 422, 0.4, 0xdc1076, "Off")
-                    cvui.printf(self.frame, 120, 442, 0.4, 0x10dcA1, "On")
+                    cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 140, 422, 0.4, 0x10dcA1, "On")
                 else:
-                    cvui.printf(self.frame, 120, 402, 0.4, 0xdc1076, "Off")
-                    cvui.printf(self.frame, 200, 422, 0.4, 0xdc1076, "Off")
-                    cvui.printf(self.frame, 120, 442, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
+                    cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
+
+                # elif (self.CFLRPropOnOff[0]):
+                #     cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
+                #     cvui.printf(self.frame, 200, 422, 0.4, 0x10dcA1, "On")
+                #     cvui.printf(self.frame, 140, 442, 0.4, 0xdc1076, "Off")
                 
             if (cvui.checkbox(self.frame, 20, 360, "Shi-Tomasi", self.ShiTProp)):
                 self.KalmanProp[0] = False
