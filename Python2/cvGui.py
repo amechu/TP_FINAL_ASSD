@@ -397,6 +397,15 @@ class cvGui():
             if ((self.usingCamera) or (self.usingVideo)):
                 if not self.pause:
                     if self.callSource():
+
+                        width = int(self.source.shape[1])
+                        height = int(self.source.shape[0])
+
+                        x0 = self.sourceX
+                        x1 = self.sourceX + self.sourceWIDTH
+                        y0 = self.sourceY
+                        y1 = self.sourceY + self.sourceHEIGHT
+
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
@@ -499,8 +508,11 @@ class cvGui():
     def callSource(self):
         todoPiola, self.source = self.cap.read()
         if todoPiola:
-            #if int(self.source.shape[1]) > STANDAR_WIDTH:
-            self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+            if int(self.source.shape[1]) > STANDAR_WIDTH:
+                self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+            else:
+                self.sourceWIDTH = int(self.source.shape[1])
+                self.sourceHEIGHT = int(self.source.shape[0])
 
             if self.checkParametersChange():
                 pass
