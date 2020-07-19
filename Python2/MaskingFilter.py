@@ -34,18 +34,6 @@ class MaskingFilter:
             pass
         elif self.mask is self.maskingType["FILTER_LAB"]:
 
-            # medianHue = np.median(cv.cvtColor(selection, cv.COLOR_BGR2HSV)[:,:,0])
-            # hue_mask = np.uint8([[[medianHue, 255, 255]]])
-            # bgr_mask = cv.cvtColor(hue_mask, cv.COLOR_HSV2BGR)
-            # lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
-            # L_low = 1
-            # a_low = np.clip(np.int32(lab_mask[0, 0, :])[1] - self.aSemiAmp, 1, 255)
-            # b_low = np.clip(np.int32(lab_mask[0, 0, :])[2] - self.bSemiAmp, 1, 255)
-            # L_high = 255
-            # a_high = np.clip(np.int32(lab_mask[0, 0, :])[1] + self.aSemiAmp, 1, 255)
-            # b_high = np.clip(np.int32(lab_mask[0, 0, :])[2] + self.bSemiAmp, 1, 255)
-
-
             medb, medg, medr = np.median(selection[:, :, 0]), np.median(selection[:, :, 1]), np.median(selection[:, :, 2])
             bgr_mask = np.uint8([[[medb, medg, medr]]])
             lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
@@ -72,7 +60,6 @@ class MaskingFilter:
             frameLab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
             mask = cv.inRange(frameLab, self.lowerThreshold, self.upperThreshold)
             self.filteredFrame = cv.bitwise_and(frame, frame, mask=mask)
-            hola = 1
 
         elif self.mask is self.maskingType["FILTER_CSHIFT"]:
             pass

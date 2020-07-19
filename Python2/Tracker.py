@@ -49,12 +49,12 @@ class Tracker:
         self.frameCounter += 1
         self.KM.predict()
 
-        if self.MF.mask is self.MF.maskingType["FILTER_OFF"]:
-            pass
-        elif self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
+        if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
             frame = self.MF.filterFrame(frame)
+
         elif self.MF.mask is self.MF.maskingType["FILTER_CSHIFT"]:
             pass
+
         elif self.MF.mask is self.MF.maskingType["FILTER_CORR"]:
             pass
 
