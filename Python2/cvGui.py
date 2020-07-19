@@ -297,6 +297,10 @@ class cvGui():
                 if (self.CFPropOnOff[0]):
                     cvui.printf(self.frame, 140, 402, 0.4, 0x10dcA1, "On")
                     cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
+                    if self.CFLRPropOnOff[0]:
+                        cvui.printf(self.frame, 200, 667, 0.4, 0x10dcA1, "On")
+                    else:
+                        cvui.printf(self.frame, 200, 667, 0.4, 0xdc1076, "Off")
                 elif (self.CFCamShiftOnOff[0]):
                     cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
                     cvui.printf(self.frame, 140, 422, 0.4, 0x10dcA1, "On")
@@ -304,10 +308,6 @@ class cvGui():
                     cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
                     cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
 
-                # elif (self.CFLRPropOnOff[0]):
-                #     cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
-                #     cvui.printf(self.frame, 200, 422, 0.4, 0x10dcA1, "On")
-                #     cvui.printf(self.frame, 140, 442, 0.4, 0xdc1076, "Off")
                 
             if (cvui.checkbox(self.frame, 20, 360, "Shi-Tomasi", self.ShiTProp)):
                 self.KalmanProp[0] = False
