@@ -27,11 +27,14 @@ class KalmanFilter:
 
         self.kalman.statePost = np.array([0., 0., 0., 0.]).reshape(4, 1)  # Matriz de estado inicial
 
+        self.trajectory = []
+
 
     def predict(self):
         self.kalman.predict()
 
     def correct(self, measured_x, measured_y):
+        self.trajectory.append((int(measured_x), int(measured_y)))
         self.kalman.correct((float(measured_x), float(measured_y)))
 
     def setStatePost(self, statePost_):

@@ -28,11 +28,16 @@ class Tracker:
                                     #Por ejemplo: [[[x1 y1]]\n\n [[x2 y2]]\n\n [[x3 y3]]]
                                     #es decir una matriz de x filas y 1 columna, donde cada elemento
                                     #de la unica columna es una coordenada [x y].
+        if self.MF.mask is not self.MF.maskingType["FILTER_OFF"]:
+            self.MF.calculateNewMask(frame, frame[int(initialPosition[1] - initialHeight / 2): int(
+            initialPosition[1] + initialHeight / 2), int(initialPosition[0] - initialWidth / 2): int(
+            initialPosition[0] + initialWidth / 2)])
+            frame = self.MF.filterFrame(frame)
         self.prevFrameGray=cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         self.features, self.trackingError = self.ST.recalculateFeatures(self.prevFrameGray[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
         self.features = self.featureTranslate(initialPosition[0]-initialWidth/2, initialPosition[1]-initialHeight/2, self.features)
         self.LK.prevFeatures=self.features
-        self.MF.calculateNewMask(frame, frame[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
+
 
 
     def featureTranslate(self,x, y, features):
@@ -50,6 +55,23 @@ class Tracker:
         self.KM.predict()
 
         if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
+            if self.frameCounter != 0 and self.frameCounter % self.MF.CIELabRecalculationNumber == 0 and self.MF.labPeriodicRecalculations is True and self.trackingError is False:
+
+                medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+                std = np.sqrt((np.std(self.features[:, 0, 0])) ** 2 + (np.std(self.features[:, 0, 1])) ** 2)
+                # calculate mean and std of features
+                mask = (self.features[:, 0, 0] < medx + self.stdMultiplier * std + 0.1) & (
+                            self.features[:, 0, 0] > medx - self.stdMultiplier * std - 0.1) & (
+                               self.features[:, 0, 1] < medy + self.stdMultiplier * std + 0.1) & (
+                                   self.features[:, 0, 1] > medy - self.stdMultiplier * std - 0.1)
+                self.features = self.features[mask]
+                # remove outliers.
+                medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+                if np.isnan(medx) is False and np.isnan(medy) is False:
+                    self.MF.calculateNewMask(frame, frame[int(medy - self.selectionHeight / 2): int(
+                        medy + self.selectionHeight / 2), int(medx - self.selectionWidth / 2): int(
+                        medx + self.selectionWidth / 2)])
+
             frame = self.MF.filterFrame(frame)
 
         elif self.MF.mask is self.MF.maskingType["FILTER_CSHIFT"]:
@@ -147,12 +169,8 @@ class Tracker:
     def getEstimatedVelocity(self):
         return self.KM.statePost[2][0], self.KM.statePost[3][0]
 
-    def getFilteredFrame(self):
-        pass
-
-    def filterFrame(self):
-        pass
-
+    def getTrajectory(self):
+        return self.KM.trajectory
 
 
 
