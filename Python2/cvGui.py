@@ -206,16 +206,15 @@ class cvGui():
                 elif not self.usingCamera:
                     self.CurrentSource = "No Video Loaded"
 
-            if (cvui.button(self.frame, 20, 105, "Use Camera")):
-                self.trackers.clear()
-                if not self.usingCamera:
-                    self.usingVideo = False
-                    self.usingCamera = True
-                    if (self.initSource()):                                                           #Chequear si se inicia bien
-                        self.CurrentSource = "Camera On"
-                    else:
-                        self.usingVideo = False
-                        self.usingCamera = False
+            if (cvui.button(self.frame, 20, 105, "Use Camera") and not self.usingCamera):
+               self.trackers.clear()
+               self.usingVideo = False
+               self.usingCamera = True
+               if (self.initSource()):                  #Chequear si se inicia bien
+                   self.CurrentSource = "Camera On"
+               else:
+                   self.usingVideo = False
+                   self.usingCamera = False
 
 
             if (cvui.button(self.frame, 60, 875, "Reset Settings")):
@@ -239,9 +238,9 @@ class cvGui():
             a = len(self.trackers)
 
             for i in range(a):
-                xTx = WINDOW_TRK_X + 15 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
+                xTx = WINDOW_TRK_X - 165 + int(WINDOW_TRK_WIDTH*(i+1)/MAX_TRACKERS)
                 yTx = WINDOW_TRK_Y + 60
-                xB = WINDOW_TRK_X + 10 + int(WINDOW_TRK_WIDTH*i/MAX_TRACKERS)
+                xB = WINDOW_TRK_X - 165 + int(WINDOW_TRK_WIDTH*(i+1)/MAX_TRACKERS)
                 yB = WINDOW_TRK_Y + 80
 
                 cvui.printf(self.frame, xTx, yTx, 0.4, self.trackerColors[i],"Tracker Number " + str(i+1))
