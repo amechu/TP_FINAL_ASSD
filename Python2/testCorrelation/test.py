@@ -43,6 +43,19 @@ def correlationSection(frame,x,y,w,h,Kernel): #Pasas punta izquierda con xy desp
     tinyFinalMask = cv.inRange(corrOut,0, 0.1)
     finalMask=np.zeros((np.shape(frame)[0],np.shape(frame)[1]))
 
+    x0 = int(x - w/2)
+    y0 = int(y - h/2)
+
+    width = int(tinyFinalMask.shape[1])
+    height = int(tinyFinalMask.shape[0])
+
+    finalMask[y0:y0 + height, x0:x0 + width] = tinyFinalMask
+
+    print(finalMask.shape)
+    print(np.shape(frame))
+
+    filteredFrame = cv.bitwise_and(frame, frame, mask=finalMask)
+
     return [corrOut,finalMask,RetPoint]
 # constant
 
@@ -100,6 +113,7 @@ if __name__ == '__main__':
         c = cv.waitKey(30) & 0xFF
         if c == 27 or c == ord('q'):
             break
+
 
     cap.release()
     cv.destroyAllWindows()
