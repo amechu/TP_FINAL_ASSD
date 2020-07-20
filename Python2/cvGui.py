@@ -544,7 +544,14 @@ class cvGui():
                 tracker.update(self.source)
 
             if not len(self.trackers) == 0:
-                self.filteredFrame = self.trackers[-1].getFilteredFrame()
+                if self.ColorFilter[0]:
+                    self.filteredFrame = self.trackers[-1].getFilteredFrame()
+                elif self.CamShiftFilter[0]:
+                    pass
+                elif self.CorrFilter[0]:
+                    aux = self.trackers[-1].getCorrFrame()
+                    if aux is not None:
+                        self.filteredFrame = aux
 
             i = 0
             for tracker in self.trackers:
