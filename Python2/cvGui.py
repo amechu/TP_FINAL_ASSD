@@ -396,7 +396,7 @@ class cvGui():
 
                 else:
                     if self.boolVideoLoaded:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.arrayVideoLoaded[0]
                     else:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
@@ -550,6 +550,10 @@ class cvGui():
                     self.filteredFrame = None
                 elif self.CorrFilter[0]:
                     self.filteredFrame = self.trackers[-1].getCorrFrame()
+                    if self.filteredFrame is not None:
+                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
+                    else:
+                        self.filteredFrame = None
                 else:
                     self.filteredFrame = None
 
