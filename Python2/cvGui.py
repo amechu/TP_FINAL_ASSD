@@ -89,6 +89,8 @@ class cvGui():
         self.sourceY = 0
         self.sourceWIDTH = 0
         self.sourceHEIGHT = 0
+        self.filterWIDTH = 0
+        self.filterHEIGHT = 0
 
         self.usingCamera = False
         self.usingVideo = False
@@ -411,7 +413,7 @@ class cvGui():
                         else:
                             self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.arrayVideoLoaded[0]
                 else:
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT,x0:x0 + self.sourceWIDTH] = self.filteredFrame
+                    self.frame[self.sourceY:self.sourceY + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -556,12 +558,19 @@ class cvGui():
                 elif self.CorrFilter[0]:
                     self.filteredFrame = self.trackers[-1].getCorrFrame()
                     if self.filteredFrame is not None:
-                        self.filteredFrame = cv.cvtColor(self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH), cv.COLOR_GRAY2BGR)
-                        #self.filteredFrame =
+                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
                     else:
                         self.filteredFrame = None
                 else:
                     self.filteredFrame = None
+
+            if self.CorrFilter[0] and self.filteredFrame is not None:
+                self.filterWIDTH = int(len(self.filteredFrame[0,:]))
+                self.filterHEIGHT = int(len(self.filteredFrame[:,0]))
+                self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)
+            else:
+                self.filterWIDTH = self.sourceWIDTH
+                self.filterHEIGHT = self.sourceHEIGHT
 
             i = 0
             for tracker in self.trackers:
