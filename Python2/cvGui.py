@@ -372,7 +372,6 @@ class cvGui():
                 #     y1 = y0 + int(toShow.shape[0])
                 #     self.frame[y0:y1, x0:x1] = toShow
 
-
             if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 60, "Cam Shift", self.CamShiftFilter) :
                 self.ColorFilter[0] = False
                 self.CorrFilter[0] = False
@@ -384,7 +383,6 @@ class cvGui():
                 #     y0 = WINDOW_FIL_Y + 130
                 #     y1 = y0 + int(toShow.shape[0])
                 #     self.frame[y0:y1, x0:x1] = toShow
-
 
             if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 90, "Correlation Filter", self.CorrFilter) :
                 self.CamShiftFilter[0] = False
