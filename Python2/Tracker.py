@@ -56,21 +56,22 @@ class Tracker:
 
         if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
             if self.frameCounter != 0 and self.frameCounter % self.MF.CIELabRecalculationNumber == 0 and self.MF.labPeriodicRecalculations is True and self.trackingError is False:
-
-                medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
-                std = np.sqrt((np.std(self.features[:, 0, 0])) ** 2 + (np.std(self.features[:, 0, 1])) ** 2)
-                # calculate mean and std of features
-                mask = (self.features[:, 0, 0] < medx + self.stdMultiplier * std + 0.1) & (
-                            self.features[:, 0, 0] > medx - self.stdMultiplier * std - 0.1) & (
-                               self.features[:, 0, 1] < medy + self.stdMultiplier * std + 0.1) & (
-                                   self.features[:, 0, 1] > medy - self.stdMultiplier * std - 0.1)
-                self.features = self.features[mask]
-                # remove outliers.
-                medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
-                if np.isnan(medx) is False and np.isnan(medy) is False:
-                    self.MF.calculateNewMask(frame, frame[int(medy - self.selectionHeight / 2): int(
-                        medy + self.selectionHeight / 2), int(medx - self.selectionWidth / 2): int(
-                        medx + self.selectionWidth / 2)])
+                vx, vy = self.getEstimatedVelocity()
+                if np.abs(vx) < 5 and np.abs(vy) < 5:
+                    medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+                    std = np.sqrt((np.std(self.features[:, 0, 0])) ** 2 + (np.std(self.features[:, 0, 1])) ** 2)
+                    # calculate mean and std of features
+                    mask = (self.features[:, 0, 0] < medx + self.stdMultiplier * std + 0.1) & (
+                                self.features[:, 0, 0] > medx - self.stdMultiplier * std - 0.1) & (
+                                   self.features[:, 0, 1] < medy + self.stdMultiplier * std + 0.1) & (
+                                       self.features[:, 0, 1] > medy - self.stdMultiplier * std - 0.1)
+                    self.features = self.features[mask]
+                    # remove outliers.
+                    medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+                    if (~np.isnan(medx)) and (~np.isnan(medy)):
+                        self.MF.calculateNewMask(frame, frame[int(medy - self.selectionHeight / 2): int(
+                            medy + self.selectionHeight / 2), int(medx - self.selectionWidth / 2): int(
+                            medx + self.selectionWidth / 2)])
 
             frame = self.MF.filterFrame(frame)
 

@@ -36,27 +36,28 @@ class MaskingFilter:
         elif self.mask is self.maskingType["FILTER_LAB"]:
 
             medb, medg, medr = np.median(selection[:, :, 0]), np.median(selection[:, :, 1]), np.median(selection[:, :, 2])
-            bgr_mask = np.uint8([[[medb, medg, medr]]])
-            self.bgrmask = [medb, medg, medr]
-            lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
+            if ~np.isnan(medb)&~np.isnan(medg)&~np.isnan(medr):
+                bgr_mask = np.uint8([[[medb, medg, medr]]])
+                self.bgrmask = [medb, medg, medr]
+                lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
 
-            if self.init is True:
-                L_low = np.clip(np.int32(lab_mask[0, 0, :])[0] - self.LSemiAmp, 1, 255)
-                a_low = np.clip(np.int32(lab_mask[0, 0, :])[1] - self.aSemiAmp, 1, 255)
-                b_low = np.clip(np.int32(lab_mask[0, 0, :])[2] - self.bSemiAmp, 1, 255)
-                L_high = np.clip(np.int32(lab_mask[0, 0, :])[0] + self.LSemiAmp, 1, 255)
-                a_high = np.clip(np.int32(lab_mask[0, 0, :])[1] + self.aSemiAmp, 1, 255)
-                b_high = np.clip(np.int32(lab_mask[0, 0, :])[2] + self.bSemiAmp, 1, 255)
-                self.lowerThreshold = np.array([L_low, a_low, b_low])
-                self.upperThreshold = np.array([L_high, a_high, b_high])
-            else:
+                if self.init is True:
+                    L_low = np.clip(np.int32(lab_mask[0, 0, :])[0] - self.LSemiAmp, 1, 255)
+                    a_low = np.clip(np.int32(lab_mask[0, 0, :])[1] - self.aSemiAmp, 1, 255)
+                    b_low = np.clip(np.int32(lab_mask[0, 0, :])[2] - self.bSemiAmp, 1, 255)
+                    L_high = np.clip(np.int32(lab_mask[0, 0, :])[0] + self.LSemiAmp, 1, 255)
+                    a_high = np.clip(np.int32(lab_mask[0, 0, :])[1] + self.aSemiAmp, 1, 255)
+                    b_high = np.clip(np.int32(lab_mask[0, 0, :])[2] + self.bSemiAmp, 1, 255)
+                    self.lowerThreshold = np.array([L_low, a_low, b_low])
+                    self.upperThreshold = np.array([L_high, a_high, b_high])
+                else:
 
-                self.lowerThreshold[0] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[0] - self.LSemiAmp, 1, 255) - self.lowerThreshold[0], -self.labMaxChange, self.labMaxChange)
-                self.lowerThreshold[1] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[1] - self.LSemiAmp, 1, 255) - self.lowerThreshold[1], -self.labMaxChange, self.labMaxChange)
-                self.lowerThreshold[2] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[2] - self.LSemiAmp, 1, 255) - self.lowerThreshold[2], -self.labMaxChange, self.labMaxChange)
-                self.upperThreshold[0] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[0] + self.LSemiAmp, 1, 255) - self.upperThreshold[0], -self.labMaxChange, self.labMaxChange)
-                self.upperThreshold[1] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[1] + self.LSemiAmp, 1, 255) - self.upperThreshold[1], -self.labMaxChange, self.labMaxChange)
-                self.upperThreshold[2] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[2] + self.LSemiAmp, 1, 255) - self.upperThreshold[2], -self.labMaxChange, self.labMaxChange)
+                    self.lowerThreshold[0] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[0] - self.LSemiAmp, 1, 255) - self.lowerThreshold[0], -self.labMaxChange, self.labMaxChange)
+                    self.lowerThreshold[1] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[1] - self.LSemiAmp, 1, 255) - self.lowerThreshold[1], -self.labMaxChange, self.labMaxChange)
+                    self.lowerThreshold[2] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[2] - self.LSemiAmp, 1, 255) - self.lowerThreshold[2], -self.labMaxChange, self.labMaxChange)
+                    self.upperThreshold[0] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[0] + self.LSemiAmp, 1, 255) - self.upperThreshold[0], -self.labMaxChange, self.labMaxChange)
+                    self.upperThreshold[1] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[1] + self.LSemiAmp, 1, 255) - self.upperThreshold[1], -self.labMaxChange, self.labMaxChange)
+                    self.upperThreshold[2] += np.clip(np.clip(np.int32(lab_mask[0, 0, :])[2] + self.LSemiAmp, 1, 255) - self.upperThreshold[2], -self.labMaxChange, self.labMaxChange)
 
         elif self.mask is self.maskingType["FILTER_CSHIFT"]:
             pass
