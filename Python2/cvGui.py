@@ -149,14 +149,8 @@ class cvGui():
         self.parametersNew = []
 
         self.boolVideoLoaded = False
-        self.arrayVideoLoaded0 = []
-        self.arrayVideoLoaded1 = []
-        self.arrayVideoLoaded2 = []
-        self.arrayVideoLoaded3 = []
-        self.arrayVideoLoaded4 = []
-        #self.arrayVideoLoaded = [self.arrayVideoLoaded0, self.arrayVideoLoaded1, self.arrayVideoLoaded2, self.arrayVideoLoaded3, self.arrayVideoLoaded4]
-        self.arrayCounter = 0
-
+        self.arrayVideoLoaded = []
+        #self.arrayMiniVideo = []
 
     def onWork(self):
 
@@ -230,23 +224,13 @@ class cvGui():
 
                 if len(self.trackers) < MAX_TRACKERS:
                     if self.boolVideoLoaded:
-                        if self.arrayCounter == 0:
-                            bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded0[0])
-                        elif self.arrayCounter == 1:
-                            bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded1[0])
-                        elif self.arrayCounter == 2:
-                            bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded2[0])
-                        elif self.arrayCounter == 3:
-                            bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded3[0])
-                        else:
-                            bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded4[0])
-                        #bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[self.arrayCounter][0])
+                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[0])
                     else:
                         bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.source)
                     cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
                     if not ((bBox[0] == 0) or (bBox[1] == 0) or (bBox[2] == 0) or (bBox[3] == 0)):
                         if self.boolVideoLoaded:
-                            self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded[self.arrayCounter][0]))
+                            self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded[0]))
                         else:
                             self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
 
@@ -419,24 +403,9 @@ class cvGui():
                     else:
                         pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                     if self.boolVideoLoaded:
-                        if self.arrayCounter == 0:
-                            del self.arrayVideoLoaded0[0]
-                        elif self.arrayCounter == 1:
-                            del self.arrayVideoLoaded1[0]
-                        elif self.arrayCounter == 2:
-                            del self.arrayVideoLoaded2[0]
-                        elif self.arrayCounter == 3:
-                            del self.arrayVideoLoaded3[0]
-                        else:
-                            del self.arrayVideoLoaded4[0]
-
-                        self.arrayCounter = self.arrayCounter + 1
-                        if self.arrayCounter == 5:
-                            self.arrayCounter = 0
-
-                        #del self.arrayVideoLoaded[self.arrayCounter][0]
+                        del self.arrayVideoLoaded[0]
                         # del self.arrayMiniVideo[0]
-                        if (len(self.arrayVideoLoaded0) == 0) or (len(self.arrayVideoLoaded1) == 0) or (len(self.arrayVideoLoaded2) == 0) or (len(self.arrayVideoLoaded3) == 0) or (len(self.arrayVideoLoaded4) == 0):
+                        if len(self.arrayVideoLoaded) == 0:
                             self.boolVideoLoaded = False
                 else:
                     if self.boolVideoLoaded:
@@ -510,13 +479,7 @@ class cvGui():
 
     def initSource(self):
         self.source = []
-        self.arrayVideoLoaded0.clear()
-        self.arrayVideoLoaded1.clear()
-        self.arrayVideoLoaded2.clear()
-        self.arrayVideoLoaded3.clear()
-        self.arrayVideoLoaded4.clear()
-        #self.arrayVideoLoaded.clear()
-
+        self.arrayVideoLoaded.clear()
         # self.arrayMiniVideo.clear()
         self.source[:] = (49, 52, 49)
         self.boolVideoLoaded = False
@@ -542,12 +505,7 @@ class cvGui():
                         self.boolVideoLoaded = False
                         self.usingCamera = False
                         self.usingVideo = False
-                        self.arrayVideoLoaded0.clear()
-                        self.arrayVideoLoaded1.clear()
-                        self.arrayVideoLoaded2.clear()
-                        self.arrayVideoLoaded3.clear()
-                        self.arrayVideoLoaded4.clear()
-                        #self.arrayVideoLoaded.clear()
+                        self.arrayVideoLoaded.clear()
                 else:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
                     self.sourceWIDTH = int(self.source.shape[1])
@@ -568,18 +526,7 @@ class cvGui():
 
     def callSource(self):
         if self.boolVideoLoaded:
-            if self.arrayCounter == 0:
-                self.source = self.arrayVideoLoaded0[0]
-            elif self.arrayCounter == 1:
-                self.source = self.arrayVideoLoaded1[0]
-            elif self.arrayCounter == 2:
-                self.source = self.arrayVideoLoaded2[0]
-            elif self.arrayCounter == 3:
-                self.source = self.arrayVideoLoaded3[0]
-            else:
-                self.source = self.arrayVideoLoaded4[0]
-
-            #self.source = self.arrayVideoLoaded[self.arrayCounter][0]
+            self.source = self.arrayVideoLoaded[0]
             todoPiola = True
         else:
             todoPiola, self.source = self.cap.read()
@@ -612,7 +559,6 @@ class cvGui():
                 else:
                     self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.searchWidth, tracker.searchHeight, (b, g, r))
                 i +=1
-
         return todoPiola
 
     def rescale_frame_standar(self, frame, maxWidth):
@@ -723,44 +669,17 @@ class cvGui():
                 someCrazyShit = self.rescale_frame_standar(someCrazyShit, STANDAR_WIDTH)
                 # someCrazyShit2 = someCrazyShit
                 # someCrazyShit2 = self.rescale_frame_standar(someCrazyShit2, WINDOW_FIL_WIDTH - 15)
-                if self.arrayCounter == 0:
-                    self.arrayVideoLoaded0.append(someCrazyShit)
-                elif self.arrayCounter == 1:
-                    self.arrayVideoLoaded1.append(someCrazyShit)
-                elif self.arrayCounter == 2:
-                    self.arrayVideoLoaded2.append(someCrazyShit)
-                elif self.arrayCounter == 3:
-                    self.arrayVideoLoaded3.append(someCrazyShit)
-                else:
-                    self.arrayVideoLoaded4.append(someCrazyShit)
-
-                #(self.arrayVideoLoaded[self.arrayCounter]).append(someCrazyShit)
+                self.arrayVideoLoaded.append(someCrazyShit)
                 # self.arrayMiniVideo.append(someCrazyShit2)
                 todoPiola, someCrazyShit = self.cap.read()
-                self.arrayCounter = self.arrayCounter + 1
-                if self.arrayCounter == 5:
-                    self.arrayCounter = 0
         else:
             while todoPiola:
                 someCrazyShit = self.rescale_frame_standar2(someCrazyShit, WINDOW_SOU_HEIGHT - 80)
-                if self.arrayCounter == 0:
-                    self.arrayVideoLoaded0.append(someCrazyShit)
-                elif self.arrayCounter == 1:
-                    self.arrayVideoLoaded1.append(someCrazyShit)
-                elif self.arrayCounter == 2:
-                    self.arrayVideoLoaded2.append(someCrazyShit)
-                elif self.arrayCounter == 3:
-                    self.arrayVideoLoaded3.append(someCrazyShit)
-                else:
-                    self.arrayVideoLoaded4.append(someCrazyShit)
+                self.arrayVideoLoaded.append(someCrazyShit)
                 todoPiola, someCrazyShit = self.cap.read()
-                self.arrayCounter = self.arrayCounter + 1
-                if self.arrayCounter == 5:
-                    self.arrayCounter = 0
 
-        self.arrayCounter = 0
-        self.sourceWIDTH = int(self.arrayVideoLoaded0[0].shape[1])
-        self.sourceHEIGHT = int(self.arrayVideoLoaded0[0].shape[0])
+        self.sourceWIDTH = int(self.arrayVideoLoaded[0].shape[1])
+        self.sourceHEIGHT = int(self.arrayVideoLoaded[0].shape[0])
 
         return todoPiola
 
