@@ -13,6 +13,7 @@ def correlationAllPic(frame):
     mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
     frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
     corr_out = cv.matchTemplate(frame_hsv, kernel, method=match_method)
+
     cv.normalize(corr_out, corr_out, 0, 1, cv.NORM_MINMAX)
     [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(corr_out)
     if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
@@ -97,8 +98,8 @@ if __name__ == '__main__':
         deltay=h
         ux=x+(deltax/2.0)
         uy=y+(deltay/2.0)
-   #     [corrOut, points]= correlationAllPic(frame)
-        [corrOut,points] = correlationSection(frame,ux,uy,deltax+50,deltay+50,kernel)
+        [corrOut, points]= correlationAllPic(frame)
+   #     [corrOut,points] = correlationSection(frame,ux,uy,deltax+50,deltay+50,kernel)
 
 
         cv.rectangle(frame,(int(points[0]),int(points[1])),(int(points[0]+deltax) , int(points[1] +deltay)),color,2)
@@ -112,6 +113,7 @@ if __name__ == '__main__':
         c = cv.waitKey(30) & 0xFF
         if c == 27 or c == ord('q'):
             break
+
 
 
     cap.release()
