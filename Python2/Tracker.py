@@ -133,7 +133,8 @@ class Tracker:
         self.KM.updateParams()
 
 
-
+    def getFilteredFrame(self):
+        return self.MF.filteredFrame
 
     def getEstimatedPosition(self):
         return self.KM.statePost[0][0], self.KM.statePost[1][0]

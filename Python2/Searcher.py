@@ -54,7 +54,9 @@ class Searcher:
     )
     usualAlgorithm = usualAlgorithmD["LK_ST"]
     missAlgorithm = missAlgorithmD["CORR"]
+
     recalcAlgorithm = recalcAlgorithmD["ST"]
+
 
     def __init__(self,firstFrame,selectionHeight_,selectionWidth_,xSelection,ySelection,prevFrameGrayC):
         self.LK = OpticalFlow()
