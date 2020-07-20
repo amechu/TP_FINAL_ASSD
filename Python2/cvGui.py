@@ -406,7 +406,10 @@ class cvGui():
                     if self.usingCamera:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.source
                     else:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFilterFrame
+                        if len(self.arrayVideoLoaded) == 0:
+                            self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFilterFrame
+                        else:
+                            self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.arrayVideoLoaded[0]
                 else:
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT,x0:x0 + self.sourceWIDTH] = self.filteredFrame
 
@@ -475,6 +478,7 @@ class cvGui():
 
 
     def initSource(self):
+        self.source = []
         self.arrayVideoLoaded.clear()
         self.filteredFrame = None
         self.source[:] = (49, 52, 49)
