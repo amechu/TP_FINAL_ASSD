@@ -136,6 +136,9 @@ class Tracker:
     def getFilteredFrame(self):
         return self.MF.filteredFrame
 
+    def getCorrFrame(self):
+        return self.SC.corr_out
+
     def getEstimatedPosition(self):
         return self.KM.statePost[0][0], self.KM.statePost[1][0]
 
