@@ -250,6 +250,7 @@ class cvGui():
 
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No trackers added. Try selecting a new area!")
+                self.filteredFrame = None
             elif a == 1:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x79d805, "Using 1 tracker of 5!")
             elif a == 2:
@@ -384,11 +385,11 @@ class cvGui():
                         #pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                     if self.boolVideoLoaded:
                         del self.arrayVideoLoaded[0]
-                        self.filteredFrame.clear()
                         if len(self.arrayVideoLoaded) == 0:
                             self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
                             self.lastVideoFrame = self.source
+                            self.filteredFrame = None
 
                 else:
                     if self.boolVideoLoaded:
@@ -398,8 +399,11 @@ class cvGui():
 
             if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
                 x0 = self.sourceX + WINDOW_SOU_WIDTH + WINDOW_VS_X
-                if len(self.filteredFrame) == 0:
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.source
+                if self.filteredFrame is None:
+                    if self.usingCamera:
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.source
+                    else:
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.arrayVideoLoaded[0]
                 else:
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT,x0:x0 + self.sourceWIDTH] = self.filteredFrame
 
@@ -470,7 +474,7 @@ class cvGui():
     def initSource(self):
         self.source = []
         self.arrayVideoLoaded.clear()
-        self.filteredFrame.clear()
+        self.filteredFrame = None
         self.source[:] = (49, 52, 49)
         self.boolVideoLoaded = False
 
@@ -535,7 +539,9 @@ class cvGui():
 
             for tracker in self.trackers:
                 tracker.update(self.source)
-                self.filteredFrame = tracker.getFilteredFrame()
+
+            if not len(self.trackers) == 0:
+                self.filteredFrame = self.trackers[-1].getFilteredFrame()
 
             i = 0
             for tracker in self.trackers:
