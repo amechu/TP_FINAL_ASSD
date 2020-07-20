@@ -148,9 +148,11 @@ class cvGui():
         self.parameters = []
         self.parametersNew = []
 
+        #Video Loaded elements
         self.boolVideoLoaded = False
         self.arrayVideoLoaded = []
         #self.arrayMiniVideo = []
+        self.lastVideoFrame = 0
 
     def onWork(self):
 
@@ -408,13 +410,16 @@ class cvGui():
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
-                        pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastVideoFrame
+                        #pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                     if self.boolVideoLoaded:
                         del self.arrayVideoLoaded[0]
                         # del self.arrayMiniVideo[0]
                         if len(self.arrayVideoLoaded) == 0:
                             self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
+                            self.lastVideoFrame = self.source
+
                 else:
                     if self.boolVideoLoaded:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
