@@ -19,9 +19,9 @@ def correlationAllPic(frame):
         matchLoc = minLoc
     else:
         matchLoc = maxLoc
-    finalMask = cv.inRange(corr_out,0, 0.1)
-    finalMask= np.uint8(finalMask)
-    return [corr_out,finalMask,matchLoc]
+#    finalMask = cv.inRange(corr_out,0, 0.1)
+#    finalMask= np.uint8(finalMask)
+    return [corr_out,matchLoc]
 
 
 def correlationSection(frame,x,y,w,h,Kernel): #Pasas punta izquierda con xy despues h y w
@@ -41,24 +41,24 @@ def correlationSection(frame,x,y,w,h,Kernel): #Pasas punta izquierda con xy desp
     else:
         matchLoc = maxLoc
     RetPoint =  (matchLoc[0]+x-w/2 ,matchLoc[1]+y-h/2)
-    tinyFinalMask = cv.inRange(corrOut,0, 0.1)
-    finalMask=np.zeros((np.shape(frame)[0],np.shape(frame)[1]))
+#    tinyFinalMask = cv.inRange(corrOut,0, 0.1)
+#    finalMask=np.zeros((np.shape(frame)[0],np.shape(frame)[1]))
 
-    x0 = int(x - w/2)
-    y0 = int(y - h/2)
+#    x0 = int(x - w/2)
+#    y0 = int(y - h/2)
 
-    width = int(tinyFinalMask.shape[1])
-    height = int(tinyFinalMask.shape[0])
+#    width = int(tinyFinalMask.shape[1])
+#    height = int(tinyFinalMask.shape[0])
 
-    finalMask[y0:y0 + height, x0:x0 + width] = tinyFinalMask
-    finalMask= np.uint8(finalMask)
+#    finalMask[y0:y0 + height, x0:x0 + width] = tinyFinalMask
+#    finalMask= np.uint8(finalMask)
 #    print(finalMask.shape)
 #    print(np.shape(frame))
-
-
-
-    return [corrOut,finalMask,RetPoint]
+    return [corrOut,RetPoint]
 # constant
+
+
+
 
 
 if __name__ == '__main__':
@@ -70,8 +70,6 @@ if __name__ == '__main__':
     cv.namedWindow('tracking')
     cv.namedWindow('kernel')
     cv.namedWindow('Corr')
-    cv.namedWindow('mask')
-    cv.namedWindow('Filtered')
 
     first=True
     ret, frame = cap.read()
@@ -85,7 +83,7 @@ if __name__ == '__main__':
     anchor = [-1,1]
     delta=0
     ddepht=-1
-    cv.imshow('kernel',kernel)
+    cv.imshow('kernel',kernelRGB)
     color = (255, 0, 0)
     color2 = (255, 255, 0)
 
@@ -99,8 +97,8 @@ if __name__ == '__main__':
         deltay=h
         ux=x+(deltax/2.0)
         uy=y+(deltay/2.0)
-        [corrOut, finalmask, points]= correlationAllPic(frame)
-  #      [corrOut,finalmask,points] = correlationSection(frame,ux,uy,deltax+50,deltay+50,kernel)
+   #     [corrOut, points]= correlationAllPic(frame)
+        [corrOut,points] = correlationSection(frame,ux,uy,deltax+50,deltay+50,kernel)
 
 
         cv.rectangle(frame,(int(points[0]),int(points[1])),(int(points[0]+deltax) , int(points[1] +deltay)),color,2)
@@ -109,8 +107,6 @@ if __name__ == '__main__':
 
         cv.imshow('tracking', frame)
         cv.imshow('Corr', corrOut)
-        cv.imshow('mask', finalmask)
-    #    cv.imshow('Filtered', filteredFrame)
 
 
         c = cv.waitKey(30) & 0xFF
