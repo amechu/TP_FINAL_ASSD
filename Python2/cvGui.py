@@ -152,7 +152,9 @@ class cvGui():
         self.boolVideoLoaded = False
         self.arrayVideoLoaded = []
         self.filteredFrame = []
-        self.lastVideoFrame = 0
+
+        self.lastVideoFrame = []
+        self.lastFilterFrame = []
 
     def onWork(self):
 
@@ -389,6 +391,7 @@ class cvGui():
                             self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
                             self.lastVideoFrame = self.source
+                            self.lastFilterFrame = self.filteredFrame
                             self.filteredFrame = None
 
                 else:
@@ -403,7 +406,7 @@ class cvGui():
                     if self.usingCamera:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.source
                     else:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.arrayVideoLoaded[0]
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFilterFrame
                 else:
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT,x0:x0 + self.sourceWIDTH] = self.filteredFrame
 
