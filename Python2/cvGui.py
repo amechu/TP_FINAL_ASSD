@@ -475,7 +475,6 @@ class cvGui():
 
 
     def initSource(self):
-        self.source = []
         self.arrayVideoLoaded.clear()
         self.filteredFrame = None
         self.source[:] = (49, 52, 49)
@@ -503,8 +502,10 @@ class cvGui():
                         self.usingCamera = False
                         self.usingVideo = False
                         self.arrayVideoLoaded.clear()
+                    self.lastFilterFrame = self.arrayVideoLoaded[0]
                 else:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+                    self.lastFilterFrame = self.source
                     self.sourceWIDTH = int(self.source.shape[1])
                     self.sourceHEIGHT = int(self.source.shape[0])
 
