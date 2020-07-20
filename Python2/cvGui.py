@@ -406,6 +406,7 @@ class cvGui():
                         del self.arrayVideoLoaded[0]
                         # del self.arrayMiniVideo[0]
                         if len(self.arrayVideoLoaded) == 0:
+                            self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
                 else:
                     if self.boolVideoLoaded:
