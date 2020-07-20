@@ -36,7 +36,7 @@ SHIT_SPIX = 4.0
 Y_SCREEN = 960
 X_SCREEN = 1280
 
-STANDAR_WIDTH = 720
+STANDAR_WIDTH = 500 #720
 
 WINDOW_VS_X = 10
 WINDOW_VS_Y = 10
@@ -50,8 +50,8 @@ WINDOW_SET_HEIGHT = Y_SCREEN - WINDOW_SET_Y - WINDOW_VS_Y
 
 WINDOW_SOU_X = WINDOW_VS_X*2 + WINDOW_VS_WIDTH
 WINDOW_SOU_Y = WINDOW_VS_Y
-WINDOW_SOU_WIDTH = STANDAR_WIDTH + 2*WINDOW_VS_X #X_SCREEN - WINDOW_VS_X - WINDOW_SOU_X
-WINDOW_SOU_HEIGHT = WINDOW_SET_Y + 605 - WINDOW_SOU_Y #STANDAR_WIDTH
+WINDOW_SOU_WIDTH = STANDAR_WIDTH + 2*WINDOW_VS_X
+WINDOW_SOU_HEIGHT = STANDAR_WIDTH + 2*WINDOW_VS_X
 
 WINDOW_FIL_X = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X
 WINDOW_FIL_Y = WINDOW_VS_Y
@@ -395,7 +395,7 @@ class cvGui():
                 #     y1 = y0 + int(toShow.shape[0])
                 #     self.frame[y0:y1, x0:x1] = toShow
 
-            cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 40, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 80, 0x5c585a, 0x242223)
+            cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
                 if not self.pause:
                     if self.callSource():
@@ -406,6 +406,7 @@ class cvGui():
                         del self.arrayVideoLoaded[0]
                         # del self.arrayMiniVideo[0]
                         if len(self.arrayVideoLoaded) == 0:
+                            self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
                 else:
                     if self.boolVideoLoaded:
