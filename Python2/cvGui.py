@@ -151,7 +151,7 @@ class cvGui():
         #Video Loaded elements
         self.boolVideoLoaded = False
         self.arrayVideoLoaded = []
-        #self.arrayMiniVideo = []
+        self.filteredFrame = []
         self.lastVideoFrame = 0
 
     def onWork(self):
@@ -359,48 +359,19 @@ class cvGui():
 
             #Filters: Correlation, Cam shift, Color
 
-            # cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_FIL_Y + 115, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
 
-            # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 30, "Color Filter", self.ColorFilter) :
             if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Color Filter", self.ColorFilter):
                 self.CamShiftFilter[0] = False
                 self.CorrFilter[0] = False
-                # if (self.usingVideo or self.usingCamera):
-                #     if len(self.arrayMiniVideo):
-                #         toShow = self.arrayMiniVideo[0]
-                #         x0 = WINDOW_FIL_X + 8
-                #         x1 = x0 + WINDOW_FIL_WIDTH - 15
-                #         y0 = WINDOW_FIL_Y + 130
-                #         y1 = y0 + int(toShow.shape[0])
-                #         self.frame[y0:y1, x0:x1] = toShow
 
-
-            # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 60, "Cam Shift", self.CamShiftFilter) :
             if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(1/3)) , WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Cam Shift", self.CamShiftFilter):
                 self.ColorFilter[0] = False
                 self.CorrFilter[0] = False
-                # if (self.usingVideo or self.usingCamera):
-                #     toShow = self.source
-                #     toShow = self.rescale_frame_standar(toShow, WINDOW_FIL_WIDTH - 15)
-                #     x0 = WINDOW_FIL_X + 7
-                #     x1 = x0 + int(toShow.shape[1])
-                #     y0 = WINDOW_FIL_Y + 130
-                #     y1 = y0 + int(toShow.shape[0])
-                #     self.frame[y0:y1, x0:x1] = toShow
 
-            # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 90, "Correlation Filter", self.CorrFilter) :
             if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(2/3)), WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Correlation Filter", self.CorrFilter):
                 self.CamShiftFilter[0] = False
                 self.ColorFilter[0] = False
-                # if (self.usingVideo or self.usingCamera):
-                #     toShow = self.source
-                #     toShow = self.rescale_frame_standar(toShow, WINDOW_FIL_WIDTH - 15)
-                #     x0 = WINDOW_FIL_X + 7
-                #     x1 = x0 + int(toShow.shape[1])
-                #     y0 = WINDOW_FIL_Y + 130
-                #     y1 = y0 + int(toShow.shape[0])
-                #     self.frame[y0:y1, x0:x1] = toShow
 
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
@@ -413,7 +384,7 @@ class cvGui():
                         #pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
                     if self.boolVideoLoaded:
                         del self.arrayVideoLoaded[0]
-                        # del self.arrayMiniVideo[0]
+                        self.filteredFrame.clear()
                         if len(self.arrayVideoLoaded) == 0:
                             self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
@@ -424,6 +395,13 @@ class cvGui():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+
+            if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
+                x0 = self.sourceX + WINDOW_SOU_WIDTH + WINDOW_VS_X
+                if len(self.filteredFrame) == 0:
+                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.source
+                else:
+                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT,x0:x0 + self.sourceWIDTH] = self.filteredFrame
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -492,7 +470,7 @@ class cvGui():
     def initSource(self):
         self.source = []
         self.arrayVideoLoaded.clear()
-        # self.arrayMiniVideo.clear()
+        self.filteredFrame.clear()
         self.source[:] = (49, 52, 49)
         self.boolVideoLoaded = False
 
@@ -557,6 +535,7 @@ class cvGui():
 
             for tracker in self.trackers:
                 tracker.update(self.source)
+                self.filteredFrame = tracker.getFilteredFrame()
 
             i = 0
             for tracker in self.trackers:
@@ -571,6 +550,7 @@ class cvGui():
                 else:
                     self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
                 i +=1
+
         return todoPiola
 
     def rescale_frame_standar(self, frame, maxWidth):
@@ -679,10 +659,7 @@ class cvGui():
         if someCrazyShit.shape[1] >= someCrazyShit.shape[0]:
             while todoPiola:
                 someCrazyShit = self.rescale_frame_standar(someCrazyShit, STANDAR_WIDTH)
-                # someCrazyShit2 = someCrazyShit
-                # someCrazyShit2 = self.rescale_frame_standar(someCrazyShit2, WINDOW_FIL_WIDTH - 15)
                 self.arrayVideoLoaded.append(someCrazyShit)
-                # self.arrayMiniVideo.append(someCrazyShit2)
                 todoPiola, someCrazyShit = self.cap.read()
         else:
             while todoPiola:
