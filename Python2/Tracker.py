@@ -110,9 +110,9 @@ class Tracker:
         self.SC.LK.lkMaxLevel = parametersNew[3]           #lk_mr
 
         # = parametersNew[4]              #Color Filter OnOff
-        #ColorFilter.ColorFilter.LIG_THR_CHANGE = parametersNew[5]  #colorFilter_LihtThr
-        #= parametersNew[6]     #colorFilter_a
-        #= parametersNew[7]     #colorFilter_b
+        MaskingFilter.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
+        MaskingFilter.aSemiAmp = parametersNew[6]     #colorFilter_a
+        MaskingFilter.bSemiAmp = parametersNew[7]     #colorFilter_b
 
         #= parametersNew[8]     #Light R OnOff
         #= parametersNew[9]    #ligtRec_x)
