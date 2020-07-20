@@ -102,11 +102,12 @@ class Searcher:
             else:
                 matchLoc = maxLoc
             candidate = matchLoc
+            #self.trackingError=False
+            #print(candidate)
             frame_to_search =frameGray[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight ),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth )]
             self.features, self.trackingError = self.ST.recalculateFeatures(frame_to_search)
             self.features = self.featureTranslate(int(matchLoc[0]),int(matchLoc[1]),self.features)
             self.LK.prevFeatures=self.features
-
         return candidate
 
     def search(self,frameCounter,frame):

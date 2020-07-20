@@ -17,7 +17,7 @@ class MaskingFilter:
     bSemiAmp = 15
     labMaxChange = 1
     CIELabRecalculationNumber = 1
-    labPeriodicRecalculations = True
+    labPeriodicRecalculations = False
 
     def __init__(self):
         self.mask = self.maskingType["FILTER_LAB"]
