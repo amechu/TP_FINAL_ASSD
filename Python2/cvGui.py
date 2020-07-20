@@ -34,7 +34,7 @@ SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
 Y_SCREEN = 960
-X_SCREEN = 1280
+X_SCREEN = 1310 #1280
 
 STANDAR_WIDTH = 500 #720
 
@@ -55,13 +55,13 @@ WINDOW_SOU_HEIGHT = STANDAR_WIDTH + 2*WINDOW_VS_X
 
 WINDOW_FIL_X = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X
 WINDOW_FIL_Y = WINDOW_VS_Y
-WINDOW_FIL_WIDTH = X_SCREEN - WINDOW_FIL_X - WINDOW_SET_X
-WINDOW_FIL_HEIGHT = Y_SCREEN - WINDOW_FIL_Y - WINDOW_VS_Y#WINDOW_SOU_HEIGHT
+WINDOW_FIL_WIDTH = WINDOW_SOU_WIDTH #X_SCREEN - WINDOW_FIL_X - WINDOW_SET_X
+WINDOW_FIL_HEIGHT = WINDOW_SOU_HEIGHT #Y_SCREEN - WINDOW_FIL_Y - WINDOW_VS_Y
 
 WINDOW_TRK_X = WINDOW_SOU_X
 WINDOW_TRK_Y = WINDOW_SOU_WIDTH + 2*WINDOW_VS_Y
-WINDOW_TRK_WIDTH = WINDOW_SOU_WIDTH
-WINDOW_TRK_HEIGHT = Y_SCREEN - WINDOW_TRK_Y - WINDOW_VS_Y
+WINDOW_TRK_WIDTH = X_SCREEN - WINDOW_TRK_X - 2*WINDOW_SET_X  #WINDOW_SOU_WIDTH
+WINDOW_TRK_HEIGHT = WINDOW_VS_HEIGHT #Y_SCREEN - WINDOW_TRK_Y - WINDOW_VS_Y
 
 MAX_TRACKERS = 5
 
@@ -358,8 +358,11 @@ class cvGui():
 
             #Filters: Correlation, Cam shift, Color
 
-            cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_FIL_Y + 115, WINDOW_FIL_WIDTH - 10, WINDOW_FIL_WIDTH - 50, 0x5c585a, 0x242223)
-            if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 30, "Color Filter", self.ColorFilter) :
+            # cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_FIL_Y + 115, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
+            cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
+
+            # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 30, "Color Filter", self.ColorFilter) :
+            if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Color Filter", self.ColorFilter):
                 self.CamShiftFilter[0] = False
                 self.CorrFilter[0] = False
                 # if (self.usingVideo or self.usingCamera):
@@ -371,7 +374,9 @@ class cvGui():
                 #         y1 = y0 + int(toShow.shape[0])
                 #         self.frame[y0:y1, x0:x1] = toShow
 
-            if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 60, "Cam Shift", self.CamShiftFilter) :
+
+            # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 60, "Cam Shift", self.CamShiftFilter) :
+            if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(1/3)) , WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Cam Shift", self.CamShiftFilter):
                 self.ColorFilter[0] = False
                 self.CorrFilter[0] = False
                 # if (self.usingVideo or self.usingCamera):
@@ -383,7 +388,8 @@ class cvGui():
                 #     y1 = y0 + int(toShow.shape[0])
                 #     self.frame[y0:y1, x0:x1] = toShow
 
-            if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 90, "Correlation Filter", self.CorrFilter) :
+            # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y + 90, "Correlation Filter", self.CorrFilter) :
+            if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(2/3)), WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Correlation Filter", self.CorrFilter):
                 self.CamShiftFilter[0] = False
                 self.ColorFilter[0] = False
                 # if (self.usingVideo or self.usingCamera):
@@ -394,6 +400,7 @@ class cvGui():
                 #     y0 = WINDOW_FIL_Y + 130
                 #     y1 = y0 + int(toShow.shape[0])
                 #     self.frame[y0:y1, x0:x1] = toShow
+
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
