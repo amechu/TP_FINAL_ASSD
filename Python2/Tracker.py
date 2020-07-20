@@ -107,12 +107,13 @@ class Tracker:
         self.KM.PROCESS_COV = parametersNew[1]        #kalman_pc
         self.KM.MEAS_NOISE_COV = parametersNew[2]     #kalman_mc
 
-        self.SC.LK.lkMaxLevel = parametersNew[3]           #lk_mr
+        #self.SC.LK.lkMaxLevel = parametersNew[3]           #lk_mr
 
         # = parametersNew[4]              #Color Filter OnOff
         MaskingFilter.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
         MaskingFilter.aSemiAmp = parametersNew[6]     #colorFilter_a
         MaskingFilter.bSemiAmp = parametersNew[7]     #colorFilter_b
+        self.MF.updateMaskFromSettings()
 
         #= parametersNew[8]     #Light R OnOff
         #= parametersNew[9]    #ligtRec_x)
@@ -120,13 +121,13 @@ class Tracker:
 
         #= parametersNew[11]    #Cam shift On/Off
 
-        self.SC.ST.maxcorners = parametersNew[12]                       #shit_MaxFeat
-        self.SC.ST.qLevel = parametersNew[13]                           #shit_FeatQual
-        self.SC.ST.minDist = parametersNew[14]                          #shit_MinFeat
-        self.SC.ST.searchEnlargementThreshold = parametersNew[15]       #shit_Rec
+        #self.SC.ST.maxcorners = parametersNew[12]                       #shit_MaxFeat
+        #self.SC.ST.qLevel = parametersNew[13]                           #shit_FeatQual
+        #self.SC.ST.minDist = parametersNew[14]                          #shit_MinFeat
+        #self.SC.ST.searchEnlargementThreshold = parametersNew[15]       #shit_Rec
 
         #= parametersNew[16]                #ShiTomasiOn/ Off
-        self.SC.ST.frameRecalculationNumber = parametersNew[17]        #shit_SPix
+        #self.SC.ST.frameRecalculationNumber = parametersNew[17]        #shit_SPix
 
         #self.MF.mask = self.MF.maskingType[parametersNew[??]] #MENSAJE PARA TOMI: tiene que ser un string parametersNew[??] fijate en la clase
 
