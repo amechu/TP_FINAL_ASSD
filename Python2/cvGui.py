@@ -565,8 +565,8 @@ class cvGui():
                     self.filteredFrame = None
 
             if self.CorrFilter[0] and self.filteredFrame is not None:
-                self.filterWIDTH = int(self.filteredFrame[0,:])
-                self.filterHEIGHT = int(self.filteredFrame[:,0])
+                self.filterWIDTH = int(len(self.filteredFrame[0,:]))
+                self.filterHEIGHT = int(len(self.filteredFrame[:,0]))
                 self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)
             else:
                 self.filterWIDTH = self.sourceWIDTH
