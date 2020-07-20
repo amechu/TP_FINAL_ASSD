@@ -497,7 +497,7 @@ class cvGui():
                 if self.usingVideo:
                     cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, X_SCREEN - 2*WINDOW_VS_X, Y_SCREEN - 2*WINDOW_VS_Y, " ")
                     cvui.printf(self.frame, int(X_SCREEN/16), int(Y_SCREEN/4), 5, 0xe9d540, "Loading Video")
-                    cvui.printf(self.frame, int(X_SCREEN/16 + 25), int(Y_SCREEN/2), 5, 0xe9d540, "Please wait...")
+                    cvui.printf(self.frame, int(X_SCREEN/16 + 25), int(Y_SCREEN/2), 5, 0xe9d540, "Please Wait...")
                     cvui.imshow(WINDOW_NAME, self.frame)
                     cv.waitKey(1)
 
@@ -572,7 +572,7 @@ class cvGui():
     def rescale_frame_standar2(self, frame, maxWidth):
         width = int(frame.shape[1])
         height = int(frame.shape[0])
-        dim = (int(maxWidth*height/width), maxWidth)
+        dim = (int(maxWidth*width/height), maxWidth)
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
     def updateParameters(self):
@@ -672,12 +672,15 @@ class cvGui():
                 self.arrayVideoLoaded.append(someCrazyShit)
                 todoPiola, someCrazyShit = self.cap.read()
         else:
-            return False
+            while todoPiola:
+                someCrazyShit = self.rescale_frame_standar2(someCrazyShit, WINDOW_SOU_HEIGHT - 80)
+                self.arrayVideoLoaded.append(someCrazyShit)
+                todoPiola, someCrazyShit = self.cap.read()
 
         self.sourceWIDTH = int(self.arrayVideoLoaded[0].shape[1])
         self.sourceHEIGHT = int(self.arrayVideoLoaded[0].shape[0])
 
-        return True
+        return todoPiola
 
 def main():
     myGui = cvGui()
