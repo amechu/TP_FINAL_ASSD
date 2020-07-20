@@ -495,8 +495,15 @@ class cvGui():
 
             if todoPiola:
                 if self.usingVideo:
+                    cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, X_SCREEN - 2*WINDOW_VS_X, Y_SCREEN - 2*WINDOW_VS_Y, " ")
+                    cvui.printf(self.frame, int(X_SCREEN/16), int(Y_SCREEN/4), 5, 0xe9d540, "Loading Video")
+                    cvui.printf(self.frame, int(X_SCREEN/16 + 25), int(Y_SCREEN/2), 5, 0xe9d540, "Please wait...")
+                    cvui.imshow(WINDOW_NAME, self.frame)
+                    cv.waitKey(1)
+
                     self.boolVideoLoaded = True
                     self.loadFullVideo()
+
                         # self.boolVideoLoaded = False
                         # self.usingCamera = False
                         # self.usingVideo = False
