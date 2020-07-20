@@ -556,7 +556,8 @@ class cvGui():
                 elif self.CorrFilter[0]:
                     self.filteredFrame = self.trackers[-1].getCorrFrame()
                     if self.filteredFrame is not None:
-                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
+                        self.filteredFrame = cv.cvtColor(self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH), cv.COLOR_GRAY2BGR)
+                        #self.filteredFrame =
                     else:
                         self.filteredFrame = None
                 else:
