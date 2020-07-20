@@ -204,7 +204,7 @@ class cvGui():
 
                 elif not self.usingCamera:
                     self.CurrentSource = "No Video Loaded"
-            
+
             if (cvui.button(self.frame, 20, 105, "Use Camera")):
                 self.trackers.clear()
                 if not self.usingCamera:
@@ -216,11 +216,11 @@ class cvGui():
                         self.usingVideo = False
                         self.usingCamera = False
 
-            
+
             if (cvui.button(self.frame, 60, 875, "Reset Settings")):
                 self.resetInitialCond()
-            
-            #Settings Buttons 
+
+            #Settings Buttons
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
 
                 if len(self.trackers) < MAX_TRACKERS:
@@ -261,8 +261,6 @@ class cvGui():
             else:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 trackers of 5! No more trackers can be added. Try deleting one.")
 
-
-
             if (cvui.button(self.frame, 20, 215, "Pause Source")):
                 self.pause = not self.pause
 
@@ -285,15 +283,15 @@ class cvGui():
                 self.KalmanProp[0] = False
                 self.CFProp[0] = False
                 self.ShiTProp[0] = False
-                
+
                 cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")
                 cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0)
-            
+
             if (cvui.checkbox(self.frame, 20, 340, "Mask Filter", self.CFProp)):
                 self.KalmanProp[0] = False
                 self.LKProp[0] = False
                 self.ShiTProp[0] = False
-                
+
                 if (cvui.checkbox(self.frame, 20, 400, "CIE-Lab Filter", self.CFPropOnOff)):
                     self.CFCamShiftOnOff[0] = False
 
@@ -305,7 +303,7 @@ class cvGui():
 
                     cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B Semi-amplitude")
                     cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 30.0)
-                
+
                     if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
 
                         cvui.printf(self.frame, 20, 695, 0.4, 0xdd97fb, "Every X Frames")
@@ -332,31 +330,32 @@ class cvGui():
                 else:
                     cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
                     cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
-                
+
             if (cvui.checkbox(self.frame, 20, 360, "Shi-Tomasi", self.ShiTProp)):
                 self.KalmanProp[0] = False
                 self.LKProp[0] = False
                 self.CFProp[0] = False
-                
+
                 cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Feature Quantity")
                 cvui.trackbar(self.frame, 20, 415, 210, self.shit_MaxFeat, 1.0, 100.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
                 self.shit_MaxFeat[0] = int(self.shit_MaxFeat[0])
 
                 cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Feature Quality Level")
                 cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.0, 1)
-                
+
                 cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Minimum Feature Distance")
                 cvui.trackbar(self.frame, 20, 555, 210, self.shit_MinFeat, 0.0, 1.0)
-                
+
                 cvui.printf(self.frame, 20, 610, 0.4, 0xdd97fb, "Search Pixel Enlargement")
                 cvui.trackbar(self.frame, 20, 625, 210, self.shit_SPix, 0.0, 10.0)
-                
+
                 if (cvui.checkbox(self.frame, 20, 680, "Feature Recalculation", self.ShiTPropOnOff)):
                     cvui.printf(self.frame, 20, 710, 0.4, 0xdd97fb, "Recalculation Number")
                     cvui.trackbar(self.frame, 20, 725, 210, self.shit_Rec, 1.0, 100.0)
                     cvui.printf(self.frame, 185, 682, 0.4, 0x10dcA1, "%s", "On")
                 else:
                     cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
+
 
             #Filters: Correlation, Cam shift, Color
 
@@ -399,8 +398,6 @@ class cvGui():
                 #     y1 = y0 + int(toShow.shape[0])
                 #     self.frame[y0:y1, x0:x1] = toShow
 
-
-
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 40, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 80, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
                 if not self.pause:
@@ -421,8 +418,6 @@ class cvGui():
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
 
-
-
             #Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
                 break
@@ -432,7 +427,7 @@ class cvGui():
         cv.destroyAllWindows()
 
         return True
-                    
+
     def verifyInitialCond(self):
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
                 self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
@@ -502,6 +497,10 @@ class cvGui():
                 if self.usingVideo:
                     self.boolVideoLoaded = True
                     self.loadFullVideo()
+                        # self.boolVideoLoaded = False
+                        # self.usingCamera = False
+                        # self.usingVideo = False
+                        # self.arrayVideoLoaded.clear()
                 else:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
                     self.sourceWIDTH = int(self.source.shape[1])
@@ -517,6 +516,7 @@ class cvGui():
                 c = (b+a)/2
                 self.sourceY = int(c - self.sourceHEIGHT/2)
                 return True
+
         return False
 
     def callSource(self):
@@ -560,6 +560,12 @@ class cvGui():
         width = int(frame.shape[1])
         height = int(frame.shape[0])
         dim = (maxWidth, int(maxWidth*height/width))
+        return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
+
+    def rescale_frame_standar2(self, frame, maxWidth):
+        width = int(frame.shape[1])
+        height = int(frame.shape[0])
+        dim = (int(maxWidth*height/width), maxWidth)
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
     def updateParameters(self):
@@ -653,13 +659,18 @@ class cvGui():
 
         todoPiola, someCrazyShit = self.cap.read()
 
-        while todoPiola:
-            someCrazyShit = self.rescale_frame_standar(someCrazyShit, STANDAR_WIDTH)
-            self.arrayVideoLoaded.append(someCrazyShit)
-            todoPiola, someCrazyShit = self.cap.read()
+        if someCrazyShit.shape[1] >= someCrazyShit.shape[0]:
+            while todoPiola:
+                someCrazyShit = self.rescale_frame_standar(someCrazyShit, STANDAR_WIDTH)
+                self.arrayVideoLoaded.append(someCrazyShit)
+                todoPiola, someCrazyShit = self.cap.read()
+        else:
+            return False
 
         self.sourceWIDTH = int(self.arrayVideoLoaded[0].shape[1])
         self.sourceHEIGHT = int(self.arrayVideoLoaded[0].shape[0])
+
+        return True
 
 def main():
     myGui = cvGui()
