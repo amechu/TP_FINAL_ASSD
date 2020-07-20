@@ -20,6 +20,7 @@ def correlationAllPic(frame):
     else:
         matchLoc = maxLoc
     finalMask = cv.inRange(corr_out,0, 0.1)
+    finalMask= np.uint8(finalMask)
     return [corr_out,finalMask,matchLoc]
 
 
@@ -50,11 +51,11 @@ def correlationSection(frame,x,y,w,h,Kernel): #Pasas punta izquierda con xy desp
     height = int(tinyFinalMask.shape[0])
 
     finalMask[y0:y0 + height, x0:x0 + width] = tinyFinalMask
+    finalMask= np.uint8(finalMask)
+#    print(finalMask.shape)
+#    print(np.shape(frame))
 
-    print(finalMask.shape)
-    print(np.shape(frame))
 
-    filteredFrame = cv.bitwise_and(frame, frame, mask=finalMask)
 
     return [corrOut,finalMask,RetPoint]
 # constant
@@ -70,6 +71,7 @@ if __name__ == '__main__':
     cv.namedWindow('kernel')
     cv.namedWindow('Corr')
     cv.namedWindow('mask')
+    cv.namedWindow('Filtered')
 
     first=True
     ret, frame = cap.read()
@@ -93,21 +95,22 @@ if __name__ == '__main__':
             break
 #        frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
-        deltax=w+200
-        deltay=h+200
-        ux=x+deltax/2
-        uy=y+deltay/2
-        #        [corrOut, finalmask, points]= correlationAllPic(frame)
-        [corrOut,finalmask,points] = correlationSection(frame,ux,uy,deltax,deltay,kernel)
+        deltax=w
+        deltay=h
+        ux=x+(deltax/2.0)
+        uy=y+(deltay/2.0)
+        [corrOut, finalmask, points]= correlationAllPic(frame)
+  #      [corrOut,finalmask,points] = correlationSection(frame,ux,uy,deltax+50,deltay+50,kernel)
 
 
-#        cv.rectangle(frame,(int(points[0]-deltax/2),int(points[1]-deltay/2)),(int(points[0]+deltax/2) , int(points[1] +deltay/2)),color,2)
+        cv.rectangle(frame,(int(points[0]),int(points[1])),(int(points[0]+deltax) , int(points[1] +deltay)),color,2)
 
-
+   #     filteredFrame = cv.bitwise_and(frame, frame, mask=finalmask)
 
         cv.imshow('tracking', frame)
         cv.imshow('Corr', corrOut)
         cv.imshow('mask', finalmask)
+    #    cv.imshow('Filtered', filteredFrame)
 
 
         c = cv.waitKey(30) & 0xFF
