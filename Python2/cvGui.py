@@ -400,7 +400,7 @@ class cvGui():
                             self.boolVideoLoaded = False
 
                 else:
-                    if self.changeInTrackers and not len(self.arrayVideoLoaded) == 0:
+                    if self.changeInTrackers and ((self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera):
                         self.changeInTrackers = False
                         self.callFilterPause()
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
