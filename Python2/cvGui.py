@@ -366,7 +366,6 @@ class cvGui():
                 else:
                     cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
 
-
             #Filters: Correlation, Cam shift, Color
 
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
@@ -401,7 +400,7 @@ class cvGui():
                             self.boolVideoLoaded = False
 
                 else:
-                    if self.changeInTrackers:
+                    if self.changeInTrackers and not len(self.arrayVideoLoaded) == 0:
                         self.changeInTrackers = False
                         self.callFilterPause()
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
@@ -509,6 +508,7 @@ class cvGui():
                         self.usingVideo = False
                         self.arrayVideoLoaded.clear()
                     self.lastFrame = self.arrayVideoLoaded[0].copy()
+                    self.source = self.arrayVideoLoaded[0].copy()
 
                 else:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
