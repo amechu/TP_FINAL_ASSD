@@ -21,9 +21,9 @@ INITIAL_CS_ONOFF = False
 
 INITIAL_ST_ONOFF = False
 
-COLORFILTER_LIGHTTHR = 70.0
-COLORFILTER_A = 20.0
-COLORFILTER_B = 20.0
+COLORFILTER_LIGHTTHR = 50.0
+COLORFILTER_A = 15.0
+COLORFILTER_B = 15.0
 LIGHTTHR_X = 1.0
 LIGHTTHR_MACT = 1.0
 
@@ -302,17 +302,17 @@ class cvGui():
                 self.LKProp[0] = False
                 self.ShiTProp[0] = False
 
-                if (cvui.checkbox(self.frame, 20, 400, "CIE-Lab Filter", self.CFPropOnOff)):
+                if (cvui.checkbox(self.frame, 20, 400, "HLS Color Filter", self.CFPropOnOff)):
                     self.CFCamShiftOnOff[0] = False
 
-                    cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "L Semi-amplitude")
+                    cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Hue Semi-amplitude")
                     cvui.trackbar(self.frame, 20, 465, 210, self.colorFilter_LihtThr, 0.0, 150.0)
 
-                    cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "A Semi-amplitude")
-                    cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 30.0)
+                    cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "Lightness Semi-amplitude")
+                    cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 200.0)
 
-                    cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B Semi-amplitude")
-                    cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 30.0)
+                    cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "Saturation Semi-amplitude")
+                    cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
 
                     if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
 
