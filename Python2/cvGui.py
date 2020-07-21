@@ -158,6 +158,7 @@ class cvGui():
         self.lastFrame = []
         self.lastFilterFrame = []
 
+        self.changeInTrackers = False
 
 
     def onWork(self):
@@ -233,9 +234,10 @@ class cvGui():
                     if self.boolVideoLoaded:
                         bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[0])
                     else:
-                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.source)
+                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.lastFrame)
                     cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
                     if not ((bBox[0] == 0) or (bBox[1] == 0) or (bBox[2] == 0) or (bBox[3] == 0)):
+                        self.changeInTrackers = True
                         if self.boolVideoLoaded:
                             self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded[0]))
                         else:
@@ -251,6 +253,7 @@ class cvGui():
 
                 cvui.printf(self.frame, xTx, yTx, 0.4, self.trackerColors[i],"Tracker Number " + str(i+1))
                 if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
+                    self.changeInTrackers = True
                     del self.trackers[i]
                     break
 
@@ -398,10 +401,10 @@ class cvGui():
                             self.boolVideoLoaded = False
 
                 else:
-                    if self.boolVideoLoaded:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.arrayVideoLoaded[0]
-                    else:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
+                    if self.changeInTrackers:
+                        self.changeInTrackers = False
+                        self.callFilterPause()
+                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
                 x0 = self.sourceX + WINDOW_SOU_WIDTH + WINDOW_VS_X
@@ -475,7 +478,6 @@ class cvGui():
         self.ShiTPropOnOff[0] = INITIAL_ST_ONOFF
         self.shit_SPix[0] = SHIT_SPIX
 
-
     def initSource(self):
         self.source = []
         self.arrayVideoLoaded.clear()
@@ -506,11 +508,11 @@ class cvGui():
                         self.usingCamera = False
                         self.usingVideo = False
                         self.arrayVideoLoaded.clear()
-                    self.lastFrame = self.arrayVideoLoaded[0]
+                    self.lastFrame = self.arrayVideoLoaded[0].copy()
 
                 else:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
-                    self.lastFrame = self.source
+                    self.lastFrame = self.source.copy()
                     self.sourceWIDTH = int(self.source.shape[1])
                     self.sourceHEIGHT = int(self.source.shape[0])
 
@@ -532,8 +534,8 @@ class cvGui():
             if len(self.arrayVideoLoaded) == 0:
                 todoPiola = False
             else:
-                self.source = self.arrayVideoLoaded[0]
-                self.lastFrame = self.source
+                self.source = self.arrayVideoLoaded[0].copy()
+                self.lastFrame = self.source.copy()
                 todoPiola = True
         else:
             todoPiola, self.source = self.cap.read()
@@ -541,7 +543,7 @@ class cvGui():
         if todoPiola:
             if self.usingCamera: #int(self.source.shape[1]) > STANDAR_WIDTH:
                 self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
-                self.lastFrame = self.source
+                self.lastFrame = self.source.copy()
 
             else:
                 self.sourceWIDTH = int(self.source.shape[1])
@@ -576,35 +578,35 @@ class cvGui():
                 self.filterWIDTH = self.sourceWIDTH
                 self.filterHEIGHT = self.sourceHEIGHT
 
-            if not self.pause:
-                i = 0
-                for tracker in self.trackers:
-                    #[b,g,r] = tracker.MF.bgrmask
-                    r = (self.trackerColors[i] >> 16) & 0xff
-                    g = (self.trackerColors[i] >> 8) & 0xff
-                    b = self.trackerColors[i] & 0xff
-                    self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
-                    if tracker.SC.trackingError is False:
-                        self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                        self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
-                    else:
-                        self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
-                    i +=1
+
+            i = 0
+            for tracker in self.trackers:
+                #[b,g,r] = tracker.MF.bgrmask
+                r = (self.trackerColors[i] >> 16) & 0xff
+                g = (self.trackerColors[i] >> 8) & 0xff
+                b = self.trackerColors[i] & 0xff
+                self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
+                if tracker.SC.trackingError is False:
+                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                    self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
+                else:
+                    self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
+                i +=1
 
         return todoPiola
 
     def callFilterPause(self):
         if self.boolVideoLoaded:
-            pausedFrame = self.arrayVideoLoaded[0]
+            self.source = self.arrayVideoLoaded[0].copy()
         else:
-            pausedFrame = self.lastFrame
+            self.source = self.lastFrame.copy()
 
         if self.checkParametersChange():
             for tracker in self.trackers:
                 tracker.changeSettings(self.parametersNew)
 
         for tracker in self.trackers:
-            tracker.update(pausedFrame)
+            tracker.update(self.source)
 
         if not len(self.trackers) == 0:
             if self.ColorFilter[0]:
@@ -627,6 +629,22 @@ class cvGui():
         else:
             self.filterWIDTH = self.sourceWIDTH
             self.filterHEIGHT = self.sourceHEIGHT
+
+        i = 0
+        for tracker in self.trackers:
+            # [b,g,r] = tracker.MF.bgrmask
+            r = (self.trackerColors[i] >> 16) & 0xff
+            g = (self.trackerColors[i] >> 8) & 0xff
+            b = self.trackerColors[i] & 0xff
+            self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
+            if tracker.SC.trackingError is False:
+                self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(),
+                                                     tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
+            else:
+                self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(),
+                                                       tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
+            i += 1
 
         return True
 
