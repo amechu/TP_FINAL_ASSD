@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import filedialog
 import Tracker
 import Artist
-import MaskingFilter
+import MaskingFilter as MF
 
 WINDOW_NAME = "MAGT Video Tracker"
 
@@ -627,11 +627,15 @@ class cvGui():
             for tracker in self.trackers:
                 tracker.changeSettings(self.parametersNew)
 
+        # for tracker in self.trackers:                                 #SI ESTÁ DESCOMENTADO, PUEDO UPDATEAR EL FILTRO EN PAUSA PERO TMB UPDATEO SOURCE
+        #     tracker.update(self.source)
+
         for tracker in self.trackers:
-            tracker.update(self.source)
+            tracker.MF.updateMaskFromSettings()
 
+        self.lastFilterFrame = self.trackers[-1].MF.filterFrame(self.source)
         self.updateFilterFrame()
-
+        
         i = 0
         for tracker in self.trackers:
             # [b,g,r] = tracker.MF.bgrmask
