@@ -228,7 +228,7 @@ class cvGui():
                 self.resetInitialCond()
 
             #Settings Buttons
-            if (cvui.button(self.frame, 20, 180, "Select New Area") and (self.usingVideo or self.usingCamera)):
+            if (cvui.button(self.frame, 20, 180, "Select New Area") and (not (self.usingVideo and len(self.arrayVideoLoaded) == 0) or self.usingCamera)):
 
                 if len(self.trackers) < MAX_TRACKERS:
                     if self.boolVideoLoaded:
@@ -543,7 +543,7 @@ class cvGui():
             todoPiola, self.source = self.cap.read()
 
         if todoPiola:
-            if self.usingCamera: #int(self.source.shape[1]) > STANDAR_WIDTH:
+            if self.usingCamera:
                 self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
                 self.lastFrame = self.source.copy()
 
@@ -589,27 +589,7 @@ class cvGui():
         for tracker in self.trackers:
             tracker.update(self.source)
 
-        if not len(self.trackers) == 0:
-            if self.ColorFilter[0]:
-                self.filteredFrame = self.trackers[-1].getFilteredFrame()
-            elif self.CamShiftFilter[0]:
-                self.filteredFrame = None
-            elif self.CorrFilter[0]:
-                self.filteredFrame = self.trackers[-1].getCorrFrame()
-                if self.filteredFrame is not None:
-                    self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
-                else:
-                    self.filteredFrame = None
-            else:
-                self.filteredFrame = None
-
-        if self.CorrFilter[0] and self.filteredFrame is not None:
-            self.filterWIDTH = int(len(self.filteredFrame[0,:]))
-            self.filterHEIGHT = int(len(self.filteredFrame[:,0]))
-            self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)
-        else:
-            self.filterWIDTH = self.sourceWIDTH
-            self.filterHEIGHT = self.sourceHEIGHT
+        self.updateFilterFrame()
 
         i = 0
         for tracker in self.trackers:
