@@ -36,8 +36,10 @@ class Tracker:
 
         self.SC = Searcher(frameReal, initialHeight, initialWidth, initialPosition[0], initialPosition[1],cv.cvtColor(frame, cv.COLOR_BGR2GRAY))
         self.SC.features, self.SC.trackingError = self.SC.ST.recalculateFeatures(self.prevFrameGray[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
-        self.SC.features = self.SC.featureTranslate(initialPosition[0]-initialWidth/2, initialPosition[1]-initialHeight/2, self.SC.features)
-        self.SC.LK.prevFeatures=self.SC.features
+        self.SC.features = self.SC.featureTranslate(initialPosition[0] - initialWidth / 2,initialPosition[1] - initialHeight / 2, self.SC.features)
+        self.SC.LK.prevFeatures = self.SC.features
+
+
 
 
 
@@ -94,7 +96,7 @@ class Tracker:
             if self.SC.trackingError is False:
                 self.KM.correct(x,y)
         else:
-            x,y = self.SC.search(self.frameCounter,frame)
+            x,y = self.SC.search(self.frameCounter,realframe,frame)
             if self.SC.trackingError is False:
                 self.KM.correct(x,y)
 
