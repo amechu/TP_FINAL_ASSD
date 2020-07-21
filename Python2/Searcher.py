@@ -3,42 +3,6 @@ import numpy as np
 from ShiTomasi import ShiTomasi
 from OpticalFlow import OpticalFlow
 
-
-def correlationAllPic(frame,Kernel):#kernel bgr
-    match_method = cv.TM_SQDIFF
-    frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-    kernel = cv.cvtColor(Kernel, cv.COLOR_BGR2HSV)
-    mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
-    frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
-    corr_out = cv.matchTemplate(frame_hsv, kernel, method=match_method)
-    cv.normalize(corr_out, corr_out, 0, 1, cv.NORM_MINMAX)
-    [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(corr_out)
-    if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
-        matchLoc = minLoc
-    else:
-        matchLoc = maxLoc
-    return [corr_out,matchLoc]
-
-
-def correlationSection(frame,x,y,w,h,Kernel): #kernel bgr
-    match_method = cv.TM_SQDIFF
-    frameselected = frame[int(y-h/2):int(y+h/2) , int(x-w/2):int(x+w/2)]
-    kernel = cv.cvtColor(Kernel, cv.COLOR_BGR2HSV)
-    frame_hsv = cv.cvtColor(frameselected, cv.COLOR_BGR2HSV) #aca ya tengo chikito :c
-
-    mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
-    frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
-    corrOut = cv.matchTemplate(frame_hsv, kernel, method=match_method)
-
-    cv.normalize(corrOut, corrOut, 0, 1, cv.NORM_MINMAX)
-    [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(corrOut)
-    if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
-        matchLoc = minLoc
-    else:
-        matchLoc = maxLoc
-    RetPoint =  (matchLoc[0]+x-w/2 ,matchLoc[1]+y-h/2)
-    return [corrOut,RetPoint]
-
 class Searcher:
     usualAlgorithmD = dict(
             LK_ST = 0,
@@ -77,7 +41,7 @@ class Searcher:
         self.corr_out=None
         self.y, self.x = np.shape(self.prevFrameGray)
         self.MASKCONDITION = self.x*self.y*0.04**2
-
+        self.match_method = cv.TM_SQDIFF
 
 
     def searchMissing(self,estX,estY,frame,filteredframe):
@@ -99,18 +63,18 @@ class Searcher:
 
         elif self.missAlgorithm== self.missAlgorithmD["CORR"]:
             frameGray = cv.cvtColor(filteredframe, cv.COLOR_BGR2GRAY)   #REVISAR
-            match_method = cv.TM_SQDIFF #REVISAR
+
 
             frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
             mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
             frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
 
 
-            self.corr_out = cv.matchTemplate(frame_hsv, self.kernel, method=match_method)
+            self.corr_out = cv.matchTemplate(frame_hsv, self.kernel, method=self.match_method)
 
             cv.normalize(self.corr_out, self.corr_out, 0, 1, cv.NORM_MINMAX)
             [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(self.corr_out)
-            if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
+            if (self.match_method == cv.TM_SQDIFF or self.match_method == cv.TM_SQDIFF_NORMED):
                 matchLoc = minLoc
             else:
                 matchLoc = maxLoc
@@ -125,11 +89,22 @@ class Searcher:
             else:
                 for i in range(10):
                     if(matchLoc[0] > self.selectionWidth/2  and matchLoc[0] < self.x - self.selectionWidth/2 and matchLoc[1] > self.selectionHeight/2  and matchLoc[1] < self.y - self.selectionHeight/2):
-                        self.corr_out[int(matchLoc[1]-self.selectionHeight/2): int(matchLoc[1] + self.selectionHeight/2),int(matchLoc[0]-self.selectionWidth/2): int(matchLoc[0] + self.selectionWidth/2)] = 1
+                        if (self.match_method == cv.TM_SQDIFF or self.match_method == cv.TM_SQDIFF_NORMED):
+                            self.corr_out[int(matchLoc[1]-self.selectionHeight/2): int(matchLoc[1] + self.selectionHeight/2),int(matchLoc[0]-self.selectionWidth/2): int(matchLoc[0] + self.selectionWidth/2)] = 1
+                        else:
+                            self.corr_out[
+                            int(matchLoc[1] - self.selectionHeight / 2): int(matchLoc[1] + self.selectionHeight / 2),
+                            int(matchLoc[0] - self.selectionWidth / 2): int(matchLoc[0] + self.selectionWidth / 2)] = 0
                     else:
-                        self.corr_out[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)] = 1
+                        if (self.match_method == cv.TM_SQDIFF or self.match_method == cv.TM_SQDIFF_NORMED):
+                            self.corr_out[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
+                            int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)] = 1
+                        else:
+                            self.corr_out[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
+                            int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)] = 0
+
                     [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(self.corr_out)
-                    if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
+                    if (self.match_method == cv.TM_SQDIFF or self.match_method == cv.TM_SQDIFF_NORMED):
                         matchLoc = minLoc
                     else:
                         matchLoc = maxLoc
@@ -156,7 +131,6 @@ class Searcher:
                 # recaulculate features?
                 if frameCounter != 0 and frameCounter % self.ST.frameRecalculationNumber == 0:
                     # yes
-                    ###############################
                     if(self.recalcAlgorithm == self.recalcAlgorithmD["ST"]):
                         medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
                         std = np.sqrt((np.std(self.features[:, 0, 0])) ** 2 + (np.std(self.features[:, 0, 1])) ** 2)
@@ -166,22 +140,16 @@ class Searcher:
                         self.features = self.features[mask]
                     # remove outliers.
                         medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
-                    ###############################
+                        self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(medy - self.selectionHeight / 2): int(medy + self.selectionHeight / 2),int(medx - self.selectionWidth / 2): int(medx + self.selectionWidth / 2)])
+                        self.features = self.featureTranslate(medx - self.selectionWidth / 2,medy - self.selectionHeight / 2, self.features)
+                        self.LK.prevFeatures = self.features
                     elif(self.recalcAlgorithm == self.recalcAlgorithmD["CORR"]):
                         medx,medy=self.searchMissing(0,0,frame,filteredFrame)
-                    ###############################
-                    self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(medy - self.selectionHeight / 2): int(medy + self.selectionHeight / 2),int(medx - self.selectionWidth / 2):
-                                                                                                                                                                                int(medx + self.selectionWidth / 2)])
-                    self.features = self.featureTranslate(medx - self.selectionWidth / 2,
-                                                          medy - self.selectionHeight / 2, self.features)
-
-                    self.LK.prevFeatures = self.features
                     # apply st algorithm
 
                     if self.trackingError is False:  # did i find features?
                        # found, then KM correct.
                         self.candidate=np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
-#                       self.KM.correct(np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1]))
                  #else would be Features not found.
                 else:  # NO, then kalman correct estimate.
                    self.candidate = np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
@@ -204,3 +172,44 @@ class Searcher:
             features[i][0][0] += x
             features[i][0][1] += y
         return features
+
+
+
+
+
+
+
+#def correlationAllPic(frame,Kernel):#kernel bgr
+#    match_method = cv.TM_SQDIFF
+#    frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+#    kernel = cv.cvtColor(Kernel, cv.COLOR_BGR2HSV)
+##    mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+##    frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
+ #   corr_out = cv.matchTemplate(frame_hsv, kernel, method=match_method)
+ #   cv.normalize(corr_out, corr_out, 0, 1, cv.NORM_MINMAX)
+ #   [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(corr_out)
+ #   if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
+ ##       matchLoc = minLoc
+  #  else:
+  ##      matchLoc = maxLoc
+   # return [corr_out,matchLoc]
+
+
+#def correlationSection(frame,x,y,w,h,Kernel): #kernel bgr
+#    match_method = cv.TM_SQDIFF
+#    frameselected = frame[int(y-h/2):int(y+h/2) , int(x-w/2):int(x+w/2)]
+#    kernel = cv.cvtColor(Kernel, cv.COLOR_BGR2HSV)
+#    frame_hsv = cv.cvtColor(frameselected, cv.COLOR_BGR2HSV) #aca ya tengo chikito :c
+
+#    mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+#    frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
+#    corrOut = cv.matchTemplate(frame_hsv, kernel, method=match_method)
+
+#    cv.normalize(corrOut, corrOut, 0, 1, cv.NORM_MINMAX)
+#    [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(corrOut)
+#    if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
+#        matchLoc = minLoc
+ #   else:
+ #       matchLoc = maxLoc
+ #   RetPoint =  (matchLoc[0]+x-w/2 ,matchLoc[1]+y-h/2)
+ #   return [corrOut,RetPoint]
