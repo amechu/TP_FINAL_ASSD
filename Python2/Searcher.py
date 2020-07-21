@@ -84,16 +84,13 @@ class Searcher:
 
         if self.missAlgorithm== self.missAlgorithmD["ST"]:
             candidate=[None,None]
-            frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-            # Yes, then apply ST algorithm around estimate
+            frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)  #REVISAR
             self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(estY - self.searchHeight / 2): int(estY + self.searchHeight / 2),int(estX - self.searchWidth / 2): int(estX + self.searchWidth / 2)])
             self.features = self.featureTranslate(estX- self.searchWidth / 2,estY - self.searchHeight / 2,self.features)
-            # did i find it?
             if self.trackingError is True:
-                # No, then enlarge search area
-                self.enlargeSearchArea()
+                self.searchWidth += self.ST.searchEnlargementThreshold
+                self.searchHeight += self.ST.searchEnlargementThreshold
             else:
-                # shrink search area to original and set tracking error to false, #kalman correct
                 self.searchHeight = self.selectionHeight
                 self.searchWidth = self.selectionWidth
                 candidate = np.mean(self.features[:, 0, 0]), np.mean(self.features[:, 0, 1])
@@ -101,8 +98,8 @@ class Searcher:
 
 
         elif self.missAlgorithm== self.missAlgorithmD["CORR"]:
-            frameGray = cv.cvtColor(filteredframe, cv.COLOR_BGR2GRAY)
-            match_method = cv.TM_SQDIFF
+            frameGray = cv.cvtColor(filteredframe, cv.COLOR_BGR2GRAY)   #REVISAR
+            match_method = cv.TM_SQDIFF #REVISAR
 
             frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
             mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
@@ -198,10 +195,6 @@ class Searcher:
             pass
 
         return self.candidate[0],self.candidate[1]
-
-    def enlargeSearchArea(self):
-        self.searchWidth += self.ST.searchEnlargementThreshold
-        self.searchHeight += self.ST.searchEnlargementThreshold
 
     @staticmethod
     def featureTranslate(x, y, features):
