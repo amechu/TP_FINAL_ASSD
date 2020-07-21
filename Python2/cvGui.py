@@ -89,6 +89,8 @@ class cvGui():
         self.sourceY = 0
         self.sourceWIDTH = 0
         self.sourceHEIGHT = 0
+        self.filterWIDTH = 0
+        self.filterHEIGHT = 0
 
         self.usingCamera = False
         self.usingVideo = False
@@ -153,8 +155,10 @@ class cvGui():
         self.arrayVideoLoaded = []
         self.filteredFrame = []
 
-        self.lastVideoFrame = []
+        self.lastFrame = []
         self.lastFilterFrame = []
+
+
 
     def onWork(self):
 
@@ -383,35 +387,30 @@ class cvGui():
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastVideoFrame
-                        #pass        #NO PUDE HACER UPDATE DE LA CAMARA/VIDEO POR ALGÚN MOTIVO!
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
+                        #Hubo algún tipo de error al cargar la camara o me quedé sin video
+                        #Muestro el último frame que cargué
+
                     if self.boolVideoLoaded:
                         del self.arrayVideoLoaded[0]
                         if len(self.arrayVideoLoaded) == 0:
                             self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
-                            self.lastVideoFrame = self.source
-                            self.lastFilterFrame = self.filteredFrame
-                            self.filteredFrame = None
 
                 else:
                     if self.boolVideoLoaded:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.arrayVideoLoaded[0]
                     else:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
 
             if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
                 x0 = self.sourceX + WINDOW_SOU_WIDTH + WINDOW_VS_X
                 if self.filteredFrame is None:
-                    if self.usingCamera:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.source
-                    else:
-                        if len(self.arrayVideoLoaded) == 0:
-                            self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFilterFrame
-                        else:
-                            self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.arrayVideoLoaded[0]
+                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFrame
                 else:
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT,x0:x0 + self.sourceWIDTH] = self.filteredFrame
+                    if self.pause:
+                        self.callFilterPause()
+                    self.frame[self.sourceY:self.sourceY + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -483,6 +482,8 @@ class cvGui():
         self.filteredFrame = None
         self.source[:] = (49, 52, 49)
         self.boolVideoLoaded = False
+        self.lastFrame = []
+        self.lastFilterFrame = []
 
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
@@ -499,17 +500,17 @@ class cvGui():
                     cvui.printf(self.frame, int(X_SCREEN/16 + 25), int(Y_SCREEN/2), 5, 0xe9d540, "Please Wait...")
                     cvui.imshow(WINDOW_NAME, self.frame)
                     cv.waitKey(1)
-
                     self.boolVideoLoaded = True
                     if self.loadFullVideo():
                         self.boolVideoLoaded = False
                         self.usingCamera = False
                         self.usingVideo = False
                         self.arrayVideoLoaded.clear()
-                    self.lastFilterFrame = self.arrayVideoLoaded[0]
+                        self.lastFrame = self.arrayVideoLoaded[0]
+
                 else:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
-                    self.lastFilterFrame = self.source
+                    self.lastFrame = self.source
                     self.sourceWIDTH = int(self.source.shape[1])
                     self.sourceHEIGHT = int(self.source.shape[0])
 
@@ -528,22 +529,27 @@ class cvGui():
 
     def callSource(self):
         if self.boolVideoLoaded:
-            self.source = self.arrayVideoLoaded[0]
-            todoPiola = True
+            if len(self.arrayVideoLoaded) == 0:
+                todoPiola = False
+            else:
+                self.source = self.arrayVideoLoaded[0]
+                self.lastFrame = self.source
+                todoPiola = True
         else:
             todoPiola, self.source = self.cap.read()
 
         if todoPiola:
             if self.usingCamera: #int(self.source.shape[1]) > STANDAR_WIDTH:
                 self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
+                self.lastFrame = self.source
+
             else:
                 self.sourceWIDTH = int(self.source.shape[1])
                 self.sourceHEIGHT = int(self.source.shape[0])
 
             if self.checkParametersChange():
-                pass
-                #for tracker in self.trackers:
-                #tracker.changeSettings(self.parametersNew)
+                for tracker in self.trackers:
+                    tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)
@@ -562,21 +568,67 @@ class cvGui():
                 else:
                     self.filteredFrame = None
 
-            i = 0
-            for tracker in self.trackers:
-                #[b,g,r] = tracker.MF.bgrmask
-                r = (self.trackerColors[i] >> 16) & 0xff
-                g = (self.trackerColors[i] >> 8) & 0xff
-                b = self.trackerColors[i] & 0xff
-                self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
-                if tracker.SC.trackingError is False:
-                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                    self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
-                else:
-                    self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
-                i +=1
+            if self.CorrFilter[0] and self.filteredFrame is not None:
+                self.filterWIDTH = int(len(self.filteredFrame[0,:]))
+                self.filterHEIGHT = int(len(self.filteredFrame[:,0]))
+                self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)
+            else:
+                self.filterWIDTH = self.sourceWIDTH
+                self.filterHEIGHT = self.sourceHEIGHT
+
+            if not self.pause:
+                i = 0
+                for tracker in self.trackers:
+                    #[b,g,r] = tracker.MF.bgrmask
+                    r = (self.trackerColors[i] >> 16) & 0xff
+                    g = (self.trackerColors[i] >> 8) & 0xff
+                    b = self.trackerColors[i] & 0xff
+                    self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
+                    if tracker.SC.trackingError is False:
+                        self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                        self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
+                    else:
+                        self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
+                    i +=1
 
         return todoPiola
+
+    def callFilterPause(self):
+        if self.boolVideoLoaded:
+            pausedFrame = self.arrayVideoLoaded[0]
+        else:
+            pausedFrame = self.lastFrame
+
+        if self.checkParametersChange():
+            for tracker in self.trackers:
+                tracker.changeSettings(self.parametersNew)
+
+        for tracker in self.trackers:
+            tracker.update(pausedFrame)
+
+        if not len(self.trackers) == 0:
+            if self.ColorFilter[0]:
+                self.filteredFrame = self.trackers[-1].getFilteredFrame()
+            elif self.CamShiftFilter[0]:
+                self.filteredFrame = None
+            elif self.CorrFilter[0]:
+                self.filteredFrame = self.trackers[-1].getCorrFrame()
+                if self.filteredFrame is not None:
+                    self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
+                else:
+                    self.filteredFrame = None
+            else:
+                self.filteredFrame = None
+
+        if self.CorrFilter[0] and self.filteredFrame is not None:
+            self.filterWIDTH = int(len(self.filteredFrame[0,:]))
+            self.filterHEIGHT = int(len(self.filteredFrame[:,0]))
+            self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)
+        else:
+            self.filterWIDTH = self.sourceWIDTH
+            self.filterHEIGHT = self.sourceHEIGHT
+
+        return True
 
     def rescale_frame_standar(self, frame, maxWidth):
         width = int(frame.shape[1])
@@ -654,7 +706,7 @@ class cvGui():
 
         if not(self.parametersNew[4] == self.parameters[4]):
             return True        #Color Filter On/Off
-        elif not( self.parametersNew[5] == self.parametersNew[5] and self.parametersNew[6] == self.parameters[6] and self.parametersNew[7] == self.parameters[7]):
+        elif not ((self.parametersNew[5] == self.parametersNew[5]) & (self.parametersNew[6] == self.parameters[6]) & (self.parametersNew[7] == self.parameters[7])):
             return True      #Chequeo Params de CF
 
         if not(self.parametersNew[8] == self.parameters[8]):
