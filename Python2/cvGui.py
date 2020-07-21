@@ -162,6 +162,7 @@ class cvGui():
         self.lastFilterFrame = []
 
         self.changeInTrackers = False
+        self.trackerAdded = False
 
 
     def onWork(self):
@@ -236,7 +237,6 @@ class cvGui():
                 if len(self.trackers) < MAX_TRACKERS:
                     bBox = [0, 0, 0, 0]
                     if self.boolVideoLoaded:
-
                         bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[0])
 
                     elif self.usingCamera or self.usingVideo:
@@ -245,6 +245,7 @@ class cvGui():
                     cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
                     if not ((bBox[2] == 0) or (bBox[3] == 0)):       #bBox[0] = X    bBox[1] = Y bBox[2] = W bBox[3] = H
                         self.changeInTrackers = True
+                        self.trackerAdded = True
                         if self.boolVideoLoaded:
                             self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded[0]))
                             toRescale = self.arrayVideoLoaded[0][bBox[1]:bBox[1] + bBox[3], bBox[0]:bBox[0] + bBox[2]].copy()
@@ -257,6 +258,8 @@ class cvGui():
                             self.trackSelection.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
                         else:
                             self.trackSelection.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
+            else:
+                self.trackerAdded = False
 
             a = len(self.trackers)
 
@@ -266,7 +269,9 @@ class cvGui():
                 xB = WINDOW_TRK_X - 170 + int(WINDOW_TRK_WIDTH*(i+1)/MAX_TRACKERS)
                 yB = WINDOW_TRK_Y + 80
 
-                self.boolForTrackers.append([False])
+                if self.trackerAdded:
+                    self.boolForTrackers.append([False])
+                    self.trackerAdded = False
 
                 windowWidth = int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS)
                 windowHeight = int(Y_SCREEN - 2*WINDOW_SOU_Y - yTx + 10)
@@ -274,21 +279,31 @@ class cvGui():
                 cvui.window(self.frame, xTx - 30, yTx - 10, windowWidth, windowHeight, "Tracker Number " + str(i + 1))
                 cvui.rect(self.frame, xTx-28, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
 
-                if cvui.checkbox(self.frame, xTx-10, yTx+60, "First Selection", self.boolForTrackers[i], 0x000000):
+                checking = []
+                for k in range(a):
+                    checking.append([False])
+
+                if cvui.checkbox(self.frame, xTx-10, yTx+95, "First Selection", self.boolForTrackers[i], 0x000000):
                     for j in range(a):
                         if not j == i:
                             self.boolForTrackers[j] = [False]
 
+                    cvui.printf(self.frame, xTx - 10, yTx + 60, 0.4, 0x000000, "Filter displayed is for")
+                    cvui.printf(self.frame, xTx + 20, yTx + 75, 0.4, 0x000000, "this tracker!")
+
                     w = int(self.trackSelection[i].shape[1])
                     h = int(self.trackSelection[i].shape[0])
                     xFrame = int((windowWidth + 2*(xTx-30))/2 - w/2)
-                    self.frame[yTx + 85:yTx + 85 + h, xFrame:xFrame + w] = self.trackSelection[i]
-                    status = cvui.iarea(xFrame, yTx + 85, w, h)
+                    self.frame[yTx + 120:yTx + 120 + h, xFrame:xFrame + w] = self.trackSelection[i]
+                    status = cvui.iarea(xFrame, yTx + 120, w, h)
                     if status == cvui.CLICK:
                         cursor = cvui.mouse(WINDOW_NAME)
                         self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
+                elif self.boolForTrackers == checking and i == a-1:
+                    cvui.printf(self.frame, xTx - 10, yTx+60, 0.4, 0x000000,"Filter displayed is for")
+                    cvui.printf(self.frame, xTx + 20, yTx+75, 0.4, 0x000000,"this tracker!")
 
-                if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
+                if (cvui.button(self.frame, xB+5, yB, "Delete Tracker")):
                     self.changeInTrackers = True
                     del self.boolForTrackers[i]
                     del self.trackers[i]
@@ -452,7 +467,9 @@ class cvGui():
                 else:
                     if self.pause:
                         self.callFilterPause()
-                    self.frame[self.sourceY:self.sourceY + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame
+                    # self.frame[self.sourceY-25:self.sourceY-25 + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame
+                    y0 = int(((WINDOW_SOU_Y + 37) + (WINDOW_SOU_Y + 37 + WINDOW_SOU_HEIGHT - 75))/2 - self.filterHEIGHT/2)
+                    self.frame[y0:y0 + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
 
             # #Help Frame
             # cvui.rect(self.frame, 200, 182, 20, 20, 0x494949, 0x545454)
