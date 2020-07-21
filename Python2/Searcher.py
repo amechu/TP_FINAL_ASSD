@@ -74,7 +74,8 @@ class Searcher:
         self.searchHeight = 0
         self.debug=False
         self.corr_out=None
-        self.MASKCONDITION = -1
+        self.MASKCONDITION = 20
+
 
 
     def searchMissing(self,estX,estY,frame,filteredframe):
