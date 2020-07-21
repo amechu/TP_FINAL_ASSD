@@ -6,7 +6,7 @@ class ShiTomasi:
     qLevel=0.00001
     minDist = 10
     blockSize_ = 5
-    frameRecalculationNumber = 25
+    frameRecalculationNumber = 20
     searchEnlargementThreshold = 6
 
     # feature_params = dict(maxCorners=maxcorners,  # Maxima cantidad de features

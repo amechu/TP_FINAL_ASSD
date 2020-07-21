@@ -47,6 +47,7 @@ class Searcher:
     recalcAlgorithmD = dict(
             ST = 0,
             ST_CORR = 1,
+            CORR = 2
     )
     missAlgorithmD = dict(
             ST = 0,
@@ -55,9 +56,8 @@ class Searcher:
     usualAlgorithm = usualAlgorithmD["LK_ST"]
     missAlgorithm = missAlgorithmD["CORR"]
 #    missAlgorithm = missAlgorithmD["ST"]
-
-    recalcAlgorithm = recalcAlgorithmD["ST"]
-
+#    recalcAlgorithm = recalcAlgorithmD["ST"]
+    recalcAlgorithm = recalcAlgorithmD["CORR"]
 
     def __init__(self,firstFrame,selectionHeight_,selectionWidth_,xSelection,ySelection,prevFrameGrayC):
         self.LK = OpticalFlow()
@@ -76,7 +76,7 @@ class Searcher:
         self.debug=False
         self.corr_out=None
         self.y, self.x = np.shape(self.prevFrameGray)
-        self.MASKCONDITION = self.x*self.y*0.01**2
+        self.MASKCONDITION = self.x*self.y*0.04**2
 
 
 
@@ -170,8 +170,8 @@ class Searcher:
                     # remove outliers.
                         medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
                     ###############################
-                    elif(self.recalcAlgorithm == self.recalcAlgorithmD["ST_CORR"]):
-                        pass
+                    elif(self.recalcAlgorithm == self.recalcAlgorithmD["CORR"]):
+                        medx,medy=self.searchMissing(0,0,frame,filteredFrame)
                     ###############################
                     self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(medy - self.selectionHeight / 2): int(medy + self.selectionHeight / 2),int(medx - self.selectionWidth / 2):
                                                                                                                                                                                 int(medx + self.selectionWidth / 2)])
