@@ -174,7 +174,7 @@ class Searcher:
                         pass
                     ###############################
                     self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(medy - self.selectionHeight / 2): int(medy + self.selectionHeight / 2),int(medx - self.selectionWidth / 2):
-                                                                                                                                                                         int(medx + self.selectionWidth / 2)])
+                                                                                                                                                                                int(medx + self.selectionWidth / 2)])
                     self.features = self.featureTranslate(medx - self.selectionWidth / 2,
                                                           medy - self.selectionHeight / 2, self.features)
 
