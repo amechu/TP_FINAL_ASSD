@@ -627,9 +627,10 @@ class cvGui():
 
         for tracker in self.trackers:
             tracker.MF.updateMaskFromSettings()
-
-        self.lastFilterFrame = self.trackers[-1].MF.filterFrame(self.source)
-        self.updateFilterFrame()
+            
+        if not len(self.trackers) == 0:
+            self.lastFilterFrame = self.trackers[-1].MF.filterFrame(self.source)
+            self.updateFilterFrame()
 
         i = 0
         for tracker in self.trackers:
