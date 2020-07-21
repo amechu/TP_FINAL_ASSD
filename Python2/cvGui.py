@@ -406,13 +406,17 @@ class cvGui():
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
+                self.updateFilterFrame()
                 x0 = self.sourceX + WINDOW_SOU_WIDTH + WINDOW_VS_X
                 if self.filteredFrame is None:
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFrame
                 else:
                     if self.pause:
                         self.callFilterPause()
-                    self.frame[self.sourceY:self.sourceY + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame
+                    if self.CorrFilter[0]:
+                        self.frame[self.sourceY:self.sourceY + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame*255
+                    else:
+                        self.frame[self.sourceY:self.sourceY + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -556,28 +560,7 @@ class cvGui():
             for tracker in self.trackers:
                 tracker.update(self.source)
 
-            if not len(self.trackers) == 0:
-                if self.ColorFilter[0]:
-                    self.filteredFrame = self.trackers[-1].getFilteredFrame()
-                elif self.CamShiftFilter[0]:
-                    self.filteredFrame = None
-                elif self.CorrFilter[0]:
-                    self.filteredFrame = self.trackers[-1].getCorrFrame()
-                    if self.filteredFrame is not None:
-                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
-                    else:
-                        self.filteredFrame = None
-                else:
-                    self.filteredFrame = None
-
-            if self.CorrFilter[0] and self.filteredFrame is not None:
-                self.filterWIDTH = int(len(self.filteredFrame[0,:]))
-                self.filterHEIGHT = int(len(self.filteredFrame[:,0]))
-                self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)
-            else:
-                self.filterWIDTH = self.sourceWIDTH
-                self.filterHEIGHT = self.sourceHEIGHT
-
+            self.updateFilterFrame()
 
             i = 0
             for tracker in self.trackers:
@@ -647,6 +630,30 @@ class cvGui():
             i += 1
 
         return True
+
+    def updateFilterFrame(self):
+        if not len(self.trackers) == 0:
+            if self.ColorFilter[0]:
+                self.filteredFrame = self.trackers[-1].getFilteredFrame()
+            elif self.CamShiftFilter[0]:
+                self.filteredFrame = None
+            elif self.CorrFilter[0]:
+                self.filteredFrame = self.trackers[-1].getCorrFrame()
+                if self.filteredFrame is not None:
+                    self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
+                else:
+                    self.filteredFrame = None
+            else:
+                self.filteredFrame = None
+
+        if self.CorrFilter[0] and self.filteredFrame is not None:
+            self.filterWIDTH = int(len(self.filteredFrame[0, :]))
+            self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
+            self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)
+        else:
+            self.filterWIDTH = self.sourceWIDTH
+            self.filterHEIGHT = self.sourceHEIGHT
+
 
     def rescale_frame_standar(self, frame, maxWidth):
         width = int(frame.shape[1])
