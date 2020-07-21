@@ -270,9 +270,11 @@ class cvGui():
                 windowWidth = int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS)
                 windowHeight = int(Y_SCREEN - 2*WINDOW_SOU_Y - yTx + 10)
 
-                cvui.window(self.frame, xTx-30, yTx-10, windowWidth, windowHeight, "Tracker Number " + str(i+1))
+                cvui.window(self.frame, xTx - 30, yTx - 10, windowWidth, windowHeight, "Tracker Number " + str(i + 1))
+                cvui.rect(self.frame, xTx-28, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
 
-                if (cvui.checkbox(self.frame, xTx-10, yTx+60, "Settings", self.boolForTrackers[i], self.trackerColors[i])):
+                #if (cvui.checkbox(self.frame, xTx - 10, yTx + 60, "Settings", self.boolForTrackers[i], self.trackerColors[i])):
+                if cvui.checkbox(self.frame, xTx-10, yTx+60, "First Selection", self.boolForTrackers[i], 0x000000):
                     w = int(self.trackSelection[i].shape[1])
                     h = int(self.trackSelection[i].shape[0])
                     xFrame = int((windowWidth + 2*(xTx-30))/2 - w/2)
