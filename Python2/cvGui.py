@@ -230,12 +230,6 @@ class cvGui():
             if (cvui.button(self.frame, 60, 875, "Reset Settings")):
                 self.resetInitialCond()
 
-            # cvui.rect(self.frame, 200, 182, 20, 20, 0x0fb1fc, 0x0752bd)
-            # cvui.text(self.frame, 205, 185, "?", 0.6)
-            # if not cvui.iarea(200, 182, 20, 20) == cvui.OUT:
-            #     cvui.rect(self.frame, 500, 500, 100, 100, 0x0fb1fc, 0x0752bd)
-
-
             #Settings Buttons
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (not (self.usingVideo and len(self.arrayVideoLoaded) == 0) or self.usingCamera)):
 
@@ -279,7 +273,6 @@ class cvGui():
                 cvui.window(self.frame, xTx - 30, yTx - 10, windowWidth, windowHeight, "Tracker Number " + str(i + 1))
                 cvui.rect(self.frame, xTx-28, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
 
-                #if (cvui.checkbox(self.frame, xTx - 10, yTx + 60, "Settings", self.boolForTrackers[i], self.trackerColors[i])):
                 if cvui.checkbox(self.frame, xTx-10, yTx+60, "First Selection", self.boolForTrackers[i], 0x000000):
                     w = int(self.trackSelection[i].shape[1])
                     h = int(self.trackSelection[i].shape[0])
@@ -456,6 +449,11 @@ class cvGui():
                         self.callFilterPause()
                     self.frame[self.sourceY:self.sourceY + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame
 
+            # #Help Frame
+            # cvui.rect(self.frame, 200, 182, 20, 20, 0x494949, 0x545454)
+            # cvui.text(self.frame, 205, 185, "?", 0.6)
+            # if not cvui.iarea(200, 182, 20, 20) == cvui.OUT:
+            #     cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 500, "Help")
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -627,15 +625,12 @@ class cvGui():
             for tracker in self.trackers:
                 tracker.changeSettings(self.parametersNew)
 
-        # for tracker in self.trackers:                                 #SI ESTÁ DESCOMENTADO, PUEDO UPDATEAR EL FILTRO EN PAUSA PERO TMB UPDATEO SOURCE
-        #     tracker.update(self.source)
-
         for tracker in self.trackers:
             tracker.MF.updateMaskFromSettings()
 
         self.lastFilterFrame = self.trackers[-1].MF.filterFrame(self.source)
         self.updateFilterFrame()
-        
+
         i = 0
         for tracker in self.trackers:
             # [b,g,r] = tracker.MF.bgrmask
