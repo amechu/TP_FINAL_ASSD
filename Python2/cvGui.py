@@ -60,7 +60,7 @@ WINDOW_FIL_HEIGHT = WINDOW_SOU_HEIGHT #Y_SCREEN - WINDOW_FIL_Y - WINDOW_VS_Y
 
 WINDOW_TRK_X = WINDOW_SOU_X
 WINDOW_TRK_Y = WINDOW_SOU_WIDTH + 2*WINDOW_VS_Y
-WINDOW_TRK_WIDTH = X_SCREEN - WINDOW_TRK_X - 2*WINDOW_SET_X  #WINDOW_SOU_WIDTH
+WINDOW_TRK_WIDTH = X_SCREEN - WINDOW_TRK_X - WINDOW_SET_X  #WINDOW_SOU_WIDTH
 WINDOW_TRK_HEIGHT = Y_SCREEN - WINDOW_TRK_Y - WINDOW_VS_Y #WINDOW_VS_HEIGHT
 
 MAX_TRACKERS = 5
@@ -230,6 +230,12 @@ class cvGui():
             if (cvui.button(self.frame, 60, 875, "Reset Settings")):
                 self.resetInitialCond()
 
+            # cvui.rect(self.frame, 200, 182, 20, 20, 0x0fb1fc, 0x0752bd)
+            # cvui.text(self.frame, 205, 185, "?", 0.6)
+            # if not cvui.iarea(200, 182, 20, 20) == cvui.OUT:
+            #     cvui.rect(self.frame, 500, 500, 100, 100, 0x0fb1fc, 0x0752bd)
+
+
             #Settings Buttons
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (not (self.usingVideo and len(self.arrayVideoLoaded) == 0) or self.usingCamera)):
 
@@ -283,7 +289,6 @@ class cvGui():
                     if status == cvui.CLICK:
                         cursor = cvui.mouse(WINDOW_NAME)
                         self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
-
 
                 if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
                     self.changeInTrackers = True
