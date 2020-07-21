@@ -413,10 +413,8 @@ class cvGui():
                 else:
                     if self.pause:
                         self.callFilterPause()
-                    if self.CorrFilter[0]:
-                        self.frame[self.sourceY:self.sourceY + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame*255
-                    else:
-                        self.frame[self.sourceY:self.sourceY + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
+                    self.frame[self.sourceY:self.sourceY + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame
+
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -649,7 +647,7 @@ class cvGui():
         if self.CorrFilter[0] and self.filteredFrame is not None:
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
             self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
-            self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)
+            self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)*255
         else:
             self.filterWIDTH = self.sourceWIDTH
             self.filterHEIGHT = self.sourceHEIGHT
