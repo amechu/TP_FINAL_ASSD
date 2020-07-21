@@ -17,7 +17,7 @@ class MaskingFilter:
     bSemiAmp = 15
     labMaxChange = 1
     CIELabRecalculationNumber = 5
-    labPeriodicRecalculations = True
+    labPeriodicRecalculations = False
 
     def __init__(self):
         self.mask = self.maskingType["FILTER_LAB"]
@@ -79,21 +79,3 @@ class MaskingFilter:
         elif self.mask is self.maskingType["FILTER_CORR"]:
             pass
         return self.filteredFrame
-
-#Mierda de correlacion
-
-#def correlationAllPic(frame):
-#    match_method = cv.TM_SQDIFF
-#    frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-#    mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
-#    frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
-#    corr_out = cv.matchTemplate(frame_hsv, kernel, method=match_method)
-#    cv.normalize(corr_out, corr_out, 0, 1, cv.NORM_MINMAX)
-#    [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(corr_out)
-#    if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
-#        matchLoc = minLoc
-#    else:
-#        matchLoc = maxLoc
-#    finalMask = cv.inRange(corr_out,0, 0.1)
-#    finalMask= np.uint8(finalMask)
-#    return [corr_out,finalMask,matchLoc]

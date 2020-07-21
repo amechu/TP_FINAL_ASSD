@@ -88,9 +88,9 @@ class Tracker:
         #Tacking error?
         if self.SC.trackingError is True:
             if self.SC.missAlgorithm == self.SC.missAlgorithmD["ST"]:
-                x,y = self.SC.searchMissing(self.KM.statePost[0][0],self.KM.statePost[1][0],frame)
+                x,y = self.SC.searchMissing(self.KM.statePost[0][0],self.KM.statePost[1][0],frame,frame)
             elif self.SC.missAlgorithm == self.SC.missAlgorithmD["CORR"]:
-                x, y = self.SC.searchMissing(self.KM.statePost[0][0], self.KM.statePost[1][0], realframe)
+                x, y = self.SC.searchMissing(self.KM.statePost[0][0], self.KM.statePost[1][0], realframe,frame)
             if self.SC.trackingError is False:
                 self.KM.correct(x,y)
         else:
