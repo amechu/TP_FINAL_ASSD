@@ -23,7 +23,7 @@ class Artist:
             if i is 0:
                 cv.circle(frame, pointArray[i], 4, color, -1)
             else:
-                color = (int(np.clip(color[0] - 5*i, 0, 255)), int(np.clip(color[1] - 5*i, 0, 255)),  int(np.clip(color[2] - 5*i, 0, 255)))
+                color = (int(np.clip(color[0] - 3*i, 0, 255)), int(np.clip(color[1] - 3*i, 0, 255)),  int(np.clip(color[2] - 3*i, 0, 255)))
                 cv.line(frame, pointArray[i-1], pointArray[i], color, 1)
             #cv.circle(frame, pointArray[i], 3, color, -1)
         return frame
