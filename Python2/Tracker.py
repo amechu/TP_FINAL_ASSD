@@ -83,10 +83,8 @@ class Tracker:
         elif self.MF.mask is self.MF.maskingType["FILTER_CSHIFT"]:
             pass
 
-        elif self.MF.mask is self.MF.maskingType["FILTER_CORR"]:
-            pass
 
-        frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+
         #Tacking error?
         if self.SC.trackingError is True:
             if self.SC.missAlgorithm == self.SC.missAlgorithmD["ST"]:
