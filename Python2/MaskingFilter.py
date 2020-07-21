@@ -81,6 +81,7 @@ class MaskingFilter:
             pass
         return self.filteredFrame
 
+
     def updateMaskFromSettings(self):
         L_low = np.clip(np.int32(self.lab_mask[0, 0, :])[0] - self.LSemiAmp, 1, 255)
         a_low = np.clip(np.int32(self.lab_mask[0, 0, :])[1] - self.aSemiAmp, 1, 255)
@@ -92,20 +93,3 @@ class MaskingFilter:
         self.upperThreshold = np.array([L_high, a_high, b_high])
 
 
-#Mierda de correlacion
-
-#def correlationAllPic(frame):
-#    match_method = cv.TM_SQDIFF
-#    frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-#    mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
-#    frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
-#    corr_out = cv.matchTemplate(frame_hsv, kernel, method=match_method)
-#    cv.normalize(corr_out, corr_out, 0, 1, cv.NORM_MINMAX)
-#    [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(corr_out)
-#    if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
-#        matchLoc = minLoc
-#    else:
-#        matchLoc = maxLoc
-#    finalMask = cv.inRange(corr_out,0, 0.1)
-#    finalMask= np.uint8(finalMask)
-#    return [corr_out,finalMask,matchLoc]
