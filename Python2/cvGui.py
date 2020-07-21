@@ -724,7 +724,7 @@ class cvGui():
 
         if not(self.parametersNew[4] == self.parameters[4]):
             return True        #Color Filter On/Off
-        elif not ((self.parametersNew[5] == self.parametersNew[5]) & (self.parametersNew[6] == self.parameters[6]) & (self.parametersNew[7] == self.parameters[7])):
+        elif not ((self.parametersNew[5] == self.parameters[5]) & (self.parametersNew[6] == self.parameters[6]) & (self.parametersNew[7] == self.parameters[7])):
             return True      #Chequeo Params de CF
 
         if not(self.parametersNew[8] == self.parameters[8]):
