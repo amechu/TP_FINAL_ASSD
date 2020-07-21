@@ -236,6 +236,7 @@ class cvGui():
                 if len(self.trackers) < MAX_TRACKERS:
                     bBox = [0, 0, 0, 0]
                     if self.boolVideoLoaded:
+
                         bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[0])
 
                     elif self.usingCamera or self.usingVideo:
@@ -274,6 +275,10 @@ class cvGui():
                 cvui.rect(self.frame, xTx-28, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
 
                 if cvui.checkbox(self.frame, xTx-10, yTx+60, "First Selection", self.boolForTrackers[i], 0x000000):
+                    for j in range(a):
+                        if not j == i:
+                            self.boolForTrackers[j] = [False]
+
                     w = int(self.trackSelection[i].shape[1])
                     h = int(self.trackSelection[i].shape[0])
                     xFrame = int((windowWidth + 2*(xTx-30))/2 - w/2)
@@ -627,9 +632,14 @@ class cvGui():
 
         for tracker in self.trackers:
             tracker.MF.updateMaskFromSettings()
-            
+
         if not len(self.trackers) == 0:
-            self.lastFilterFrame = self.trackers[-1].MF.filterFrame(self.source)
+            filterOfInteres = -1
+            for i in range(len(self.boolForTrackers)):
+                if self.boolForTrackers[i] == [True]:
+                    filterOfInteres = i
+                    break
+            self.lastFilterFrame = self.trackers[filterOfInteres].MF.filterFrame(self.source)
             self.updateFilterFrame()
 
         i = 0
@@ -651,13 +661,19 @@ class cvGui():
         return True
 
     def updateFilterFrame(self):
+        filterOfInteres = -1
+        for i in range(len(self.boolForTrackers)):
+            if self.boolForTrackers[i] == [True]:
+                filterOfInteres = i
+                break
+
         if not len(self.trackers) == 0:
             if self.ColorFilter[0]:
-                self.filteredFrame = self.trackers[-1].getFilteredFrame()
+                self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
             elif self.CamShiftFilter[0]:
                 self.filteredFrame = None
             elif self.CorrFilter[0]:
-                self.filteredFrame = self.trackers[-1].getCorrFrame()
+                self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
                     self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
                 else:
