@@ -40,7 +40,7 @@ class MaskingFilter:
             if ~np.isnan(medb)&~np.isnan(medg)&~np.isnan(medr):
                 bgr_mask = np.uint8([[[medb, medg, medr]]])
                 self.bgrmask = [medb, medg, medr]
-                self.lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2HLS)
+                self.lab_mask = cv.cvtColor(bgr_mask, cv.COLOR_BGR2LAB)
 
                 if self.init is True:
                     L_low = np.clip(np.int32(self.lab_mask[0, 0, :])[0] - self.LSemiAmp, 1, 255)
@@ -71,7 +71,7 @@ class MaskingFilter:
             pass
         elif self.mask is self.maskingType["FILTER_LAB"]:
 
-            frameLab = cv.cvtColor(frame, cv.COLOR_BGR2HLS)
+            frameLab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
             mask = cv.inRange(frameLab, self.lowerThreshold, self.upperThreshold)
             self.filteredFrame = cv.bitwise_and(frame, frame, mask=mask)
 
