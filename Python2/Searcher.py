@@ -77,6 +77,7 @@ class Searcher:
         self.MASKCONDITION = 20
 
 
+
     def searchMissing(self,estX,estY,frame,filteredframe):
 
         if self.missAlgorithm== self.missAlgorithmD["ST"]:
