@@ -506,7 +506,7 @@ class cvGui():
                         self.usingCamera = False
                         self.usingVideo = False
                         self.arrayVideoLoaded.clear()
-                        self.lastFrame = self.arrayVideoLoaded[0]
+                    self.lastFrame = self.arrayVideoLoaded[0]
 
                 else:
                     self.source = self.rescale_frame_standar(self.source, STANDAR_WIDTH)
