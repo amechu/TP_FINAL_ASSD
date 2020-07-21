@@ -150,6 +150,8 @@ class cvGui():
         self.parameters = []
         self.parametersNew = []
         self.boolForTrackers = []
+        self.trackSelection = []
+        self.trackSelectionBGR = [None, None, None, None, None]
 
         #Video Loaded elements
         self.boolVideoLoaded = False
@@ -235,15 +237,25 @@ class cvGui():
                     bBox = [0, 0, 0, 0]
                     if self.boolVideoLoaded:
                         bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[0])
+
                     elif self.usingCamera or self.usingVideo:
-                            bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.lastFrame)
+                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.lastFrame)
+
                     cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
-                    if not ((bBox[0] == 0) and (bBox[1] == 0) and (bBox[2] == 0) and (bBox[3] == 0)):
+                    if not ((bBox[2] == 0) or (bBox[3] == 0)):       #bBox[0] = X    bBox[1] = Y bBox[2] = W bBox[3] = H
                         self.changeInTrackers = True
                         if self.boolVideoLoaded:
                             self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded[0]))
+                            toRescale = self.arrayVideoLoaded[0][bBox[1]:bBox[1] + bBox[3], bBox[0]:bBox[0] + bBox[2]].copy()
                         else:
                             self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
+                            toRescale = self.lastFrame[bBox[1]:bBox[1] + bBox[3], bBox[0]:bBox[0] + bBox[2]].copy()
+                        w = int(np.asarray(toRescale).shape[1])
+                        h = int(np.asarray(toRescale).shape[0])
+                        if w >= h:
+                            self.trackSelection.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
+                        else:
+                            self.trackSelection.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
 
             a = len(self.trackers)
 
@@ -260,18 +272,25 @@ class cvGui():
 
                 cvui.window(self.frame, xTx-30, yTx-10, windowWidth, windowHeight, "Tracker Number " + str(i+1))
 
-                if (cvui.checkbox(self.frame, xTx-10, yTx+75, "Settings", self.boolForTrackers[i])):
-                    for j in range(a):
-                        if j != i:
-                            self.boolForTrackers[j] = [False]
-                    pass
+                if (cvui.checkbox(self.frame, xTx-10, yTx+60, "Settings", self.boolForTrackers[i], self.trackerColors[i])):
+                    w = int(self.trackSelection[i].shape[1])
+                    h = int(self.trackSelection[i].shape[0])
+                    xFrame = int((windowWidth + 2*(xTx-30))/2 - w/2)
+                    self.frame[yTx + 85:yTx + 85 + h, xFrame:xFrame + w] = self.trackSelection[i]
+                    status = cvui.iarea(xFrame, yTx + 85, w, h)
+                    if status == cvui.CLICK:
+                        cursor = cvui.mouse(WINDOW_NAME)
+                        self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
 
-                #cvui.printf(self.frame, xTx, yTx, 0.4, self.trackerColors[i],"Tracker Number " + str(i+1))
+
                 if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
                     self.changeInTrackers = True
                     del self.boolForTrackers[i]
                     del self.trackers[i]
+                    del self.trackSelection[i]
+                    self.trackSelectionBGR = [None, None, None, None, None]
                     break
+
 
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No trackers added. Try selecting a new area!")
