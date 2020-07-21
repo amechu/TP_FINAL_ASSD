@@ -46,15 +46,15 @@ class Searcher:
     )
     recalcAlgorithmD = dict(
             ST = 0,
-            CORR = 1,
+            ST_CORR = 1,
     )
     missAlgorithmD = dict(
             ST = 0,
             CORR = 1,
     )
     usualAlgorithm = usualAlgorithmD["LK_ST"]
-#    missAlgorithm = missAlgorithmD["CORR"]
-    missAlgorithm = missAlgorithmD["ST"]
+    missAlgorithm = missAlgorithmD["CORR"]
+#    missAlgorithm = missAlgorithmD["ST"]
 
     recalcAlgorithm = recalcAlgorithmD["ST"]
 
@@ -150,9 +150,9 @@ class Searcher:
 
         return candidate
 
-    def search(self,frameCounter,frame):
+    def search(self,frameCounter,frame,filteredFrame):
         if self.usualAlgorithm== self.usualAlgorithmD["LK_ST"]:
-            frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+            frameGray = cv.cvtColor(filteredFrame, cv.COLOR_BGR2GRAY)
             # Apply LK algorithm
             self.features, self.trackingError = self.LK.updateFeatures(self.prevFrameGray, frameGray)
             if self.trackingError is False:  # Tracking error?
@@ -168,7 +168,10 @@ class Searcher:
                                & (self.features[:, 0, 1] > medy - self.stdMultiplier * std - 0.1)
                         self.features = self.features[mask]
                     # remove outliers.
-                    medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+                        medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
+                    ###############################
+                    elif(self.recalcAlgorithm == self.recalcAlgorithmD["ST_CORR"]):
+                        pass
                     ###############################
                     self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(medy - self.selectionHeight / 2): int(medy + self.selectionHeight / 2),int(medx - self.selectionWidth / 2):
                                                                                                                                                                          int(medx + self.selectionWidth / 2)])

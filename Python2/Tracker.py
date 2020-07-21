@@ -94,7 +94,7 @@ class Tracker:
             if self.SC.trackingError is False:
                 self.KM.correct(x,y)
         else:
-            x,y = self.SC.search(self.frameCounter,frame)
+            x,y = self.SC.search(self.frameCounter,realframe,frame)
             if self.SC.trackingError is False:
                 self.KM.correct(x,y)
 
