@@ -53,7 +53,8 @@ class Searcher:
             CORR = 1,
     )
     usualAlgorithm = usualAlgorithmD["LK_ST"]
-    missAlgorithm = missAlgorithmD["CORR"]
+#    missAlgorithm = missAlgorithmD["CORR"]
+    missAlgorithm = missAlgorithmD["ST"]
 
     recalcAlgorithm = recalcAlgorithmD["ST"]
 
@@ -74,7 +75,8 @@ class Searcher:
         self.searchHeight = 0
         self.debug=False
         self.corr_out=None
-        self.MASKCONDITION = 20
+        self.y, self.x = np.shape(self.prevFrameGray)
+        self.MASKCONDITION = self.x*self.y*0.01**2
 
 
 
@@ -99,18 +101,18 @@ class Searcher:
 
 
         elif self.missAlgorithm== self.missAlgorithmD["CORR"]:
-            frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+            frameGray = cv.cvtColor(filteredframe, cv.COLOR_BGR2GRAY)
             match_method = cv.TM_SQDIFF
 
             frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
             mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
             frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
 
+
             self.corr_out = cv.matchTemplate(frame_hsv, self.kernel, method=match_method)
 
             cv.normalize(self.corr_out, self.corr_out, 0, 1, cv.NORM_MINMAX)
             [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(self.corr_out)
-
             if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
                 matchLoc = minLoc
             else:
@@ -124,22 +126,27 @@ class Searcher:
                 self.features = self.featureTranslate(int(matchLoc[0]), int(matchLoc[1]), self.features)
                 self.LK.prevFeatures = self.features
             else:
-                self.corr_out[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
-                int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)] = 1
-                [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(self.corr_out)
-                if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
-                    matchLoc = minLoc
-                else:
-                    matchLoc = maxLoc
-                frame_to_search = frameGray[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
-                                  int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]
-                if np.count_nonzero(filteredframe[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
-                                    int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]) > self.MASKCONDITION:
-                    self.features, self.trackingError = self.ST.recalculateFeatures(frame_to_search)
-                    self.features = self.featureTranslate(int(matchLoc[0]), int(matchLoc[1]), self.features)
-                    self.LK.prevFeatures = self.features
-                else:
-                    self.trackingError=True
+                for i in range(10):
+                    if(matchLoc[0] > self.selectionWidth/2  and matchLoc[0] < self.x - self.selectionWidth/2 and matchLoc[1] > self.selectionHeight/2  and matchLoc[1] < self.y - self.selectionHeight/2):
+                        self.corr_out[int(matchLoc[1]-self.selectionHeight/2): int(matchLoc[1] + self.selectionHeight/2),int(matchLoc[0]-self.selectionWidth/2): int(matchLoc[0] + self.selectionWidth/2)] = 1
+                    else:
+                        self.corr_out[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)] = 1
+                    [minval, maxval, minLoc, maxLoc] = cv.minMaxLoc(self.corr_out)
+                    if (match_method == cv.TM_SQDIFF or match_method == cv.TM_SQDIFF_NORMED):
+                        matchLoc = minLoc
+                    else:
+                        matchLoc = maxLoc
+                    frame_to_search = frameGray[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
+                                      int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]
+                    if np.count_nonzero(filteredframe[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
+                                        int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]) > self.MASKCONDITION:
+                        self.features, self.trackingError = self.ST.recalculateFeatures(frame_to_search)
+                        self.features = self.featureTranslate(int(matchLoc[0]), int(matchLoc[1]), self.features)
+                        self.LK.prevFeatures = self.features
+                    else:
+                        self.trackingError=True
+                    if self.trackingError == False:
+                        break
 
         return candidate
 
