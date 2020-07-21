@@ -61,7 +61,7 @@ WINDOW_FIL_HEIGHT = WINDOW_SOU_HEIGHT #Y_SCREEN - WINDOW_FIL_Y - WINDOW_VS_Y
 WINDOW_TRK_X = WINDOW_SOU_X
 WINDOW_TRK_Y = WINDOW_SOU_WIDTH + 2*WINDOW_VS_Y
 WINDOW_TRK_WIDTH = X_SCREEN - WINDOW_TRK_X - 2*WINDOW_SET_X  #WINDOW_SOU_WIDTH
-WINDOW_TRK_HEIGHT = WINDOW_VS_HEIGHT #Y_SCREEN - WINDOW_TRK_Y - WINDOW_VS_Y
+WINDOW_TRK_HEIGHT = Y_SCREEN - WINDOW_TRK_Y - WINDOW_VS_Y #WINDOW_VS_HEIGHT
 
 MAX_TRACKERS = 5
 
@@ -149,6 +149,7 @@ class cvGui():
         self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
         self.parameters = []
         self.parametersNew = []
+        self.boolForTrackers = []
 
         #Video Loaded elements
         self.boolVideoLoaded = False
@@ -231,12 +232,13 @@ class cvGui():
             if (cvui.button(self.frame, 20, 180, "Select New Area") and (not (self.usingVideo and len(self.arrayVideoLoaded) == 0) or self.usingCamera)):
 
                 if len(self.trackers) < MAX_TRACKERS:
+                    bBox = [0, 0, 0, 0]
                     if self.boolVideoLoaded:
                         bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[0])
-                    else:
-                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.lastFrame)
+                    elif self.usingCamera or self.usingVideo:
+                            bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.lastFrame)
                     cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
-                    if not ((bBox[0] == 0) or (bBox[1] == 0) or (bBox[2] == 0) or (bBox[3] == 0)):
+                    if not ((bBox[0] == 0) and (bBox[1] == 0) and (bBox[2] == 0) and (bBox[3] == 0)):
                         self.changeInTrackers = True
                         if self.boolVideoLoaded:
                             self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded[0]))
@@ -248,12 +250,26 @@ class cvGui():
             for i in range(a):
                 xTx = WINDOW_TRK_X - 165 + int(WINDOW_TRK_WIDTH*(i+1)/MAX_TRACKERS)
                 yTx = WINDOW_TRK_Y + 60
-                xB = WINDOW_TRK_X - 165 + int(WINDOW_TRK_WIDTH*(i+1)/MAX_TRACKERS)
+                xB = WINDOW_TRK_X - 170 + int(WINDOW_TRK_WIDTH*(i+1)/MAX_TRACKERS)
                 yB = WINDOW_TRK_Y + 80
 
-                cvui.printf(self.frame, xTx, yTx, 0.4, self.trackerColors[i],"Tracker Number " + str(i+1))
+                self.boolForTrackers.append([False])
+
+                windowWidth = int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS)
+                windowHeight = int(Y_SCREEN - 2*WINDOW_SOU_Y - yTx + 10)
+
+                cvui.window(self.frame, xTx-30, yTx-10, windowWidth, windowHeight, "Tracker Number " + str(i+1))
+
+                if (cvui.checkbox(self.frame, xTx-10, yTx+75, "Settings", self.boolForTrackers[i])):
+                    for j in range(a):
+                        if j != i:
+                            self.boolForTrackers[j] = [False]
+                    pass
+
+                #cvui.printf(self.frame, xTx, yTx, 0.4, self.trackerColors[i],"Tracker Number " + str(i+1))
                 if (cvui.button(self.frame, xB, yB, "Delete Tracker")):
                     self.changeInTrackers = True
+                    del self.boolForTrackers[i]
                     del self.trackers[i]
                     break
 
@@ -398,12 +414,11 @@ class cvGui():
                         if len(self.arrayVideoLoaded) == 0:
                             self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
-
                 else:
                     if self.changeInTrackers and ((self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera):
                         self.changeInTrackers = False
                         self.callFilterPause()
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
+                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source #self.lastFrame
 
             if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
                 self.updateFilterFrame()
