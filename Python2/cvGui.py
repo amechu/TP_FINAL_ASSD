@@ -309,6 +309,8 @@ class cvGui():
                     del self.trackers[i]
                     del self.trackSelection[i]
                     self.trackSelectionBGR = [None, None, None, None, None]
+                    if len(self.trackers) == 0:
+                        self.filteredFrame = None
                     break
 
 
