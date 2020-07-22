@@ -18,8 +18,8 @@ class Searcher:
             CORR = 1,
     )
     usualAlgorithm = usualAlgorithmD["LK_ST"]
-    missAlgorithm = missAlgorithmD["CORR"]
-#    missAlgorithm = missAlgorithmD["ST"]
+#    missAlgorithm = missAlgorithmD["CORR"]
+    missAlgorithm = missAlgorithmD["ST"]
 #    recalcAlgorithm = recalcAlgorithmD["ST"]
     recalcAlgorithm = recalcAlgorithmD["CORR"]
 
@@ -61,10 +61,8 @@ class Searcher:
                 self.LK.prevFeatures = self.features
 
 
-        elif self.missAlgorithm== self.missAlgorithmD["CORR"]:
-            frameGray = cv.cvtColor(filteredframe, cv.COLOR_BGR2GRAY)   #REVISAR
-
-
+        elif self.missAlgorithm == self.missAlgorithmD["CORR"]:
+            frameGray = cv.cvtColor(filteredframe, cv.COLOR_BGR2GRAY)   
             frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
             mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
             frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
@@ -144,7 +142,11 @@ class Searcher:
                         self.features = self.featureTranslate(medx - self.selectionWidth / 2,medy - self.selectionHeight / 2, self.features)
                         self.LK.prevFeatures = self.features
                     elif(self.recalcAlgorithm == self.recalcAlgorithmD["CORR"]):
+                        a= self.missAlgorithm
+                        self.missAlgorithm = self.missAlgorithmD["CORR"]
                         medx,medy=self.searchMissing(0,0,frame,filteredFrame)
+                        self.missAlgorithm = a
+
                     # apply st algorithm
 
                     if self.trackingError is False:  # did i find features?

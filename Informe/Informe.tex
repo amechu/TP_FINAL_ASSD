@@ -201,8 +201,42 @@ K_k = P_{k|k-1}H^TS_k^{-1}
 	\caption{Seno con ruido comparada con estimación de Kalman.}
 	\label{fig:kalman-comp}
 \end{figure}
+\subsection{Filtros de Correlación:}
+\label{sec:corr}
+El filtro de correlación o también conocido como ``Matched Filter'' del inglés, se obtiene al calcular la correlación de una señal conocida,  o un ``kernel'', con una señal desconocida con el propósito de detectar este kernel en la última señal. Esto último es equivalente a convolucionar la señal desconocida con la inversión temporal del conjugado del kernel. Este filtro es el filtro óptimo lineal que maximiza la relación señal a ruido (SNR) en presencia de ruido aditivo.\\ En la implementación que fue usada se utilizó la siguiente fórmula para el cálculo:
+\begin{align}
+R(x,y) = \frac{\Sigma_{x',y'} \left( T(x',y') - I(x+x',y+y') \right)^2}{\sqrt{\Sigma_{x',y'} T(x',y')^2  \cdot \Sigma_{x',y'}  I(x+x',y+y')^2}}
+\end{align}
+
+Donde R es la función de resultado, I la señal desconocida, y T el template o kernel.
+A continuación se muestra una imagen y el resultado del cálculo de correlación.
 
 
+
+\begin{figure}[H]
+\centering
+	\begin{subfigure}{.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Imagenes/Original.png}
+		\caption{Imagen Fuente.}
+		\label{fig:original}
+	\end{subfigure}
+	\begin{subfigure}{.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Imagenes/Correlation.png}
+		\caption{Correlación}
+		\label{fig:corr}
+	\end{subfigure}
+	\begin{subfigure}{.1\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Imagenes/kernel.png}
+		\caption{Kernel}
+		\label{fig:kernel}
+	\end{subfigure}
+	\caption{Aplicación de correlación.}
+	\label{fig:corrtest}
+\end{figure}
+Se puede apreciar como el punto mas oscuro de la pantalla hace refernecia al punto de mayr correlacion 
 
 \section{Aportes y Desarrollo}
 
@@ -372,12 +406,29 @@ Sin embargo, el filtro de Kalman no puede estimar la posición del objeto indefi
 
 Finalmente, para reforzar el algoritmo de seguimiento, se implemento además una recalculación periódica de las features con el método de Shi-Tomasi, partiendo de la media del cúmulo de features, removiendo los outliers, volviendo a calcular nuevamente la media y utilizar esta posición para aplicar el algoritmo de Shi-Tomasi, de misma manera que se realiza sobre la primera selección proporcionada por el usuario.
 
+\subsection{Algoritmo correlación}
+Para el algoritmo de correlacion no solo se utiliza el filtro explicado en la sección \ref{sec:corr} se realiza un filtrado de tanto el frame como el kernel, haciendo un cambio a \textbf{HSV} y un filtrado del frame en este espacio bajo las siguientes especificaciones: 
+            
+\begin{align}
+MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (32,255)
+\end{align}
+luego se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, y se compara con el frame filtrado, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado, esto se logra aplicando una mascara en la sección de mayor correlación y sobre este realizar nuevamente el cálculo de máxima correlación. Esto se repite 5 veces\footnote{Se utilizó 5 arbitrariamente con el propósito de no ralentizar el programa}, y en caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).
 
+
+\subsection{Optimización del Código}
+Se realizó una optimización del codigo, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto permitió una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
+
+
+\subsection{KTN}
+
+\begin{figure}[H]
+\centering
+	\includegraphics[width=0.4\textwidth]{../flowchart.jpg}
+	\caption{Flow-chart del algoritmo.}
+	\label{fig:Flowchart}
+\end{figure}
 
 Se decidió implementar código en \textbf{Python}, apoyándose en la librería \href{https://opencv.org/}{OpenCV}.
-
-
-
 El pseudocódigo que corresponde es:
 
 
