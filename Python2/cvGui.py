@@ -530,6 +530,7 @@ class cvGui():
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
 
                     cvui.window(self.frame, WINDOW_SET_X + 5, 885, WINDOW_SET_WIDTH - 10, Y_SCREEN - 880 - WINDOW_VS_Y*2, "Selection Options")
+                    cvui.rect(self.frame, WINDOW_SET_X + 7, 905, WINDOW_SET_WIDTH - 13, Y_SCREEN - 912 - WINDOW_VS_Y, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
                     asiAndaBienElEnter = (cv.waitKey(1) == 13)
                     if ((cvui.button(self.frame, WINDOW_SET_X + 10, 910, "Ok") or asiAndaBienElEnter)  and (len(self.coordsRoi) >= 4) ):
                         if not (wid == 0 or hei == 0):
@@ -775,7 +776,7 @@ class cvGui():
             if self.ColorFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
             elif self.CamShiftFilter[0]:
-                self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
+                self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrameHist()
             elif self.CorrFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
