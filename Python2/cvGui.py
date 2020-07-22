@@ -137,7 +137,7 @@ class cvGui():
         self.shit_Rec = [SHIT_REC]
         self.shit_SPix = [SHIT_SPIX]
         
-        cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
+        cv.namedWindow(WINDOW_NAME, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
 
         #Filter Edit
@@ -763,7 +763,7 @@ class cvGui():
             if self.ColorFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
             elif self.CamShiftFilter[0]:
-                self.filteredFrame = None
+                self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
             elif self.CorrFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
