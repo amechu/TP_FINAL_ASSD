@@ -27,6 +27,8 @@ COLORFILTER_B = 15.0
 LIGHTTHR_X = 1.0
 LIGHTTHR_MACT = 1.0
 
+CAMSHIFT_BIN = 64.0
+
 SHIT_MAXFEAT = 100.0
 SHIT_FEATQUAL = 0.001
 SHIT_MINFEAT = 0.01
@@ -126,6 +128,7 @@ class cvGui():
         self.colorFilter_b = [COLORFILTER_B]
         self.ligtRec_x = [LIGHTTHR_X]
         self.ligtRec_maxT = [LIGHTTHR_MACT]
+        self.camShift_bins = [CAMSHIFT_BIN]
     
         #Shi - Tomasi Properties
         self.ShiTProp = [False]
@@ -137,7 +140,7 @@ class cvGui():
         self.shit_Rec = [SHIT_REC]
         self.shit_SPix = [SHIT_SPIX]
         
-        cv.namedWindow(WINDOW_NAME)#, cv.WINDOW_NORMAL)
+        cv.namedWindow(WINDOW_NAME, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
 
         #Filter Edit
@@ -152,6 +155,11 @@ class cvGui():
         self.boolForTrackers = []
         self.trackSelection = []
         self.trackSelectionBGR = [None, None, None, None, None]
+        self.lastTracker = -1
+        self.configSelected = []
+
+        self.changeInTrackers = False
+        self.trackerAdded = False
 
         #Video Loaded elements
         self.boolVideoLoaded = False
@@ -161,14 +169,15 @@ class cvGui():
         self.lastFrame = []
         self.lastFilterFrame = []
 
-        self.changeInTrackers = False
-        self.trackerAdded = False
-
         self.replaceRoi = False
         self.coordsRoi = []
 
 
     def onWork(self):
+
+        selectedT = -1
+        self.updateParameters()
+        originalParam = self.parameters.copy()
 
         while True:
 
@@ -184,22 +193,24 @@ class cvGui():
             cvui.window(self.frame, WINDOW_TRK_X, WINDOW_TRK_Y, WINDOW_TRK_WIDTH, WINDOW_TRK_HEIGHT, "Trackers:")
 
             #Text
-            cvui.printf(self.frame, 20, 35, 0.4, 0xdd97fb, "Current Source:")                #Video Source
-            cvui.printf(self.frame, 20, 50, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
+            cvui.printf(self.frame, 17, 35, 0.4, 0xdd97fb, "Current Source:")                #Video Source
+            cvui.printf(self.frame, 17, 50, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
 
-            if self.verifyInitialCond():
-                cvui.printf(self.frame, 20, 275, 0.4, 0xdd97fb, "Settings Selected By Default")
-            else :
-                cvui.printf(self.frame, 20, 275, 0.4, 0xdd97fb, "Changes Saved!")
+            if selectedT == -1:
+                cvui.printf(self.frame, 17, 275, 0.4, 0xdd97fb, "No Tracker Selected To Modify")        #0xd11616
+            elif self.verifyInitialCond():
+                cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Settings By Default For Tracker " + str(selectedT + 1) + "!")
+            else:
+                cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Changes Saved For Tracker " + str(selectedT + 1) + "!")
 
-            if self.pause and not self.replaceRoi:
+            if self.pause:# and not self.replaceRoi:
                 if (self.usingVideo or self.usingCamera):
-                    cvui.printf(self.frame, 20, 255, 0.4, 0xdc1076, "Source Paused!")
+                    cvui.printf(self.frame, 17, 255, 0.4, 0xdc1076, "Source Paused!")
                 else:
-                    cvui.printf(self.frame, 20, 255, 0.4, 0xdc1076, "Source Will Be Paused.")
+                    cvui.printf(self.frame, 17, 255, 0.4, 0xdc1076, "Source Will Be Paused.")
             else:
                 if (self.usingVideo or self.usingCamera):
-                    cvui.printf(self.frame, 20, 255, 0.4, 0x10dca1, "Source Playing!")
+                    cvui.printf(self.frame, 17, 255, 0.4, 0x10dca1, "Source Playing!")
                 else:
                     cvui.printf(self.frame, 20, 255, 0.4, 0x10dca1, "Source Will Be Playing.")
 
@@ -247,6 +258,8 @@ class cvGui():
                 windowWidth = int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS)
                 windowHeight = int(Y_SCREEN - 2*WINDOW_SOU_Y - yTx + 10)
 
+                xx, yy = self.trackers[i].getEstimatedPosition()
+                vx, vy = self.trackers[i].getEstimatedVelocity()
                 cvui.window(self.frame, xTx - 30, yTx - 10, windowWidth, windowHeight, "Tracker Number " + str(i + 1))
                 cvui.rect(self.frame, xTx-28, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
 
@@ -254,31 +267,40 @@ class cvGui():
                 for k in range(a):
                     checking.append([False])
 
-                if cvui.checkbox(self.frame, xTx-10, yTx+95, "First Selection", self.boolForTrackers[i], 0x000000):
+                cvui.printf(self.frame, xTx - 15, yTx + 85, 0.4, 0x000000, f'X = {int(xx)}')
+                cvui.printf(self.frame, xTx + 70, yTx + 85, 0.4, 0x000000, f'Y = {int(-yy)}')
+                cvui.printf(self.frame, xTx - 15, yTx + 100, 0.4, 0x000000, f'Vx = {round(vx, 1)}')
+                cvui.printf(self.frame, xTx + 70, yTx + 100, 0.4, 0x000000, f'Vy = {round(-vy, 1)}')
+
+                if cvui.checkbox(self.frame, xTx, yTx+125, "Select Tracker", self.boolForTrackers[i], 0x000000):
                     for j in range(a):
                         if not j == i:
                             self.boolForTrackers[j] = [False]
 
-                    cvui.printf(self.frame, xTx - 10, yTx + 60, 0.4, 0x000000, "Filter displayed is for")
-                    cvui.printf(self.frame, xTx + 20, yTx + 75, 0.4, 0x000000, "this tracker!")
+                    cvui.printf(self.frame, xTx - 10, yTx + 50, 0.4, 0x000000, "Filter displayed is for")
+                    cvui.printf(self.frame, xTx + 20, yTx + 65, 0.4, 0x000000, "this tracker!")
 
                     w = int(self.trackSelection[i].shape[1])
                     h = int(self.trackSelection[i].shape[0])
                     xFrame = int((windowWidth + 2*(xTx-30))/2 - w/2)
-                    self.frame[yTx + 120:yTx + 120 + h, xFrame:xFrame + w] = self.trackSelection[i]
-                    status = cvui.iarea(xFrame, yTx + 120, w, h)
+                    yFrame = yTx + 150
+                    self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.trackSelection[i]
+                    status = cvui.iarea(xFrame, yFrame, w, h)
                     if status == cvui.CLICK:
                         cursor = cvui.mouse(WINDOW_NAME)
                         self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
                 elif self.boolForTrackers == checking and i == a-1:
-                    cvui.printf(self.frame, xTx - 10, yTx+60, 0.4, 0x000000,"Filter displayed is for")
-                    cvui.printf(self.frame, xTx + 20, yTx+75, 0.4, 0x000000,"this tracker!")
+                    cvui.printf(self.frame, xTx - 10, yTx+50, 0.4, 0x000000,"Filter displayed is for")
+                    cvui.printf(self.frame, xTx + 20, yTx+65, 0.4, 0x000000,"this tracker!")
 
-                if (cvui.button(self.frame, xB+5, yB, "Delete Tracker")):
+                if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
                     self.changeInTrackers = True
+                    del self.configSelected[i]
                     del self.boolForTrackers[i]
                     del self.trackers[i]
                     del self.trackSelection[i]
+                    self.trackerColors.append(self.trackerColors[i])
+                    del self.trackerColors[i]
                     self.trackSelectionBGR = [None, None, None, None, None]
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
@@ -302,96 +324,107 @@ class cvGui():
                 self.pause = not self.pause
 
             #Settings Poperties
-            if (cvui.checkbox(self.frame, 20, 300, "Kalman", self.KalmanProp)):
+            if cvui.checkbox(self.frame, 20, 300, "Kalman", self.KalmanProp):
                 self.LKProp[0] = False
                 self.CFProp[0] = False
                 self.ShiTProp[0] = False
 
-                cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Process Time Multiplier")
-                cvui.trackbar(self.frame, 20, 415, 210, self.kalman_ptm, 0.0, 2.0)
+                if not selectedT == -1:
 
-                cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Process Covariance")
-                cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 0.1, 1, "%0.3Lf", )
+                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Process Time Multiplier")
+                    cvui.trackbar(self.frame, 20, 415, 210, self.kalman_ptm, 0.0, 2.0)
 
-                cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Measurement Covariance")
-                cvui.trackbar(self.frame, 20, 555, 210, self.kalman_mc, 0.0, 1.0)
+                    cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Process Covariance")
+                    cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 0.1, 1, "%0.3Lf", )
 
-            if (cvui.checkbox(self.frame, 20, 320, "Lucas-Kanade", self.LKProp)):
+                    cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Measurement Covariance")
+                    cvui.trackbar(self.frame, 20, 555, 210, self.kalman_mc, 0.0, 1.0)
+
+            if cvui.checkbox(self.frame, 20, 320, "Lucas-Kanade", self.LKProp):
                 self.KalmanProp[0] = False
                 self.CFProp[0] = False
                 self.ShiTProp[0] = False
 
-                cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")
-                cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0)
+                if not selectedT == -1:
 
-            if (cvui.checkbox(self.frame, 20, 340, "Mask Filter", self.CFProp)):
+                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")
+                    cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0)
+
+            if cvui.checkbox(self.frame, 20, 340, "Mask Filter", self.CFProp):
                 self.KalmanProp[0] = False
                 self.LKProp[0] = False
                 self.ShiTProp[0] = False
 
-                if (cvui.checkbox(self.frame, 20, 400, "HLS Color Filter", self.CFPropOnOff)):
-                    self.CFCamShiftOnOff[0] = False
+                if not selectedT == -1:
+                    if (cvui.checkbox(self.frame, 20, 400, "LAB Color Filter", self.CFPropOnOff)):
+                        self.CFCamShiftOnOff[0] = False
 
-                    cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Hue Semi-amplitude")
-                    cvui.trackbar(self.frame, 20, 465, 210, self.colorFilter_LihtThr, 0.0, 150.0)
+                        cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "L")
+                        cvui.trackbar(self.frame, 20, 465, 210, self.colorFilter_LihtThr, 0.0, 150.0)
 
-                    cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "Lightness Semi-amplitude")
-                    cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 200.0)
+                        cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "A")
+                        cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 200.0)
 
-                    cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "Saturation Semi-amplitude")
-                    cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
+                        cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B")
+                        cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
 
-                    if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
+                        if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
 
-                        cvui.printf(self.frame, 20, 695, 0.4, 0xdd97fb, "Every X Frames")
-                        cvui.trackbar(self.frame, 20, 710, 210, self.ligtRec_x, 0.0, 150.0)
+                            cvui.printf(self.frame, 20, 695, 0.4, 0xdd97fb, "Every X Frames")
+                            cvui.trackbar(self.frame, 20, 710, 210, self.ligtRec_x, 0.0, 150.0)
 
-                        cvui.printf(self.frame, 20, 765, 0.4, 0xdd97fb, "Maximum Threshold Change")
-                        cvui.trackbar(self.frame, 20, 780, 210, self.ligtRec_maxT, 0.0, 30.0)
+                            cvui.printf(self.frame, 20, 765, 0.4, 0xdd97fb, "Maximum Threshold Change")
+                            cvui.trackbar(self.frame, 20, 780, 210, self.ligtRec_maxT, 0.0, 30.0)
 
-                if (cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff)):
-                    self.CFPropOnOff[0] = False
-                    self.CFLRPropOnOff[0] = False
+                    if (cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff) and not selectedT == -1):
+                        self.CFPropOnOff[0] = False
+                        self.CFLRPropOnOff[0] = False
 
-                #Printeo ONS/OFFS
-                if (self.CFPropOnOff[0]):
-                    cvui.printf(self.frame, 140, 402, 0.4, 0x10dcA1, "On")
-                    cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
-                    if self.CFLRPropOnOff[0]:
-                        cvui.printf(self.frame, 200, 667, 0.4, 0x10dcA1, "On")
+                        cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Number Of Bins")
+                        cvui.trackbar(self.frame, 20, 465, 210, self.camShift_bins, 1.0, 200.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        self.camShift_bins[0] = int(self.camShift_bins[0])
+
+
+                    #Printeo ONS/OFFS
+                    if (self.CFPropOnOff[0]):
+                        cvui.printf(self.frame, 145, 402, 0.4, 0x10dcA1, "On")
+                        cvui.printf(self.frame, 145, 422, 0.4, 0xdc1076, "Off")
+                        if self.CFLRPropOnOff[0]:
+                            cvui.printf(self.frame, 200, 667, 0.4, 0x10dcA1, "On")
+                        else:
+                            cvui.printf(self.frame, 200, 667, 0.4, 0xdc1076, "Off")
+                    elif (self.CFCamShiftOnOff[0]):
+                        cvui.printf(self.frame, 145, 402, 0.4, 0xdc1076, "Off")
+                        cvui.printf(self.frame, 145, 422, 0.4, 0x10dcA1, "On")
                     else:
-                        cvui.printf(self.frame, 200, 667, 0.4, 0xdc1076, "Off")
-                elif (self.CFCamShiftOnOff[0]):
-                    cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
-                    cvui.printf(self.frame, 140, 422, 0.4, 0x10dcA1, "On")
-                else:
-                    cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
-                    cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
+                        cvui.printf(self.frame, 145, 402, 0.4, 0xdc1076, "Off")
+                        cvui.printf(self.frame, 145, 422, 0.4, 0xdc1076, "Off")
 
-            if (cvui.checkbox(self.frame, 20, 360, "Shi-Tomasi", self.ShiTProp)):
+            if cvui.checkbox(self.frame, 20, 360, "Shi-Tomasi", self.ShiTProp):
                 self.KalmanProp[0] = False
                 self.LKProp[0] = False
                 self.CFProp[0] = False
 
-                cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Feature Quantity")
-                cvui.trackbar(self.frame, 20, 415, 210, self.shit_MaxFeat, 1.0, 100.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
-                self.shit_MaxFeat[0] = int(self.shit_MaxFeat[0])
+                if not selectedT == -1:
+                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Feature Quantity")
+                    cvui.trackbar(self.frame, 20, 415, 210, self.shit_MaxFeat, 1.0, 100.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                    self.shit_MaxFeat[0] = int(self.shit_MaxFeat[0])
 
-                cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Feature Quality Level")
-                cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.0, 1)
+                    cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Feature Quality Level")
+                    cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.0, 1)
 
-                cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Minimum Feature Distance")
-                cvui.trackbar(self.frame, 20, 555, 210, self.shit_MinFeat, 0.0, 1.0)
+                    cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Minimum Feature Distance")
+                    cvui.trackbar(self.frame, 20, 555, 210, self.shit_MinFeat, 0.0, 1.0)
 
-                cvui.printf(self.frame, 20, 610, 0.4, 0xdd97fb, "Search Pixel Enlargement")
-                cvui.trackbar(self.frame, 20, 625, 210, self.shit_SPix, 0.0, 10.0)
+                    cvui.printf(self.frame, 20, 610, 0.4, 0xdd97fb, "Search Pixel Enlargement")
+                    cvui.trackbar(self.frame, 20, 625, 210, self.shit_SPix, 0.0, 10.0)
 
-                if (cvui.checkbox(self.frame, 20, 680, "Feature Recalculation", self.ShiTPropOnOff)):
-                    cvui.printf(self.frame, 20, 710, 0.4, 0xdd97fb, "Recalculation Number")
-                    cvui.trackbar(self.frame, 20, 725, 210, self.shit_Rec, 1.0, 100.0)
-                    cvui.printf(self.frame, 185, 682, 0.4, 0x10dcA1, "%s", "On")
-                else:
-                    cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
+                    if (cvui.checkbox(self.frame, 20, 680, "Feature Recalculation", self.ShiTPropOnOff)):
+                        cvui.printf(self.frame, 20, 710, 0.4, 0xdd97fb, "Recalculation Number")
+                        cvui.trackbar(self.frame, 20, 725, 210, self.shit_Rec, 1.0, 100.0)
+                        cvui.printf(self.frame, 185, 682, 0.4, 0x10dcA1, "%s", "On")
+                    else:
+                        cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
 
             #Filters: Correlation, Cam shift, Color
 
@@ -409,10 +442,17 @@ class cvGui():
                 self.CamShiftFilter[0] = False
                 self.ColorFilter[0] = False
 
+            selectedT = self.IsTrackerSelected()
+            if not (selectedT == -1) and self.lastTracker != selectedT:
+                self.loadParameters(selectedT)
+                self.lastTracker = selectedT
+
+            if (cvui.button(self.frame, 60, 830, "Reset Settings")):
+                self.resetInitialCond()
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
-                if not self.pause:
+                if not (self.pause or self.replaceRoi):
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
@@ -429,7 +469,10 @@ class cvGui():
                     if self.changeInTrackers and ((self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera):
                         self.changeInTrackers = False
                         self.callFilterPause()
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source #self.lastFrame
+                    if self.usingVideo and len(self.arrayVideoLoaded) == 0:
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
+                    else:
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
                 self.updateFilterFrame()
@@ -437,7 +480,7 @@ class cvGui():
                 if self.filteredFrame is None:
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFrame
                 else:
-                    if self.pause:
+                    if self.pause or self.replaceRoi:
                         self.callFilterPause()
                     y0 = int(((WINDOW_SOU_Y + 37) + (WINDOW_SOU_Y + 37 + WINDOW_SOU_HEIGHT - 75))/2 - self.filterHEIGHT/2)
                     self.frame[y0:y0 + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
@@ -447,23 +490,24 @@ class cvGui():
             # cvui.text(self.frame, 205, 185, "?", 0.6)
             # if not cvui.iarea(200, 182, 20, 20) == cvui.OUT:
             #     cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 500, "Help")
-            #
 
-
-            if (cvui.button(self.frame, 60, 830, "Reset Settings")):
-                self.resetInitialCond()
-
-            if ((cvui.button(self.frame, 20, 180, "Select New Area") and ( (self.usingVideo and len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
+            if ((cvui.button(self.frame, 20, 180, "Add Tracker") and ( (self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
 
                 if len(self.trackers) < MAX_TRACKERS:
                     self.replaceRoi = True
-                    self.pause = True
+                    # self.pause = True
+
+                    posX = 0
+                    posY = 0
+                    wid = 0
+                    hei = 0
 
                     status = cvui.iarea(self.sourceX, self.sourceY, self.sourceWIDTH, self.sourceHEIGHT)
                     if status == cvui.CLICK or status == cvui.DOWN:
                         cursorRoi = cvui.mouse(WINDOW_NAME)
                         self.coordsRoi.append(cursorRoi.x)
                         self.coordsRoi.append(cursorRoi.y)
+
                     if len(self.coordsRoi) == 6:
                         self.coordsRoi[2] = self.coordsRoi[4]
                         self.coordsRoi[3] = self.coordsRoi[5]
@@ -488,10 +532,10 @@ class cvGui():
                             hei = self.coordsRoi[3] - self.coordsRoi[1]
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
 
-
-
-                    cvui.window(self.frame, WINDOW_SET_X + 5, 880, WINDOW_SET_WIDTH - 10, Y_SCREEN - 880 - WINDOW_VS_Y*2, "Selection Options")
-                    if (cvui.button(self.frame, WINDOW_SET_X + 10, 910, "Ok") and (len(self.coordsRoi) >= 4) ):
+                    cvui.window(self.frame, WINDOW_SET_X + 5, 885, WINDOW_SET_WIDTH - 10, Y_SCREEN - 880 - WINDOW_VS_Y*2, "Selection Options")
+                    cvui.rect(self.frame, WINDOW_SET_X + 7, 905, WINDOW_SET_WIDTH - 13, Y_SCREEN - 912 - WINDOW_VS_Y, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                    asiAndaBienElEnter = (cv.waitKey(1) == 13)
+                    if ((cvui.button(self.frame, WINDOW_SET_X + 10, 910, "Ok") or asiAndaBienElEnter)  and (len(self.coordsRoi) >= 4) ):
                         if not (wid == 0 or hei == 0):
                             posX = posX - self.sourceX
                             posY = posY - self.sourceY
@@ -503,6 +547,8 @@ class cvGui():
                             else:
                                 self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source))
                                 toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
+
+                            self.configSelected.append(originalParam)
                             w = int(np.asarray(toRescale).shape[1])
                             h = int(np.asarray(toRescale).shape[0])
                             if w >= h:
@@ -512,7 +558,7 @@ class cvGui():
 
                         self.coordsRoi.clear()
                         self.replaceRoi = False
-                        self.pause = False
+                        # self.pause = False
                     if (cvui.button(self.frame, WINDOW_SET_X + 73, 910, "Redo")):
                         self.coordsRoi.clear()
                     if (cvui.button(self.frame, WINDOW_SET_X + 148, 910, "Cancel")):
@@ -537,52 +583,14 @@ class cvGui():
 
         return True
 
-    # def checkbBox(self, bBox):
-    #     newbb = [0, 0, 0, 0]
-    #
-    #     newx = 0
-    #     newh = 0
-    #     newy = 0
-    #     neww = 0
-    #
-    #     if bBox[0] < self.sourceX:
-    #         if bBox[0] + bBox[2] <= self.sourceX:
-    #             return newbb
-    #         else:
-    #             newx = self.sourceX
-    #             newh = bBox[0] + bBox[2] - self.sourceX
-    #     elif self.sourceX <= bBox[0] <= self.sourceX + self.sourceWIDTH:
-    #         newx = bBox[0]
-    #         if ((bBox[0] + bBox[2]) <= (self.sourceX + self.sourceWIDTH)):
-    #             newh = bBox[2]
-    #         else:
-    #             newh = self.sourceX + self.sourceWIDTH - bBox[0]
-    #     else:
-    #         return newbb
-    #
-    #     if bBox[1] < self.sourceY:
-    #         if bBox[1] + bBox[3] <= self.sourceY:
-    #             return newbb
-    #         else:
-    #             newy = self.sourceY
-    #             neww = bBox[1] + bBox[3] - self.sourceY
-    #     elif self.sourceY <= bBox[1] <= self.sourceY + self.sourceHEIGHT:
-    #         newy = bBox[1]
-    #         if ((bBox[1] + bBox[3]) <= (self.sourceY + self.sourceHEIGHT)):
-    #             neww = bBox[3]
-    #         else:
-    #             neww = self.sourceY + self.sourceHEIGHT - bBox[1]
-    #     else:
-    #         return newbb
-    #
-    #     return [newx, newy, newh, neww]
-
     def verifyInitialCond(self):
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
                 self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
                 self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
                 self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (
-                self.CFLRPropOnOff[0] == INITIAL_LR_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF)and (self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF):
+                self.CFLRPropOnOff[0] == INITIAL_LR_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF) and (self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF):
+            # and (self.camShift_bins[0] == CAMSHIFT_BIN)
+
             return True
         else:
             return False
@@ -618,6 +626,7 @@ class cvGui():
         self.ligtRec_maxT[0] = LIGHTTHR_MACT
 
         self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF
+        # self.camShift_bins[0] = CAMSHIFT_BIN
 
         self.shit_MaxFeat[0] = SHIT_MAXFEAT
         self.shit_FeatQual[0] = SHIT_FEATQUAL
@@ -635,6 +644,7 @@ class cvGui():
         self.boolVideoLoaded = False
         self.lastFrame = []
         self.lastFilterFrame = []
+        self.trackSelection.clear()
 
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
@@ -704,13 +714,14 @@ class cvGui():
                     tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
-                tracker.update(self.source)
+                tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
+
 
             self.updateFilterFrame()
 
             i = 0
             for tracker in self.trackers:
-                #[b,g,r] = tracker.MF.bgrmask
+                # [b,g,r] = tracker.MF.bgrmask
                 r = (self.trackerColors[i] >> 16) & 0xff
                 g = (self.trackerColors[i] >> 8) & 0xff
                 b = self.trackerColors[i] & 0xff
@@ -739,11 +750,7 @@ class cvGui():
             tracker.MF.updateMaskFromSettings()
 
         if not len(self.trackers) == 0:
-            filterOfInteres = -1
-            for i in range(len(self.boolForTrackers)):
-                if self.boolForTrackers[i] == [True]:
-                    filterOfInteres = i
-                    break
+            filterOfInteres = self.IsTrackerSelected()
             self.lastFilterFrame = self.trackers[filterOfInteres].MF.filterFrame(self.source)
             self.updateFilterFrame()
 
@@ -766,17 +773,14 @@ class cvGui():
         return True
 
     def updateFilterFrame(self):
-        filterOfInteres = -1
-        for i in range(len(self.boolForTrackers)):
-            if self.boolForTrackers[i] == [True]:
-                filterOfInteres = i
-                break
+        filterOfInteres = self.IsTrackerSelected()
 
         if not len(self.trackers) == 0:
             if self.ColorFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
             elif self.CamShiftFilter[0]:
-                self.filteredFrame = None
+                pass
+                # self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrameHist()
             elif self.CorrFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
@@ -807,6 +811,34 @@ class cvGui():
         dim = (int(maxWidth*width/height), maxWidth)
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
+    def loadParameters(self, selected):
+
+        self.kalman_ptm[0] = self.configSelected[selected][0]
+        self.kalman_pc[0] = self.configSelected[selected][1]
+        self.kalman_mc[0] = self.configSelected[selected][2]
+
+        self.lk_mr[0] = self.configSelected[selected][3]
+
+        self.CFPropOnOff[0] = self.configSelected[selected][4]
+        self.colorFilter_LihtThr[0] = self.configSelected[selected][5]
+        self.colorFilter_a[0] = self.configSelected[selected][6]
+        self.colorFilter_b[0] = self.configSelected[selected][7]
+
+        self.CFLRPropOnOff[0] = self.configSelected[selected][8]
+        self.ligtRec_x[0] = self.configSelected[selected][9]
+        self.ligtRec_maxT[0] = self.configSelected[selected][10]
+
+        self.CFCamShiftOnOff[0] = self.configSelected[selected][11]
+        # self.camShift_bins[0] = self.configSelected[selected][12]
+
+        self.shit_MaxFeat[0] = self.configSelected[selected][12]
+        self.shit_FeatQual[0] = self.configSelected[selected][13]
+        self.shit_MinFeat[0] = self.configSelected[selected][14]
+        self.shit_Rec[0] = self.configSelected[selected][15]
+
+        self.ShiTPropOnOff[0] = self.configSelected[selected][16]
+        self.shit_SPix[0] = self.configSelected[selected][17]
+
     def updateParameters(self):
         self.parameters.clear()
 
@@ -826,6 +858,7 @@ class cvGui():
         self.parameters.append(self.ligtRec_maxT[0])
 
         self.parameters.append(self.CFCamShiftOnOff[0])
+        # self.parameters.append(self.camShift_bins[0])
 
         self.parameters.append(self.shit_MaxFeat[0])
         self.parameters.append(self.shit_FeatQual[0])
@@ -835,64 +868,84 @@ class cvGui():
         self.parameters.append(self.ShiTPropOnOff[0])
         self.parameters.append(self.shit_SPix[0])
 
+    def IsTrackerSelected(self):
+        filterOfInteres = -1
+        for i in range(len(self.boolForTrackers)):
+            if self.boolForTrackers[i] == [True]:
+                filterOfInteres = i
+                break
+        return filterOfInteres
+
     def checkParametersChange(self):
-        self.parametersNew.clear()
 
-        self.parametersNew.append(self.kalman_ptm[0])
-        self.parametersNew.append(self.kalman_pc[0])
-        self.parametersNew.append(self.kalman_mc[0])
+        filterOfInteres = self.IsTrackerSelected()
 
-        self.parametersNew.append(self.lk_mr[0])
+        changes = False
 
-        self.parametersNew.append(self.CFPropOnOff[0])              #
-        self.parametersNew.append(self.colorFilter_LihtThr[0])
-        self.parametersNew.append(self.colorFilter_a[0])
-        self.parametersNew.append(self.colorFilter_b[0])
+        if not filterOfInteres == -1:
+            self.parametersNew.clear()
 
-        self.parametersNew.append(self.CFLRPropOnOff[0])            #
-        self.parametersNew.append(self.ligtRec_x[0])
-        self.parametersNew.append(self.ligtRec_maxT[0])
+            self.parametersNew.append(self.kalman_ptm[0])
+            self.parametersNew.append(self.kalman_pc[0])
+            self.parametersNew.append(self.kalman_mc[0])
 
-        self.parametersNew.append(self.CFCamShiftOnOff[0])          #
+            self.parametersNew.append(self.lk_mr[0])
 
-        self.parametersNew.append(self.shit_MaxFeat[0])
-        self.parametersNew.append(self.shit_FeatQual[0])
-        self.parametersNew.append(self.shit_MinFeat[0])
-        self.parametersNew.append(self.shit_Rec[0])
+            self.parametersNew.append(self.CFPropOnOff[0])              #
+            self.parametersNew.append(self.colorFilter_LihtThr[0])
+            self.parametersNew.append(self.colorFilter_a[0])
+            self.parametersNew.append(self.colorFilter_b[0])
 
-        self.parametersNew.append(self.ShiTPropOnOff[0])               #
-        self.parametersNew.append(self.shit_SPix[0])
+            self.parametersNew.append(self.CFLRPropOnOff[0])            #
+            self.parametersNew.append(self.ligtRec_x[0])
+            self.parametersNew.append(self.ligtRec_maxT[0])
 
-        if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
-            return True         #Chequeo Kalman
+            self.parametersNew.append(self.CFCamShiftOnOff[0])          #
+            #self.parametersNew.append(self.camShift_bins[0])
 
-        if not(self.parametersNew[3] == self.parameters[3]):
-            return True         #Chequeo Lucas-Kanade
 
-        if not(self.parametersNew[4] == self.parameters[4]):
-            return True        #Color Filter On/Off
-        elif not ((self.parametersNew[5] == self.parameters[5]) & (self.parametersNew[6] == self.parameters[6]) & (self.parametersNew[7] == self.parameters[7])):
-            return True      #Chequeo Params de CF
+            self.parametersNew.append(self.shit_MaxFeat[0])
+            self.parametersNew.append(self.shit_FeatQual[0])
+            self.parametersNew.append(self.shit_MinFeat[0])
+            self.parametersNew.append(self.shit_Rec[0])
 
-        if not(self.parametersNew[8] == self.parameters[8]):
-            return True        #LR On/Off
-        elif not(self.parametersNew[9] == self.parameters[9] and self.parametersNew[10] == self.parameters[10]):
-            return True   #Chequeo Params de CF
+            self.parametersNew.append(self.ShiTPropOnOff[0])               #
+            self.parametersNew.append(self.shit_SPix[0])
 
-        if not(self.parametersNew[11] == self.parameters[11]):
-            return True        #Cam Shift On/Off
-        #elif not(False):
-        #    return True
+            if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
+                changes = True         #Chequeo Kalman
 
-        if not(self.parametersNew[12] == self.parameters[12] and self.parametersNew[13] == self.parameters[13] and self.parametersNew[14] == self.parameters[14]):
-            return True         #Chequeo Shi-Tomasi
+            if not(self.parametersNew[3] == self.parameters[3]):
+                changes = True         #Chequeo Lucas-Kanade
 
-        if not(self.parametersNew[15] == self.parameters[15]):
-            return True        #Shi-Tomasi On/Off
-        elif not(self.parametersNew[16] == self.parameters[16]):
-            return True   #Chequeo Params Shi
+            if not(self.parametersNew[4] == self.parameters[4]):
+                changes = True        #Color Filter On/Off
+            elif not ((self.parametersNew[5] == self.parameters[5]) & (self.parametersNew[6] == self.parameters[6]) & (self.parametersNew[7] == self.parameters[7])):
+                changes = True      #Chequeo Params de CF
 
-        return False
+            if not(self.parametersNew[8] == self.parameters[8]):
+                changes = True        #LR On/Off
+            elif not(self.parametersNew[9] == self.parameters[9] and self.parametersNew[10] == self.parameters[10]):
+                changes = True   #Chequeo Params de CF
+
+            if not(self.parametersNew[11] == self.parameters[11]):
+                changes = True        #Cam Shift On/Off
+            #elif not(self.parametersNew[12] == self.parameters[12]):       #BINS
+            #    changes = True
+
+            if not(self.parametersNew[12] == self.parameters[12] and self.parametersNew[13] == self.parameters[13] and self.parametersNew[14] == self.parameters[14]):
+                changes = True         #Chequeo Shi-Tomasi
+
+            if not(self.parametersNew[15] == self.parameters[15]):
+                changes = True        #Shi-Tomasi On/Off
+            elif not(self.parametersNew[16] == self.parameters[16]):
+                changes = True   #Chequeo Params Shi
+
+        if changes:
+            self.configSelected[filterOfInteres] = self.parametersNew.copy()
+            self.lastTracker = filterOfInteres
+
+        return changes
 
     def loadFullVideo(self):
 

@@ -79,10 +79,10 @@ class Tracker:
 
 
             frame = self.MF.filterFrame(frame)
-
         elif self.MF.mask is self.MF.maskingType["FILTER_CSHIFT"]:
-            pass
+            frame = self.MF.filterFrame(frame)
             #TINCHO
+
 
 
         #Tacking error?
