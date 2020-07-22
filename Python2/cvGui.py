@@ -164,6 +164,9 @@ class cvGui():
         self.changeInTrackers = False
         self.trackerAdded = False
 
+        self.replaceRoi = False
+        self.coordsRoi = []
+
 
     def onWork(self):
 
@@ -189,7 +192,7 @@ class cvGui():
             else :
                 cvui.printf(self.frame, 20, 275, 0.4, 0xdd97fb, "Changes Saved!")
 
-            if self.pause:
+            if self.pause and not self.replaceRoi:
                 if (self.usingVideo or self.usingCamera):
                     cvui.printf(self.frame, 20, 255, 0.4, 0xdc1076, "Source Paused!")
                 else:
@@ -228,39 +231,7 @@ class cvGui():
                    self.usingCamera = False
 
 
-            if (cvui.button(self.frame, 60, 875, "Reset Settings")):
-                self.resetInitialCond()
-
             #Settings Buttons
-            if (cvui.button(self.frame, 20, 180, "Select New Area") and (not (self.usingVideo and len(self.arrayVideoLoaded) == 0) or self.usingCamera)):
-
-                if len(self.trackers) < MAX_TRACKERS:
-                    bBox = [0, 0, 0, 0]
-                    if self.boolVideoLoaded:
-                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.arrayVideoLoaded[0])
-
-                    elif self.usingCamera or self.usingVideo:
-                        bBox = cv.selectROI('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.', self.lastFrame)
-
-                    cv.destroyWindow('Select New Area. Press SPACE or ENTER. Cancel by Pressing C.')
-                    if not ((bBox[2] == 0) or (bBox[3] == 0)):       #bBox[0] = X    bBox[1] = Y bBox[2] = W bBox[3] = H
-                        self.changeInTrackers = True
-                        self.trackerAdded = True
-                        if self.boolVideoLoaded:
-                            self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.arrayVideoLoaded[0]))
-                            toRescale = self.arrayVideoLoaded[0][bBox[1]:bBox[1] + bBox[3], bBox[0]:bBox[0] + bBox[2]].copy()
-                        else:
-                            self.trackers.append(Tracker.Tracker((bBox[0] + bBox[2]/2, bBox[1] + bBox[3]/2), bBox[2], bBox[3],self.source))
-                            toRescale = self.lastFrame[bBox[1]:bBox[1] + bBox[3], bBox[0]:bBox[0] + bBox[2]].copy()
-                        w = int(np.asarray(toRescale).shape[1])
-                        h = int(np.asarray(toRescale).shape[0])
-                        if w >= h:
-                            self.trackSelection.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
-                        else:
-                            self.trackSelection.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
-            else:
-                self.trackerAdded = False
-
             a = len(self.trackers)
 
             for i in range(a):
@@ -313,7 +284,6 @@ class cvGui():
                         self.filteredFrame = None
                     break
 
-
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No trackers added. Try selecting a new area!")
                 self.filteredFrame = None
@@ -328,7 +298,7 @@ class cvGui():
             else:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 trackers of 5! No more trackers can be added. Try deleting one.")
 
-            if (cvui.button(self.frame, 20, 215, "Pause Source")):
+            if (cvui.button(self.frame, 20, 215, "Pause Source") and not self.replaceRoi):
                 self.pause = not self.pause
 
             #Settings Poperties
@@ -469,7 +439,6 @@ class cvGui():
                 else:
                     if self.pause:
                         self.callFilterPause()
-                    # self.frame[self.sourceY-25:self.sourceY-25 + self.filterHEIGHT,x0:x0 + self.filterWIDTH] = self.filteredFrame
                     y0 = int(((WINDOW_SOU_Y + 37) + (WINDOW_SOU_Y + 37 + WINDOW_SOU_HEIGHT - 75))/2 - self.filterHEIGHT/2)
                     self.frame[y0:y0 + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
 
@@ -478,6 +447,82 @@ class cvGui():
             # cvui.text(self.frame, 205, 185, "?", 0.6)
             # if not cvui.iarea(200, 182, 20, 20) == cvui.OUT:
             #     cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 500, "Help")
+            #
+
+
+            if (cvui.button(self.frame, 60, 830, "Reset Settings")):
+                self.resetInitialCond()
+
+            if ((cvui.button(self.frame, 20, 180, "Select New Area") and ( (self.usingVideo and len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
+
+                if len(self.trackers) < MAX_TRACKERS:
+                    self.replaceRoi = True
+                    self.pause = True
+
+                    status = cvui.iarea(self.sourceX, self.sourceY, self.sourceWIDTH, self.sourceHEIGHT)
+                    if status == cvui.CLICK or status == cvui.DOWN:
+                        cursorRoi = cvui.mouse(WINDOW_NAME)
+                        self.coordsRoi.append(cursorRoi.x)
+                        self.coordsRoi.append(cursorRoi.y)
+                    if len(self.coordsRoi) == 6:
+                        self.coordsRoi[2] = self.coordsRoi[4]
+                        self.coordsRoi[3] = self.coordsRoi[5]
+                        del self.coordsRoi[5]
+                        del self.coordsRoi[4]
+
+                    if not len(self.coordsRoi) == 0:
+                        cvui.rect(self.frame, self.coordsRoi[0], self.coordsRoi[1], 2, 2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+
+                    if len(self.coordsRoi) == 4:
+                        if self.coordsRoi[0] - self.coordsRoi[2] > 0:
+                            posX = self.coordsRoi[2]
+                            wid = self.coordsRoi[0] - self.coordsRoi[2]
+                        else:
+                            posX = self.coordsRoi[0]
+                            wid = self.coordsRoi[2] - self.coordsRoi[0]
+                        if self.coordsRoi[1] - self.coordsRoi[3] > 0:
+                            posY = self.coordsRoi[3]
+                            hei = self.coordsRoi[1] - self.coordsRoi[3]
+                        else:
+                            posY = self.coordsRoi[1]
+                            hei = self.coordsRoi[3] - self.coordsRoi[1]
+                        cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
+
+
+
+                    cvui.window(self.frame, WINDOW_SET_X + 5, 880, WINDOW_SET_WIDTH - 10, Y_SCREEN - 880 - WINDOW_VS_Y*2, "Selection Options")
+                    if (cvui.button(self.frame, WINDOW_SET_X + 10, 910, "Ok") and (len(self.coordsRoi) >= 4) ):
+                        if not (wid == 0 or hei == 0):
+                            posX = posX - self.sourceX
+                            posY = posY - self.sourceY
+                            self.changeInTrackers = True
+                            self.trackerAdded = True
+                            if self.boolVideoLoaded:
+                                self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.arrayVideoLoaded[0]))
+                                toRescale = self.arrayVideoLoaded[0][posY:posY + hei, posX:posX + wid].copy()
+                            else:
+                                self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source))
+                                toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
+                            w = int(np.asarray(toRescale).shape[1])
+                            h = int(np.asarray(toRescale).shape[0])
+                            if w >= h:
+                                self.trackSelection.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
+                            else:
+                                self.trackSelection.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
+
+                        self.coordsRoi.clear()
+                        self.replaceRoi = False
+                        self.pause = False
+                    if (cvui.button(self.frame, WINDOW_SET_X + 73, 910, "Redo")):
+                        self.coordsRoi.clear()
+                    if (cvui.button(self.frame, WINDOW_SET_X + 148, 910, "Cancel")):
+                        self.coordsRoi.clear()
+                        self.replaceRoi = False
+                        self.pause = False
+
+
+            else:
+                self.trackerAdded = False
 
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
@@ -491,6 +536,46 @@ class cvGui():
         cv.destroyAllWindows()
 
         return True
+
+    # def checkbBox(self, bBox):
+    #     newbb = [0, 0, 0, 0]
+    #
+    #     newx = 0
+    #     newh = 0
+    #     newy = 0
+    #     neww = 0
+    #
+    #     if bBox[0] < self.sourceX:
+    #         if bBox[0] + bBox[2] <= self.sourceX:
+    #             return newbb
+    #         else:
+    #             newx = self.sourceX
+    #             newh = bBox[0] + bBox[2] - self.sourceX
+    #     elif self.sourceX <= bBox[0] <= self.sourceX + self.sourceWIDTH:
+    #         newx = bBox[0]
+    #         if ((bBox[0] + bBox[2]) <= (self.sourceX + self.sourceWIDTH)):
+    #             newh = bBox[2]
+    #         else:
+    #             newh = self.sourceX + self.sourceWIDTH - bBox[0]
+    #     else:
+    #         return newbb
+    #
+    #     if bBox[1] < self.sourceY:
+    #         if bBox[1] + bBox[3] <= self.sourceY:
+    #             return newbb
+    #         else:
+    #             newy = self.sourceY
+    #             neww = bBox[1] + bBox[3] - self.sourceY
+    #     elif self.sourceY <= bBox[1] <= self.sourceY + self.sourceHEIGHT:
+    #         newy = bBox[1]
+    #         if ((bBox[1] + bBox[3]) <= (self.sourceY + self.sourceHEIGHT)):
+    #             neww = bBox[3]
+    #         else:
+    #             neww = self.sourceY + self.sourceHEIGHT - bBox[1]
+    #     else:
+    #         return newbb
+    #
+    #     return [newx, newy, newh, neww]
 
     def verifyInitialCond(self):
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
