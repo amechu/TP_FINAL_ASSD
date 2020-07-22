@@ -776,7 +776,8 @@ class cvGui():
             if self.ColorFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
             elif self.CamShiftFilter[0]:
-                self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrameHist()
+                pass
+                # self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrameHist()
             elif self.CorrFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
