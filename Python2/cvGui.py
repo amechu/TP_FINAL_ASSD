@@ -288,6 +288,8 @@ class cvGui():
                     del self.boolForTrackers[i]
                     del self.trackers[i]
                     del self.trackSelection[i]
+                    self.trackerColors.append(self.trackerColors[i])
+                    del self.trackerColors[i]
                     self.trackSelectionBGR = [None, None, None, None, None]
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
