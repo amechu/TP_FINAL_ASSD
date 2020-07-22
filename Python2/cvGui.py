@@ -255,6 +255,7 @@ class cvGui():
                 windowWidth = int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS)
                 windowHeight = int(Y_SCREEN - 2*WINDOW_SOU_Y - yTx + 10)
 
+                vx, vy = self.trackers[i].getEstimatedVelocity()
                 cvui.window(self.frame, xTx - 30, yTx - 10, windowWidth, windowHeight, "Tracker Number " + str(i + 1))
                 cvui.rect(self.frame, xTx-28, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
 
@@ -262,32 +263,27 @@ class cvGui():
                 for k in range(a):
                     checking.append([False])
 
-                ePos = self.trackers[i].getEstimatedPosition
-                traj = self.trackers[i].getTrajectory
-
-                print(f'ePos = {ePos}       traj = {traj}')
-
-                if cvui.checkbox(self.frame, xTx-10, yTx+95, "First Selection", self.boolForTrackers[i], 0x000000):
+                if cvui.checkbox(self.frame, xTx-10, yTx+105, "Select Tracker", self.boolForTrackers[i], 0x000000):
                     for j in range(a):
                         if not j == i:
                             self.boolForTrackers[j] = [False]
 
-                    cvui.printf(self.frame, xTx - 10, yTx + 60, 0.4, 0x000000, "Filter displayed is for")
-                    cvui.printf(self.frame, xTx + 20, yTx + 75, 0.4, 0x000000, "this tracker!")
+                    cvui.printf(self.frame, xTx - 10, yTx + 70, 0.4, 0x000000, "Filter displayed is for")
+                    cvui.printf(self.frame, xTx + 20, yTx + 85, 0.4, 0x000000, "this tracker!")
 
                     w = int(self.trackSelection[i].shape[1])
                     h = int(self.trackSelection[i].shape[0])
                     xFrame = int((windowWidth + 2*(xTx-30))/2 - w/2)
-                    self.frame[yTx + 120:yTx + 120 + h, xFrame:xFrame + w] = self.trackSelection[i]
-                    status = cvui.iarea(xFrame, yTx + 120, w, h)
+                    self.frame[yTx + 130:yTx + 130 + h, xFrame:xFrame + w] = self.trackSelection[i]
+                    status = cvui.iarea(xFrame, yTx + 130, w, h)
                     if status == cvui.CLICK:
                         cursor = cvui.mouse(WINDOW_NAME)
                         self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
                 elif self.boolForTrackers == checking and i == a-1:
-                    cvui.printf(self.frame, xTx - 10, yTx+60, 0.4, 0x000000,"Filter displayed is for")
-                    cvui.printf(self.frame, xTx + 20, yTx+75, 0.4, 0x000000,"this tracker!")
+                    cvui.printf(self.frame, xTx - 10, yTx+70, 0.4, 0x000000,"Filter displayed is for")
+                    cvui.printf(self.frame, xTx + 20, yTx+85, 0.4, 0x000000,"this tracker!")
 
-                if (cvui.button(self.frame, xB+5, yB, "Delete Tracker")):
+                if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
                     self.changeInTrackers = True
                     del self.configSelected[i]
                     del self.boolForTrackers[i]
@@ -350,16 +346,16 @@ class cvGui():
                 self.ShiTProp[0] = False
 
                 if not selectedT == -1:
-                    if (cvui.checkbox(self.frame, 20, 400, "HLS Color Filter", self.CFPropOnOff)):
+                    if (cvui.checkbox(self.frame, 20, 400, "LAB Color Filter", self.CFPropOnOff)):
                         self.CFCamShiftOnOff[0] = False
 
-                        cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Hue Semi-amplitude")
+                        cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "L")
                         cvui.trackbar(self.frame, 20, 465, 210, self.colorFilter_LihtThr, 0.0, 150.0)
 
-                        cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "Lightness Semi-amplitude")
+                        cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "A")
                         cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 200.0)
 
-                        cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "Saturation Semi-amplitude")
+                        cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B")
                         cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
 
                         if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
@@ -376,18 +372,18 @@ class cvGui():
 
                     #Printeo ONS/OFFS
                     if (self.CFPropOnOff[0]):
-                        cvui.printf(self.frame, 140, 402, 0.4, 0x10dcA1, "On")
-                        cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
+                        cvui.printf(self.frame, 145, 402, 0.4, 0x10dcA1, "On")
+                        cvui.printf(self.frame, 145, 422, 0.4, 0xdc1076, "Off")
                         if self.CFLRPropOnOff[0]:
                             cvui.printf(self.frame, 200, 667, 0.4, 0x10dcA1, "On")
                         else:
                             cvui.printf(self.frame, 200, 667, 0.4, 0xdc1076, "Off")
                     elif (self.CFCamShiftOnOff[0]):
-                        cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
-                        cvui.printf(self.frame, 140, 422, 0.4, 0x10dcA1, "On")
+                        cvui.printf(self.frame, 145, 402, 0.4, 0xdc1076, "Off")
+                        cvui.printf(self.frame, 145, 422, 0.4, 0x10dcA1, "On")
                     else:
-                        cvui.printf(self.frame, 140, 402, 0.4, 0xdc1076, "Off")
-                        cvui.printf(self.frame, 140, 422, 0.4, 0xdc1076, "Off")
+                        cvui.printf(self.frame, 145, 402, 0.4, 0xdc1076, "Off")
+                        cvui.printf(self.frame, 145, 422, 0.4, 0xdc1076, "Off")
 
             if cvui.checkbox(self.frame, 20, 360, "Shi-Tomasi", self.ShiTProp):
                 self.KalmanProp[0] = False
@@ -689,13 +685,13 @@ class cvGui():
                 self.sourceWIDTH = int(self.source.shape[1])
                 self.sourceHEIGHT = int(self.source.shape[0])
 
-            trackEdited = self.IsTrackerSelected()
-            if not trackEdited == -1 and self.checkParametersChange():
-                self.trackers[trackEdited].changeSettings(self.parametersNew)
+            # trackEdited = self.IsTrackerSelected()
+            # if not trackEdited == -1 and self.checkParametersChange():
+            #     self.trackers[trackEdited].changeSettings(self.parametersNew)
 
-            #  if self.checkParametersChange():
-            #     for tracker in self.trackers:
-            #         tracker.changeSettings(self.parametersNew)
+            if self.checkParametersChange():
+                for tracker in self.trackers:
+                    tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
