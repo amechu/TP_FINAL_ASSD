@@ -27,6 +27,8 @@ COLORFILTER_B = 15.0
 LIGHTTHR_X = 1.0
 LIGHTTHR_MACT = 1.0
 
+CAMSHIFT_BIN = 64.0
+
 SHIT_MAXFEAT = 100.0
 SHIT_FEATQUAL = 0.001
 SHIT_MINFEAT = 0.01
@@ -126,6 +128,7 @@ class cvGui():
         self.colorFilter_b = [COLORFILTER_B]
         self.ligtRec_x = [LIGHTTHR_X]
         self.ligtRec_maxT = [LIGHTTHR_MACT]
+        self.camShift_bins = [CAMSHIFT_BIN]
     
         #Shi - Tomasi Properties
         self.ShiTProp = [False]
@@ -374,6 +377,11 @@ class cvGui():
                         self.CFPropOnOff[0] = False
                         self.CFLRPropOnOff[0] = False
 
+                        cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Number Of Bins")
+                        cvui.trackbar(self.frame, 20, 465, 210, self.camShift_bins, 1.0, 200.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        self.camShift_bins[0] = int(self.camShift_bins[0])
+
+
                     #Printeo ONS/OFFS
                     if (self.CFPropOnOff[0]):
                         cvui.printf(self.frame, 145, 402, 0.4, 0x10dcA1, "On")
@@ -477,7 +485,7 @@ class cvGui():
             # if not cvui.iarea(200, 182, 20, 20) == cvui.OUT:
             #     cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 500, "Help")
 
-            if ((cvui.button(self.frame, 20, 180, "Select New Area") and ( (self.usingVideo and len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
+            if ((cvui.button(self.frame, 20, 180, "Add Tracker") and ( (self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
 
                 if len(self.trackers) < MAX_TRACKERS:
                     self.replaceRoi = True
@@ -573,7 +581,9 @@ class cvGui():
                 self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
                 self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
                 self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (
-                self.CFLRPropOnOff[0] == INITIAL_LR_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF)and (self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF):
+                self.CFLRPropOnOff[0] == INITIAL_LR_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF) and (self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF):
+            # and (self.camShift_bins[0] == CAMSHIFT_BIN)
+
             return True
         else:
             return False
@@ -609,6 +619,7 @@ class cvGui():
         self.ligtRec_maxT[0] = LIGHTTHR_MACT
 
         self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF
+        # self.camShift_bins[0] = CAMSHIFT_BIN
 
         self.shit_MaxFeat[0] = SHIT_MAXFEAT
         self.shit_FeatQual[0] = SHIT_FEATQUAL
@@ -689,10 +700,6 @@ class cvGui():
             else:
                 self.sourceWIDTH = int(self.source.shape[1])
                 self.sourceHEIGHT = int(self.source.shape[0])
-
-            # trackEdited = self.IsTrackerSelected()
-            # if not trackEdited == -1 and self.checkParametersChange():
-            #     self.trackers[trackEdited].changeSettings(self.parametersNew)
 
             if self.checkParametersChange():
                 for tracker in self.trackers:
@@ -813,6 +820,7 @@ class cvGui():
         self.ligtRec_maxT[0] = self.configSelected[selected][10]
 
         self.CFCamShiftOnOff[0] = self.configSelected[selected][11]
+        # self.camShift_bins[0] = self.configSelected[selected][12]
 
         self.shit_MaxFeat[0] = self.configSelected[selected][12]
         self.shit_FeatQual[0] = self.configSelected[selected][13]
@@ -841,6 +849,7 @@ class cvGui():
         self.parameters.append(self.ligtRec_maxT[0])
 
         self.parameters.append(self.CFCamShiftOnOff[0])
+        # self.parameters.append(self.camShift_bins[0])
 
         self.parameters.append(self.shit_MaxFeat[0])
         self.parameters.append(self.shit_FeatQual[0])
@@ -883,6 +892,8 @@ class cvGui():
             self.parametersNew.append(self.ligtRec_maxT[0])
 
             self.parametersNew.append(self.CFCamShiftOnOff[0])          #
+            #self.parametersNew.append(self.camShift_bins[0])
+
 
             self.parametersNew.append(self.shit_MaxFeat[0])
             self.parametersNew.append(self.shit_FeatQual[0])
@@ -910,7 +921,7 @@ class cvGui():
 
             if not(self.parametersNew[11] == self.parameters[11]):
                 changes = True        #Cam Shift On/Off
-            #elif not(False):
+            #elif not(self.parametersNew[12] == self.parameters[12]):       #BINS
             #    changes = True
 
             if not(self.parametersNew[12] == self.parameters[12] and self.parametersNew[13] == self.parameters[13] and self.parametersNew[14] == self.parameters[14]):
