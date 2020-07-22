@@ -258,6 +258,7 @@ class cvGui():
                 windowWidth = int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS)
                 windowHeight = int(Y_SCREEN - 2*WINDOW_SOU_Y - yTx + 10)
 
+                xx, yy = self.trackers[i].getEstimatedPosition()
                 vx, vy = self.trackers[i].getEstimatedVelocity()
                 cvui.window(self.frame, xTx - 30, yTx - 10, windowWidth, windowHeight, "Tracker Number " + str(i + 1))
                 cvui.rect(self.frame, xTx-28, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
@@ -266,10 +267,12 @@ class cvGui():
                 for k in range(a):
                     checking.append([False])
 
-                cvui.printf(self.frame, xTx - 20, yTx + 80, 0.4, 0x000000, f'Vx = {round(vx, 1)}')
-                cvui.printf(self.frame, xTx + 70, yTx + 80, 0.4, 0x000000, f'Vy = {round(-vy, 1)}')
+                cvui.printf(self.frame, xTx - 15, yTx + 85, 0.4, 0x000000, f'X = {int(xx)}')
+                cvui.printf(self.frame, xTx + 70, yTx + 85, 0.4, 0x000000, f'Y = {int(-yy)}')
+                cvui.printf(self.frame, xTx - 15, yTx + 100, 0.4, 0x000000, f'Vx = {round(vx, 1)}')
+                cvui.printf(self.frame, xTx + 70, yTx + 100, 0.4, 0x000000, f'Vy = {round(-vy, 1)}')
 
-                if cvui.checkbox(self.frame, xTx-10, yTx+105, "Select Tracker", self.boolForTrackers[i], 0x000000):
+                if cvui.checkbox(self.frame, xTx, yTx+125, "Select Tracker", self.boolForTrackers[i], 0x000000):
                     for j in range(a):
                         if not j == i:
                             self.boolForTrackers[j] = [False]
@@ -280,7 +283,7 @@ class cvGui():
                     w = int(self.trackSelection[i].shape[1])
                     h = int(self.trackSelection[i].shape[0])
                     xFrame = int((windowWidth + 2*(xTx-30))/2 - w/2)
-                    yFrame = yTx + 130
+                    yFrame = yTx + 150
                     self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.trackSelection[i]
                     status = cvui.iarea(xFrame, yFrame, w, h)
                     if status == cvui.CLICK:
