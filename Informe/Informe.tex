@@ -236,7 +236,7 @@ A continuación se muestra una imagen y el resultado del cálculo de correlació
 	\caption{Aplicación de correlación.}
 	\label{fig:corrtest}
 \end{figure}
-Se puede apreciar como el punto mas oscuro de la pantalla hace refernecia al punto de mayr correlacion 
+Se puede apreciar como el punto mas oscuro de la pantalla hace referencia al punto de mayor correlación 
 
 \section{Aportes y Desarrollo}
 
@@ -412,11 +412,11 @@ Para el algoritmo de correlacion no solo se utiliza el filtro explicado en la se
 \begin{align}
 MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (32,255)
 \end{align}
-luego se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, y se compara con el frame filtrado, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado, esto se logra aplicando una mascara en la sección de mayor correlación y sobre este realizar nuevamente el cálculo de máxima correlación. Esto se repite 5 veces\footnote{Se utilizó 5 arbitrariamente con el propósito de no ralentizar el programa}, y en caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).
+luego se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, y se compara con el frame filtrado, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una mascara en la sección de mayor correlación y sobre este realizar nuevamente el cálculo de máxima correlación. Se realizan unas pocas iteraciones con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).
 
 
 \subsection{Optimización del Código}
-Se realizó una optimización del codigo, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto permitió una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
+Se realizó una optimización del codigo, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto y una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
 
 
 \subsection{KTN}
