@@ -262,6 +262,11 @@ class cvGui():
                 for k in range(a):
                     checking.append([False])
 
+                ePos = self.trackers[i].getEstimatedPosition
+                traj = self.trackers[i].getTrajectory
+
+                print(f'ePos = {ePos}       traj = {traj}')
+
                 if cvui.checkbox(self.frame, xTx-10, yTx+95, "First Selection", self.boolForTrackers[i], 0x000000):
                     for j in range(a):
                         if not j == i:
@@ -684,13 +689,17 @@ class cvGui():
                 self.sourceWIDTH = int(self.source.shape[1])
                 self.sourceHEIGHT = int(self.source.shape[0])
 
-            if self.checkParametersChange():
-                for tracker in self.trackers:
-                    tracker.changeSettings(self.parametersNew)
+            trackEdited = self.IsTrackerSelected()
+            if not trackEdited == -1 and self.checkParametersChange():
+                self.trackers[trackEdited].changeSettings(self.parametersNew)
+
+            #  if self.checkParametersChange():
+            #     for tracker in self.trackers:
+            #         tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
-                pass
-                # tracker.update(self.source)           #Hay que agregar: Color seleccionado, que tracker está seleccionado y parametros nuevos
+                tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
+
 
             self.updateFilterFrame()
 
