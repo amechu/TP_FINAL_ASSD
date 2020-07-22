@@ -82,7 +82,7 @@ class Tracker:
 
         elif self.MF.mask is self.MF.maskingType["FILTER_CSHIFT"]:
             pass
-
+            #TINCHO
 
 
         #Tacking error?
