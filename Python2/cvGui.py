@@ -203,7 +203,7 @@ class cvGui():
             else:
                 cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Changes Saved For Tracker " + str(selectedT + 1) + "!")
 
-            if self.pause and not self.replaceRoi:
+            if self.pause:# and not self.replaceRoi:
                 if (self.usingVideo or self.usingCamera):
                     cvui.printf(self.frame, 17, 255, 0.4, 0xdc1076, "Source Paused!")
                 else:
@@ -449,7 +449,7 @@ class cvGui():
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
-                if not self.pause:
+                if not (self.pause or self.replaceRoi):
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
@@ -466,7 +466,10 @@ class cvGui():
                     if self.changeInTrackers and ((self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera):
                         self.changeInTrackers = False
                         self.callFilterPause()
-                    self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source #self.lastFrame
+                    if self.usingVideo and len(self.arrayVideoLoaded) == 0:
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
+                    else:
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
                 self.updateFilterFrame()
@@ -474,7 +477,7 @@ class cvGui():
                 if self.filteredFrame is None:
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFrame
                 else:
-                    if self.pause:
+                    if self.pause or self.replaceRoi:
                         self.callFilterPause()
                     y0 = int(((WINDOW_SOU_Y + 37) + (WINDOW_SOU_Y + 37 + WINDOW_SOU_HEIGHT - 75))/2 - self.filterHEIGHT/2)
                     self.frame[y0:y0 + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
@@ -489,7 +492,7 @@ class cvGui():
 
                 if len(self.trackers) < MAX_TRACKERS:
                     self.replaceRoi = True
-                    self.pause = True
+                    # self.pause = True
 
                     posX = 0
                     posY = 0
@@ -551,7 +554,7 @@ class cvGui():
 
                         self.coordsRoi.clear()
                         self.replaceRoi = False
-                        self.pause = False
+                        # self.pause = False
                     if (cvui.button(self.frame, WINDOW_SET_X + 73, 910, "Redo")):
                         self.coordsRoi.clear()
                     if (cvui.button(self.frame, WINDOW_SET_X + 148, 910, "Cancel")):
@@ -637,6 +640,7 @@ class cvGui():
         self.boolVideoLoaded = False
         self.lastFrame = []
         self.lastFilterFrame = []
+        self.trackSelection.clear()
 
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
