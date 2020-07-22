@@ -688,7 +688,7 @@ class cvGui():
 
             for tracker in self.trackers:
                 pass
-                # tracker.update(self.source)           #Hay que agregar: Color seleccionado, que tracker está seleccionado, parametros nuevos
+                # tracker.update(self.source)           #Hay que agregar: Color seleccionado, que tracker está seleccionado y parametros nuevos
 
             self.updateFilterFrame()
 
