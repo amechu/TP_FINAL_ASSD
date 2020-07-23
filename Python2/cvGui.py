@@ -36,7 +36,7 @@ SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
 Y_SCREEN = 960
-X_SCREEN = 1310 #1280
+X_SCREEN = 1500 #1310 #1280
 
 STANDAR_WIDTH = 500 #720
 
@@ -59,6 +59,11 @@ WINDOW_FIL_X = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X
 WINDOW_FIL_Y = WINDOW_VS_Y
 WINDOW_FIL_WIDTH = WINDOW_SOU_WIDTH #X_SCREEN - WINDOW_FIL_X - WINDOW_SET_X
 WINDOW_FIL_HEIGHT = WINDOW_SOU_HEIGHT #Y_SCREEN - WINDOW_FIL_Y - WINDOW_VS_Y
+
+WINDOW_FILS_X = WINDOW_FIL_X + WINDOW_FIL_WIDTH + WINDOW_VS_X
+WINDOW_FILS_Y = WINDOW_VS_Y
+WINDOW_FILS_WIDTH = X_SCREEN - WINDOW_FILS_X - WINDOW_SET_X
+WINDOW_FILS_HEIGHT = WINDOW_SOU_HEIGHT #Y_SCREEN - WINDOW_FIL_Y - WINDOW_VS_Y
 
 WINDOW_TRK_X = WINDOW_SOU_X
 WINDOW_TRK_Y = WINDOW_SOU_WIDTH + 2*WINDOW_VS_Y
@@ -144,9 +149,14 @@ class cvGui():
         cvui.init(WINDOW_NAME)
 
         #Filter Edit
-        self.ColorFilter = [False]
-        self.CamShiftFilter = [False]
+        self.FilterSetCF = [True]           #Color Filter
+        self.FilterSetCS = [False]          #Cam Shift
+
+        self.ColorFilter = [True]
         self.CorrFilter = [False]
+
+        self.CamShiftFilter = [False]
+        self.Hist = [False]
 
         #Tracker elements
         self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
@@ -186,10 +196,11 @@ class cvGui():
             self.frame[:] = (49, 52, 49)
 
             # FRAMES
-            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Video Source:")  # Video Source Frame
-            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Settings:")  # Settings Frame
+            cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Load Source:")  # Video Source Frame
+            cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Tracker Settings:")  # Settings Frame
             cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SOU_Y, WINDOW_SOU_WIDTH, WINDOW_SOU_HEIGHT, "Source:")
-            cvui.window(self.frame, WINDOW_FIL_X, WINDOW_FIL_Y, WINDOW_FIL_WIDTH, WINDOW_FIL_HEIGHT, "Filters:")
+            cvui.window(self.frame, WINDOW_FIL_X, WINDOW_FIL_Y, WINDOW_FIL_WIDTH, WINDOW_FIL_HEIGHT, "Filter View:")
+            cvui.window(self.frame, WINDOW_FILS_X, WINDOW_FILS_Y, WINDOW_FILS_WIDTH, WINDOW_FILS_HEIGHT, "Filter Selection:")
             cvui.window(self.frame, WINDOW_TRK_X, WINDOW_TRK_Y, WINDOW_TRK_WIDTH, WINDOW_TRK_HEIGHT, "Trackers:")
 
             #Text
@@ -212,7 +223,7 @@ class cvGui():
                 if (self.usingVideo or self.usingCamera):
                     cvui.printf(self.frame, 17, 255, 0.4, 0x10dca1, "Source Playing!")
                 else:
-                    cvui.printf(self.frame, 20, 255, 0.4, 0x10dca1, "Source Will Be Playing.")
+                    cvui.printf(self.frame, 17, 255, 0.4, 0x10dca1, "Source Will Be Playing.")
 
 
             #Video Source Buttons
@@ -246,43 +257,45 @@ class cvGui():
             a = len(self.trackers)
 
             for i in range(a):
-                xTx = WINDOW_TRK_X - 165 + int(WINDOW_TRK_WIDTH*(i+1)/MAX_TRACKERS)
-                yTx = WINDOW_TRK_Y + 60
-                xB = WINDOW_TRK_X - 170 + int(WINDOW_TRK_WIDTH*(i+1)/MAX_TRACKERS)
-                yB = WINDOW_TRK_Y + 80
 
                 if self.trackerAdded:
                     self.boolForTrackers.append([False])
                     self.trackerAdded = False
 
-                windowWidth = int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS)
+                windowWidth = int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS)
+
+                xTx = WINDOW_TRK_X + int((WINDOW_TRK_WIDTH - 10) * (i) / MAX_TRACKERS) + 20
+                yTx = WINDOW_TRK_Y + 60
+                xB = xTx + int(windowWidth/MAX_TRACKERS) #WINDOW_TRK_X - 170 + int(WINDOW_TRK_WIDTH * (i + 1) / MAX_TRACKERS)
+                yB = WINDOW_TRK_Y + 80
+
                 windowHeight = int(Y_SCREEN - 2*WINDOW_SOU_Y - yTx + 10)
 
                 xx, yy = self.trackers[i].getEstimatedPosition()
                 vx, vy = self.trackers[i].getEstimatedVelocity()
-                cvui.window(self.frame, xTx - 30, yTx - 10, windowWidth, windowHeight, "Tracker Number " + str(i + 1))
-                cvui.rect(self.frame, xTx-28, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
+                cvui.window(self.frame, xTx, yTx - 10, windowWidth, windowHeight, "Tracker Number " + str(i + 1))
+                cvui.rect(self.frame, xTx + 2, yTx+10, windowWidth-3, windowHeight-20, self.trackerColors[i], self.trackerColors[i])
 
                 checking = []
                 for k in range(a):
                     checking.append([False])
 
-                cvui.printf(self.frame, xTx - 15, yTx + 85, 0.4, 0x000000, f'X = {int(xx)}')
-                cvui.printf(self.frame, xTx + 70, yTx + 85, 0.4, 0x000000, f'Y = {int(-yy)}')
-                cvui.printf(self.frame, xTx - 15, yTx + 100, 0.4, 0x000000, f'Vx = {round(vx, 1)}')
-                cvui.printf(self.frame, xTx + 70, yTx + 100, 0.4, 0x000000, f'Vy = {round(-vy, 1)}')
+                cvui.printf(self.frame, xTx + 25, yTx + 85, 0.4, 0x000000, f'X = {int(xx)}')
+                cvui.printf(self.frame, xTx + 125, yTx + 85, 0.4, 0x000000, f'Y = {int(-yy)}')
+                cvui.printf(self.frame, xTx + 25, yTx + 100, 0.4, 0x000000, f'Vx = {round(vx, 1)}')
+                cvui.printf(self.frame, xTx + 125, yTx + 100, 0.4, 0x000000, f'Vy = {round(-vy, 1)}')
 
-                if cvui.checkbox(self.frame, xTx, yTx+125, "Select Tracker", self.boolForTrackers[i], 0x000000):
+                if cvui.checkbox(self.frame, xB, yTx+125, "Select Tracker", self.boolForTrackers[i], 0x000000):
                     for j in range(a):
                         if not j == i:
                             self.boolForTrackers[j] = [False]
 
-                    cvui.printf(self.frame, xTx - 10, yTx + 50, 0.4, 0x000000, "Filter displayed is for")
-                    cvui.printf(self.frame, xTx + 20, yTx + 65, 0.4, 0x000000, "this tracker!")
+                    cvui.printf(self.frame, xB - 5, yTx + 50, 0.4, 0x000000, "Filter displayed is for")
+                    cvui.printf(self.frame, xB + 25, yTx + 65, 0.4, 0x000000, "this tracker!")
 
                     w = int(self.trackSelection[i].shape[1])
                     h = int(self.trackSelection[i].shape[0])
-                    xFrame = int((windowWidth + 2*(xTx-30))/2 - w/2)
+                    xFrame = int((windowWidth + 2*(xTx))/2 - w/2)   #int((windowWidth + 2*(xTx-30))/2 - w/2)
                     yFrame = yTx + 150
                     self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.trackSelection[i]
                     status = cvui.iarea(xFrame, yFrame, w, h)
@@ -290,8 +303,8 @@ class cvGui():
                         cursor = cvui.mouse(WINDOW_NAME)
                         self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
                 elif self.boolForTrackers == checking and i == a-1:
-                    cvui.printf(self.frame, xTx - 10, yTx+50, 0.4, 0x000000,"Filter displayed is for")
-                    cvui.printf(self.frame, xTx + 20, yTx+65, 0.4, 0x000000,"this tracker!")
+                    cvui.printf(self.frame, xB - 5, yTx+50, 0.4, 0x000000,"Filter displayed is for")
+                    cvui.printf(self.frame, xB + 25, yTx+65, 0.4, 0x000000,"this tracker!")
 
                 if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
                     self.changeInTrackers = True
@@ -307,18 +320,18 @@ class cvGui():
                     break
 
             if a == 0:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No trackers added. Try selecting a new area!")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No Trackers Added. Try Selecting A New Area!")
                 self.filteredFrame = None
             elif a == 1:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x79d805, "Using 1 tracker of 5!")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x79d805, "Using 1 Tracker Of 5!")
             elif a == 2:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xa0d805, "Using 2 trackers of 5!")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xa0d805, "Using 2 Tracker Of 5!")
             elif a == 3:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xcfd805, "Using 3 trackers of 5!")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xcfd805, "Using 3 Tracker Of 5!")
             elif a == 4:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdcce10, "Using 4 trackers of 5!")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdcce10, "Using 4 Tracker Of 5!")
             else:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 trackers of 5! No more trackers can be added. Try deleting one.")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 Trackers Of 5! No More Trackers Can Be Added. Try Deleting One.")
 
             if (cvui.button(self.frame, 20, 215, "Pause Source") and not self.replaceRoi):
                 self.pause = not self.pause
@@ -430,17 +443,36 @@ class cvGui():
 
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
 
-            if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Color Filter", self.ColorFilter):
-                self.CamShiftFilter[0] = False
-                self.CorrFilter[0] = False
+            if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Color Filter Settings", self.FilterSetCF):
+                self.FilterSetCS[0] = False
 
-            if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(1/3)) , WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Cam Shift", self.CamShiftFilter):
-                self.ColorFilter[0] = False
-                self.CorrFilter[0] = False
+                # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Color Filter", self.ColorFilter):
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 90, "Color Filter", self.ColorFilter):
+                    self.CamShiftFilter[0] = False
+                    self.CorrFilter[0] = False
+                    self.Hist[0] = False
 
-            if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(2/3)), WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Correlation Filter", self.CorrFilter):
-                self.CamShiftFilter[0] = False
-                self.ColorFilter[0] = False
+                # if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(1/3)) , WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Correlation Filter", self.CorrFilter):
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 110, "Correlation Filter", self.CorrFilter):
+                    self.CamShiftFilter[0] = False
+                    self.ColorFilter[0] = False
+                    self.Hist[0] = False
+
+            if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Cam Shift Settings", self.FilterSetCS):
+                self.FilterSetCF[0] = False
+
+                # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Cam Shift", self.CamShiftFilter):
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 90, "Cam Shift", self.CamShiftFilter):
+                    self.ColorFilter[0] = False
+                    self.CorrFilter[0] = False
+
+                # if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(1/3)) , WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Histogram", self.Hist):
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 110, "Histogram", self.Hist):
+                    self.ColorFilter[0] = False
+                    self.CorrFilter[0] = False
+                    self.CamShiftFilter[0]
+
+
 
             selectedT = self.IsTrackerSelected()
             if not (selectedT == -1) and self.lastTracker != selectedT:
@@ -515,7 +547,7 @@ class cvGui():
                         del self.coordsRoi[4]
 
                     if not len(self.coordsRoi) == 0:
-                        cvui.rect(self.frame, self.coordsRoi[0], self.coordsRoi[1], 2, 2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                        cvui.rect(self.frame, self.coordsRoi[0]-1, self.coordsRoi[1]-1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
 
                     if len(self.coordsRoi) == 4:
                         if self.coordsRoi[0] - self.coordsRoi[2] > 0:
