@@ -10,7 +10,7 @@ class HistFilter:
         self.hist = None
 
 
-    def compute_hist(self, src, bins=10):
+    def compute_hist(self, src, bins=64):
         """
         This function computes the color distribuition probabilty
         for a given BGR image. Often used to compute Kernel histogram
@@ -173,9 +173,9 @@ class MaskingFilter:
                     self.upperThreshold[1] += np.clip(np.clip(np.int32(self.lab_mask[0, 0, :])[1] + self.LSemiAmp, 1, 255) - self.upperThreshold[1], -self.labMaxChange, self.labMaxChange)
                     self.upperThreshold[2] += np.clip(np.clip(np.int32(self.lab_mask[0, 0, :])[2] + self.LSemiAmp, 1, 255) - self.upperThreshold[2], -self.labMaxChange, self.labMaxChange)
 
-                #Histogram Filter init
-                self.hist_filter.compute_hist(selection)
-                self.hist_filter.show_hist(self.hist_filter.hist)
+            #Histogram Filter init
+            self.hist_filter.compute_hist(selection)
+            self.hist_filter.show_hist(self.hist_filter.hist)
 
         self.init = False
 
