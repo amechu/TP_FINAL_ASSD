@@ -473,6 +473,14 @@ class cvGui():
                             h = np.asarray(miniFilter).shape[0]
                             y0 = int(WINDOW_FILS_Y + 130)
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                        else:
+                            miniFilter = self.lastFrame.copy()
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130)
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Correlation Filter",self.CorrFilter):
                     self.CamShiftFilter[0] = False
@@ -504,12 +512,20 @@ class cvGui():
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
 
                         # CORRELATION FILTER
-                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100  + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
-                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125  + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter = self.trackers[selectedT].getCorrFrame()
                         if miniFilter is not None:
                             miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                        else:
+                            miniFilter = self.lastFrame.copy()
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
@@ -529,6 +545,14 @@ class cvGui():
                         if miniFilter is not None:
                             miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130)
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                        else:
+                            miniFilter = self.lastFrame.copy()
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
