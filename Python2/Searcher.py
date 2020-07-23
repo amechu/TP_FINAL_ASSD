@@ -39,7 +39,7 @@ class Searcher:
         self.debug=False
         self.corr_out=None
         self.y, self.x = np.shape(self.prevFrameGray)
-        self.MASKCONDITION = selectionWidth_*selectionHeight_*0.2
+        self.MASKCONDITION = 0.2
         self.match_method = cv.TM_SQDIFF
 
 
@@ -79,7 +79,7 @@ class Searcher:
 
             frame_to_search =frameGray[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight ),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth )]
 
-            if np.count_nonzero(filteredframe[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight ),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth )])  > self.MASKCONDITION:
+            if np.count_nonzero(filteredframe[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight ),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth )])  > (self.MASKCONDITION* self.selectionHeight * self.selectionWidth):
                 self.features, self.trackingError = self.ST.recalculateFeatures(frame_to_search)
                 self.features = self.featureTranslate(int(matchLoc[0]), int(matchLoc[1]), self.features)
                 self.LK.prevFeatures = self.features
@@ -108,7 +108,7 @@ class Searcher:
                     frame_to_search = frameGray[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
                                       int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]
                     if np.count_nonzero(filteredframe[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
-                                        int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]) > self.MASKCONDITION:
+                                        int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]) > (self.MASKCONDITION* self.selectionHeight * self.selectionWidth ):
                         self.features, self.trackingError = self.ST.recalculateFeatures(frame_to_search)
                         self.features = self.featureTranslate(int(matchLoc[0]), int(matchLoc[1]), self.features)
                         self.LK.prevFeatures = self.features
