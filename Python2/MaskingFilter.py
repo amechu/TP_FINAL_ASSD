@@ -8,9 +8,9 @@ class HistFilter:
     def __init__(self):
         self.ranges = [0, 180]
         self.hist = None
+        self.mask = None
 
-
-    def compute_hist(self, src, bins=10):
+    def compute_hist(self, src, bins=100):
         """
         This function computes the color distribuition probabilty
         for a given BGR image. Often used to compute Kernel histogram
@@ -28,8 +28,8 @@ class HistFilter:
         bins = bins
         hist_size = max(bins, 2)
         hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
-        mask = cv.inRange(hsv, np.array((0., 60., 0.)), np.array((180., 255., 255.)))  #((0., 60., 32.))
-        hist = cv.calcHist([hsv], [0], mask, [hist_size], self.ranges)
+        self.mask = cv.inRange(hsv, np.array((0., 60., 0.)), np.array((180., 255., 255.)))  #((0., 60., 32.))
+        hist = cv.calcHist([hsv], [0], self.mask, [hist_size], self.ranges)
         cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
         self.hist = hist.reshape(-1)
         # self.show_hist(hist)
@@ -81,6 +81,7 @@ class HistFilter:
         -------
 
         """
+        # thresholded = cv.adaptiveThreshold(src,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,cv.THRESH_BINARY,5,2)
         thresholded = cv.inRange(src, np.array(200), np.array(255))
         return thresholded
 
@@ -107,12 +108,23 @@ class HistFilter:
         cv.imshow('hist', img)
 
     def get_mask(self, src):
+        hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
+        # 4 Aramamos una mascara generica que solo usa el Hue y un acotado rango de S y V
+        # res = cv.medianBlur(src, 11)
+        # res = cv.dilate(hsv, (11, 11))
+        mask = cv.inRange(hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
 
-        res = self.apply_hist_mask(src, self.hist)
-        res = self.apply_threshold(res)
-        res = cv.medianBlur(res, 11)
-        res = cv.dilate(res, (11, 11))
-        return res
+        prob = cv.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
+        cv.imshow("Mascara final", prob)
+        prob &= mask
+        mask2 = cv.inRange(prob, 230, 255)
+
+
+        # res = self.apply_hist_mask(src, self.hist)
+        # res = self.apply_threshold(res)
+        # res = cv.medianBlur(res, 11)
+        # res = cv.dilate(res, (11, 11))
+        return mask2
 
 class MaskingFilter:
 
@@ -173,9 +185,9 @@ class MaskingFilter:
                     self.upperThreshold[1] += np.clip(np.clip(np.int32(self.lab_mask[0, 0, :])[1] + self.LSemiAmp, 1, 255) - self.upperThreshold[1], -self.labMaxChange, self.labMaxChange)
                     self.upperThreshold[2] += np.clip(np.clip(np.int32(self.lab_mask[0, 0, :])[2] + self.LSemiAmp, 1, 255) - self.upperThreshold[2], -self.labMaxChange, self.labMaxChange)
 
-                #Histogram Filter init
-                self.hist_filter.compute_hist(selection)
-                self.hist_filter.show_hist(self.hist_filter.hist)
+            #Histogram Filter init
+            self.hist_filter.compute_hist(selection)
+            self.hist_filter.show_hist(self.hist_filter.hist)
 
         self.init = False
 
@@ -188,7 +200,7 @@ class MaskingFilter:
             self.filteredFrame = cv.bitwise_and(frame, frame, mask=mask)
         elif self.mask is self.maskingType["FILTER_CSHIFT"]:
             mask1 = self.hist_filter.get_mask(frame)
-            self.filteredFrame = cv.bitwise_and(frame,frame, mask = mask1)
+            self.filteredFrame = cv.bitwise_and(frame, frame, mask = mask1)
         elif self.mask is self.maskingType["FILTER_CORR"]:
             pass
         return self.filteredFrame
