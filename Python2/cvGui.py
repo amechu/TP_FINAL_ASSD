@@ -806,13 +806,17 @@ class cvGui():
 
     def updateFilterFrame(self):
         filterOfInteres = self.IsTrackerSelected()
-
+        
         if not len(self.trackers) == 0:
+            #LAB COLOR FILTER
             if self.ColorFilter[0]:
+                self.trackers[filterOfInteres].setFilter("FILTER_LAB")
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
+            #HIST COLOR FILTER
             elif self.CamShiftFilter[0]:
-                pass
-                # self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrameHist()
+                self.trackers[filterOfInteres].setFilter("FILTER_CSHIFT")
+                self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
+            #CORRELATION FILTER
             elif self.CorrFilter[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
@@ -821,6 +825,22 @@ class cvGui():
                     self.filteredFrame = None
             else:
                 self.filteredFrame = None
+
+
+        # if not len(self.trackers) == 0:
+        #     if self.ColorFilter[0]:
+        #         self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
+        #     elif self.CamShiftFilter[0]:
+        #         pass
+        #         # self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrameHist()
+        #     elif self.CorrFilter[0]:
+        #         self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
+        #         if self.filteredFrame is not None:
+        #             self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
+        #         else:
+        #             self.filteredFrame = None
+        #     else:
+        #         self.filteredFrame = None
 
         if self.CorrFilter[0] and self.filteredFrame is not None:
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
