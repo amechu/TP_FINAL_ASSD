@@ -7,7 +7,9 @@
 	\label{fig:Flowchart}
 \end{figure*}
 
-A partir de una selección del video proporcionada por el usuario se obtienen las mejores features del objeto seleccionado utilizando el algoritmo de Shi-Tomasi. Luego, mediante el algoritmo de Lucas-Kanade de Optical Flow se obtiene la evolución de las features en el tiempo. A este cúmulo de puntos se le calcula el centro de masas $\mu$ y el centro de inercia $\sigma$. Se rechazan los puntos de este cúmulo que se encuentren a una distancia mayor a $k_{\sigma}\sigma$ respecto al centro de masas, para luego calcular nuevamente el centro de masas el cual es el que se introduce en el filtro de Kalman como medición de la posición.
+\subsubsection{Primer diseño}
+
+A partir de una selección del video proporcionada por el usuario se obtienen las mejores features del objeto seleccionado utilizando el algoritmo de Shi-Tomasi. Luego, mediante el algoritmo de Lucas-Kanade de Optical Flow se obtiene la evolución de dichas features en el tiempo. A este cúmulo de puntos se le calcula el centro de masas $\mu$ y el centro de inercia $\sigma$. Se rechazan los puntos de este cúmulo que se encuentren a una distancia mayor a $k_{\sigma}\sigma$ respecto al centro de masas, para luego calcular nuevamente el centro de masas el cual es el que se introduce en el filtro de Kalman como medición de la posición.
 
 La dimensión del vector de estados del filtro de Kalman es de cuatro, poseyendo la posición y la velocidad tanto horizontal como vertical. La dimensión del vector de observación es de dos dado que solamente se mide la posición horizontal y vertical del centro de masas. La matriz $A$ queda definida por las ecuaciones que caracterizan el movimiento del objeto a seguir que, por simplicidad, se consideraron las ecuaciones cinemáticas de MRU, quedando entonces
 \begin{equation}
@@ -90,6 +92,7 @@ P_{k|k} =
 \end{equation}
 
 Siendo $\gamma_{i}$ la varianza de cada variable de estado. Cabe notar que el modelo utilizado asume independencia entre las variables aleatorias por simplicidad.
+
 Este algoritmo, hasta ahora explicado, cuenta con grandes problemas. Dados dos objetos $A$ y $B$, donde $A$ es el objeto a seguir:
 
 \begin{itemize}
@@ -98,7 +101,9 @@ Este algoritmo, hasta ahora explicado, cuenta con grandes problemas. Dados dos o
 \item Profundizando en el item anterior, existe una ambigüedad entre que $A$ pase de un movimiento MRU a que se quede completamente quieto y que $A$ pase por detras de $B$, dado que en ambas situaciones las features quedarán quietas en el lugar donde $A$ se haya quedado quieto o el lugar de la intersección entre $A$ y $B$
 \end{itemize}
 
-La mejora propuesta para sortear este problema consiste en agregar un filtro de color, para diferenciar a $A$ y a $B$ por su color. La implementación de este filtro de color comienza en el momento que el usuario selecciona el área a seguir. Se calcula la mediana del color de la zona elegida, y ese color es transformado de formato RGB a formato HSV, o Hue-Saturation-Value, dado que es más sencillo definir una máscara de este modo. Dado $x$ e $y$ las coordenadas de los píxeles de la imagen, $\vec{R_k}$, $\vec{G_k}$ y $\vec{B_k}$ los vectores de píxeles de la selección, $mediana(\vec{R_k}, \vec{G_k}, \vec{B_k}) = (m_R, m_G, m_B)$ el vector que define la mediana del color de la selección, $\mathbb{HSV}$ el operador de transformación del espacio de coordenadas RGB a HSV, y $\mathbb{HSV}(m_R, m_G, m_B) = (m_H, m_S, m_V)$ el vector de la mediana del color de la selección en el espacio HSV, queda entonces definida la máscara de color como
+\subsubsection{Segundo diseño}
+
+La mejora propuesta para sortear estos problemas consiste en agregar un filtro de color, para diferenciar a $A$ y a $B$ por su color. La implementación de este filtro de color comienza en el momento en el que el usuario selecciona el área a seguir. Se calcula la mediana del color de la zona elegida, y ese color es transformado de formato RGB a formato HSV, o Hue-Saturation-Value, dado que es más sencillo definir una máscara de este modo. Dado $x$ e $y$ las coordenadas de los píxeles de la imagen, $\vec{R_k}$, $\vec{G_k}$ y $\vec{B_k}$ los vectores de píxeles de la selección, $mediana(\vec{R_k}, \vec{G_k}, \vec{B_k}) = (m_R, m_G, m_B)$ el vector que define la mediana del color de la selección, $\mathbb{HSV}$ el operador de transformación del espacio de coordenadas RGB a HSV, y $\mathbb{HSV}(m_R, m_G, m_B) = (m_H, m_S, m_V)$ el vector de la mediana del color de la selección en el espacio HSV, queda entonces definida la máscara de color como
 
 \begin{equation}
 f(x, y) = (f_h(x, y), f_s(x, y), f_v(x, y))
@@ -120,7 +125,7 @@ f_{u}(x,y) = \left\{
 \right.
 \end{equation}
 
-donde $\Lambda$ es el límite para cada propiedad $u$, siendo estas Hue, Saturation o Value. Una vez obtenida la máscara $f(x, y)$ se realiza una operación AND bit-a-bit entre la máscara y la imagen original, logrando obtener una intensidad nula en los píxeles de la imagen que no posean un color cercano a la mediana calculada como se puede ver en las Figuras (\ref{fig:col1}) y (\ref{fig:col2}).
+donde $\Lambda$ es el límite para cada propiedad $u$, siendo estas Hue, Saturation o Value. Una vez obtenida la máscara $f(x, y)$ se realiza la operación AND entre la máscara y la imagen original, logrando obtener una intensidad nula en los píxeles de la imagen que no posean un color cercano a la mediana calculada como se puede ver en las Figuras (\ref{fig:col1}) y (\ref{fig:col2}).
 
 \begin{figure}[H]
 \centering
@@ -140,7 +145,7 @@ donde $\Lambda$ es el límite para cada propiedad $u$, siendo estas Hue, Saturat
 	\label{fig:color_comp}
 \end{figure}
 
-Este filtrado de color no solo posee una gran sinergia con el método de obtención de features de Shi-Tomasi, dado que este frame tendrá bordes de mucha mejor calidad, sino que tambíen posee una gran sinergia con el método de Optical Flow, debido a que como se verán menos bordes en la imagen modificada, aumenta notablemente la probabilidad de que los features queden contenidos todos dentro, o sobre los bordes del objeto a seguir.
+Este filtrado de color no solo posee una gran sinergia con el método de obtención de features de Shi-Tomasi, dado que este frame tendrá bordes de mucha mejor calidad, sino que también posee una gran sinergia con el método de Optical Flow, debido a que como se verán menos bordes en la imagen modificada, aumenta notablemente la probabilidad de que los features queden contenidos todos dentro, o sobre los bordes del objeto a seguir.
 
 Volviendo al caso de los objetos $A$ y $B$:
 
