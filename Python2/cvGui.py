@@ -185,6 +185,11 @@ class cvGui():
         selectedT = -1
         self.updateParameters()
         originalParam = self.parameters.copy()
+        originalParam.append(False)
+        originalParam.append(False)
+        originalParam.append(False)
+        originalParam.append(False)
+
 
         while True:
 
@@ -954,6 +959,11 @@ class cvGui():
         self.ShiTPropOnOff[0] = self.configSelected[selected][16]
         self.shit_SPix[0] = self.configSelected[selected][17]
 
+        self.ColorFilter[0] = self.configSelected[selected][18]
+        self.CorrFilter[0] = self.configSelected[selected][19]
+        self.CamShiftFilter[0] = self.configSelected[selected][20]
+        self.Hist[0] = self.configSelected[selected][21]
+
     def updateParameters(self):
         self.parameters.clear()
 
@@ -1058,6 +1068,16 @@ class cvGui():
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
+            # self.configSelected[filterOfInteres].append(False)
+            # self.configSelected[filterOfInteres].append(False)
+            # self.configSelected[filterOfInteres].append(False)
+            # self.configSelected[filterOfInteres].append(False)
+
+            self.configSelected[filterOfInteres].append(self.ColorFilter[0])
+            self.configSelected[filterOfInteres].append(self.CorrFilter[0])
+            self.configSelected[filterOfInteres].append(self.CamShiftFilter[0])
+            self.configSelected[filterOfInteres].append(self.Hist[0])
+
             self.lastTracker = filterOfInteres
 
         return changes
