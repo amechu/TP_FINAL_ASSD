@@ -396,15 +396,15 @@ class cvGui():
 
                         cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "Mask Blur")
                         cvui.trackbar(self.frame, 20, 535, 210, self.camShift_mb, 0.0, 20.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
-                        self.camShift_bins[0] = int(self.camShift_mb[0])
+                        self.camShift_mb[0] = int(self.camShift_mb[0])
 
                         cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "Selection Blur")
                         cvui.trackbar(self.frame, 20, 605, 210, self.camShift_sb, 0.0, 20.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
-                        self.camShift_bins[0] = int(self.camShift_sb[0])
+                        self.camShift_sb[0] = int(self.camShift_sb[0])
 
                         cvui.printf(self.frame, 20, 660, 0.4, 0xdd97fb, "Lower Bound Prob. Thr.")
                         cvui.trackbar(self.frame, 20, 675, 210, self.camShift_lbpt, 0.0, 254.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
-                        self.camShift_bins[0] = int(self.camShift_lbpt[0])
+                        self.camShift_lbpt[0] = int(self.camShift_lbpt[0])
 
                     #Printeo ONS/OFFS
                     if (self.CFPropOnOff[0]):
