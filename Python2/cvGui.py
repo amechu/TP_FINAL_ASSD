@@ -727,7 +727,7 @@ class cvGui():
 
         self.lk_mr[0] = INITIAL_LK_MR
 
-        self.CFPropOnOff[0] = INITIAL_CF_ONOFF
+        # self.CFPropOnOff[0] = INITIAL_CF_ONOFF                    #Queda mejor sin reestablecer esto
         self.colorFilter_LihtThr[0] = COLORFILTER_LIGHTTHR
         self.colorFilter_a[0] = COLORFILTER_A
         self.colorFilter_b[0] = COLORFILTER_B
@@ -736,7 +736,7 @@ class cvGui():
         self.ligtRec_x[0] = LIGHTTHR_X
         self.ligtRec_maxT[0] = LIGHTTHR_MACT
 
-        self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF
+        # self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF                    #Queda mejor sin reestablecer esto
         # self.camShift_bins[0] = CAMSHIFT_BIN
 
         self.shit_MaxFeat[0] = SHIT_MAXFEAT
