@@ -36,6 +36,8 @@ SHIT_MINFEAT = 0.01
 SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
+MASK_COND = 0.2
+
 Y_SCREEN = 960
 X_SCREEN = 1500 #1310 #1280
 
@@ -153,6 +155,8 @@ class cvGui():
         #Recalculation Algorithm
         self.recAlgCorr = [True]
         self.recAlgST = [False]
+
+        self.masckCondition = [MASK_COND]
 
         cv.namedWindow(WINDOW_NAME, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
@@ -745,7 +749,7 @@ class cvGui():
                 self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF) and (
                 self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
                 self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
-                self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False):
+                self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.masckCondition[0] == MASK_COND):
             return True
         else:
             return False
@@ -795,6 +799,9 @@ class cvGui():
 
         self.recAlgCorr[0] = [True]
         self.recAlgST[0] = [False]
+
+        self.masckCondition[0] = [MASK_COND]
+
 
     def initSource(self):
         self.source = []
@@ -1006,6 +1013,8 @@ class cvGui():
         self.recAlgCorr[0] = self.configSelected[selected][21]
         self.recAlgST[0] = self.configSelected[selected][22]
 
+        self.masckCondition[0] = self.configSelected[selected][23]
+
     def updateParameters(self):
         self.parameters.clear()
 
@@ -1039,6 +1048,8 @@ class cvGui():
 
         self.parameters.append(self.recAlgCorr[0])         #21
         self.parameters.append(self.recAlgST[0])         #22
+
+        self.parameters.append(self.masckCondition[0])         #23
 
     def IsTrackerSelected(self):
         filterOfInteres = -1
@@ -1088,6 +1099,8 @@ class cvGui():
             self.parametersNew.append(self.recAlgCorr[0])  # 21
             self.parametersNew.append(self.recAlgST[0])  # 22
 
+            self.parametersNew.append(self.masckCondition[0])  # 23
+
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
 
@@ -1113,7 +1126,10 @@ class cvGui():
                 changes = True   #Chequeo Params Shi
 
             if not(self.parametersNew[19] == self.parameters[19] and self.parametersNew[20] == self.parameters[20] and  self.parametersNew[21] == self.parameters[21] and  self.parametersNew[22] == self.parameters[22]):
-                changes = True
+                changes = True      #Missing and Search algorithm
+
+            if not(self.parametersNew[23] == self.parameters[23]):
+                changes = True      #Mask condition
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
@@ -1144,8 +1160,6 @@ class cvGui():
 def main():
     myGui = cvGui()
     myGui.onWork()
-
-
 
 
 if __name__ == '__main__':
