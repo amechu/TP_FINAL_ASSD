@@ -156,7 +156,7 @@ class cvGui():
         self.recAlgCorr = [True]
         self.recAlgST = [False]
 
-        self.masckCondition = [MASK_COND]
+        self.maskCondition = [MASK_COND]
 
         cv.namedWindow(WINDOW_NAME, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
@@ -600,10 +600,37 @@ class cvGui():
                     cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
                     cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
 
-            if (cvui.button(self.frame, 60, 830, "Reset Settings")):
-                self.resetInitialCond()
 
 
+            cvui.printf(self.frame, 20, 775, 0.4, 0xdd97fb, "Missing Algorithm")
+            if cvui.checkbox(self.frame, 20, 790, "Correlation", self.missAlgCorr):
+                self.missAlgST[0] = False
+            else:
+                self.missAlgST[0] = True
+
+            if cvui.checkbox(self.frame, 150, 790, "ST", self.missAlgST):
+                self.missAlgCorr[0] = False
+            else:
+                self.missAlgCorr[0] = True
+
+            cvui.printf(self.frame, 20, 810, 0.4, 0xdd97fb, "Recalculation Algorithm")
+            if cvui.checkbox(self.frame, 20, 825, "Correlation", self.recAlgCorr):
+                self.recAlgST[0] = False
+            else:
+                self.recAlgST[0] = True
+
+            if cvui.checkbox(self.frame, 150, 825, "ST", self.recAlgST):
+                self.recAlgCorr[0] = False
+            else:
+                self.recAlgCorr[0] = True
+            
+            if (self.missAlgCorr[0] or self.recAlgCorr[0]) and not self.replaceRoi:
+                cvui.printf(self.frame, 20, 850, 0.4, 0xdd97fb, "Mask Correlation")
+                cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1)
+
+            if not self.replaceRoi:
+                if (cvui.button(self.frame, 60, 915, "Reset Settings")):
+                    self.resetInitialCond()
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
@@ -743,7 +770,7 @@ class cvGui():
                 self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF) and (
                 self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
                 self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
-                self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.masckCondition[0] == MASK_COND):
+                self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.maskCondition[0] == MASK_COND):
 
                 selected = self.IsTrackerSelected()
                 if selected == -1 or self.trackSelectionBGR[selected] == None:
@@ -799,7 +826,7 @@ class cvGui():
         self.recAlgCorr[0] = [True]
         self.recAlgST[0] = [False]
 
-        self.masckCondition[0] = [MASK_COND]
+        self.maskCondition[0] = [MASK_COND]
 
         sT = self.IsTrackerSelected()
         if not sT == -1:
@@ -1016,7 +1043,7 @@ class cvGui():
         self.recAlgCorr[0] = self.configSelected[selected][21]
         self.recAlgST[0] = self.configSelected[selected][22]
 
-        self.masckCondition[0] = self.configSelected[selected][23]
+        self.maskCondition[0] = self.configSelected[selected][23]
 
         self.trackSelectionBGR[selected] = self.configSelected[selected][24]
 
@@ -1054,7 +1081,7 @@ class cvGui():
         self.parameters.append(self.recAlgCorr[0])         #21
         self.parameters.append(self.recAlgST[0])         #22
 
-        self.parameters.append(self.masckCondition[0])         #23
+        self.parameters.append(self.maskCondition[0])         #23
 
         sT = self.IsTrackerSelected()
         if not sT == -1:
@@ -1111,7 +1138,7 @@ class cvGui():
             self.parametersNew.append(self.recAlgCorr[0])       # 21
             self.parametersNew.append(self.recAlgST[0])         # 22
 
-            self.parametersNew.append(self.masckCondition[0])       # 23
+            self.parametersNew.append(self.maskCondition[0])       # 23
 
             sT = self.IsTrackerSelected()
             if not sT == -1:
