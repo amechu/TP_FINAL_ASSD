@@ -286,11 +286,6 @@ class cvGui():
                     for j in range(a):
                         if not j == i:
                             self.boolForTrackers[j] = [False]
-                        else:
-                            self.filterConditions[j][0] = self.ColorFilter[0]
-                            self.filterConditions[j][1] = self.CorrFilter[0]
-                            self.filterConditions[j][2] = self.CamShiftFilter[0]
-                            self.filterConditions[j][3] = self.Hist[0]
 
                     cvui.printf(self.frame, xB - 5, yTx + 50, 0.4, 0x000000, "Filter displayed is for")
                     cvui.printf(self.frame, xB + 25, yTx + 65, 0.4, 0x000000, "this tracker!")
@@ -441,8 +436,25 @@ class cvGui():
                         cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
 
             #Filters: Correlation, Cam shift, Color, Histogram
+
+            selectedT = self.IsTrackerSelected()
+            if self.lastTracker != selectedT:
+                if not len(self.filterConditions) == 0:
+                    self.ColorFilter[0] = self.filterConditions[selectedT][0]
+                    self.CorrFilter[0] = self.filterConditions[selectedT][1]
+                    self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
+                    self.Hist[0] = self.filterConditions[selectedT][3]
+                if not (selectedT == -1):
+                    self.loadParameters(selectedT)
+                    self.lastTracker = selectedT
+            elif not len(self.filterConditions) == 0:
+                self.filterConditions[selectedT][0] = self.ColorFilter[0]
+                self.filterConditions[selectedT][1] = self.CorrFilter[0]
+                self.filterConditions[selectedT][2] = self.CamShiftFilter[0]
+                self.filterConditions[selectedT][3] = self.Hist[0]
+
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
-            if self.CFPropOnOff[0]:
+            if self.CFPropOnOff[0] and not len(self.filterConditions) == 0:
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Color Filter", self.ColorFilter):
                     self.CamShiftFilter[0] = False
                     self.CorrFilter[0] = False
@@ -480,7 +492,7 @@ class cvGui():
                         y0 = int(WINDOW_FILS_Y + 130)
                         self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
-            elif self.CFCamShiftOnOff[0]:
+            elif self.CFCamShiftOnOff[0] and not len(self.filterConditions) == 0:
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Cam Shift", self.CamShiftFilter):
                     self.ColorFilter[0] = False
                     self.CorrFilter[0] = False
@@ -555,33 +567,6 @@ class cvGui():
                     # HISTOGRAM
                     cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
                     cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
-
-            # if not len(self.filterConditions) == 0:
-            #     self.ColorFilter[0] = self.filterConditions[selectedT][0]
-            #     self.CorrFilter[0] = self.filterConditions[selectedT][1]
-            #     self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
-            #     self.Hist[0] = self.filterConditions[selectedT][3]
-            #
-            # if not len(self.filterConditions) == 0:
-            #     self.filterConditions[selectedT][0] = self.ColorFilter[0]
-            #     self.filterConditions[selectedT][1] = self.CorrFilter[0]
-            #     self.filterConditions[selectedT][2] = self.CamShiftFilter[0]
-            #     self.filterConditions[selectedT][3] = self.Hist[0]
-            #
-            # selectedT = self.IsTrackerSelected()
-            # if not (selectedT == -1) and (self.lastTracker != selectedT):
-            #     self.loadParameters(selectedT)
-            #     self.lastTracker = selectedT
-
-            selectedT = self.IsTrackerSelected()
-            if self.lastTracker != selectedT:
-                self.ColorFilter[0] = self.filterConditions[selectedT][0]
-                self.CorrFilter[0] = self.filterConditions[selectedT][1]
-                self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
-                self.Hist[0] = self.filterConditions[selectedT][3]
-                if not (selectedT == -1):
-                    self.loadParameters(selectedT)
-                    self.lastTracker = selectedT
 
             if (cvui.button(self.frame, 60, 830, "Reset Settings")):
                 self.resetInitialCond()
