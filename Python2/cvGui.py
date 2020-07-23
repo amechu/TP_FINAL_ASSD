@@ -149,9 +149,6 @@ class cvGui():
         cvui.init(WINDOW_NAME)
 
         #Filter Edit
-        self.FilterSetCF = [False]           #Color Filter
-        self.FilterSetCS = [False]          #Cam Shift
-
         self.ColorFilter = [False]
         self.CorrFilter = [False]
 
@@ -235,6 +232,7 @@ class cvGui():
                         self.VideoLoaded = self.videoPath
                         self.CurrentSource = "Video Loaded: " + self.videoName
                         self.trackers.clear()
+                        self.pause = True
                     else:
                         self.usingCamera = False
                         self.usingVideo = False
@@ -369,7 +367,7 @@ class cvGui():
                 self.ShiTProp[0] = False
 
                 if not selectedT == -1:
-                    if (cvui.checkbox(self.frame, 20, 400, "LAB Color Filter", self.CFPropOnOff)):
+                    if cvui.checkbox(self.frame, 20, 400, "LAB Color Filter", self.CFPropOnOff):
                         self.CFCamShiftOnOff[0] = False
 
                         cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "L")
@@ -389,7 +387,7 @@ class cvGui():
                             cvui.printf(self.frame, 20, 765, 0.4, 0xdd97fb, "Maximum Threshold Change")
                             cvui.trackbar(self.frame, 20, 780, 210, self.ligtRec_maxT, 0.0, 30.0)
 
-                    if (cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff) and not selectedT == -1):
+                    if cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff):
                         self.CFPropOnOff[0] = False
                         self.CFLRPropOnOff[0] = False
 
@@ -439,42 +437,121 @@ class cvGui():
                     else:
                         cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
 
-            #Filters: Correlation, Cam shift, Color
-
+            #Filters: Correlation, Cam shift, Color, Histogram
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
-
-            if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Color Filter Settings", self.FilterSetCF):
-                self.FilterSetCS[0] = False
-
-                # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Color Filter", self.ColorFilter):
-                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 90, "Color Filter", self.ColorFilter):
+            if self.CFPropOnOff[0]:
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Color Filter", self.ColorFilter):
                     self.CamShiftFilter[0] = False
                     self.CorrFilter[0] = False
                     self.Hist[0] = False
 
-                # if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(1/3)) , WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Correlation Filter", self.CorrFilter):
-                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 110, "Correlation Filter", self.CorrFilter):
+                    if not len(self.trackers) == 0:
+                        # CORRELATION FILTER
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        miniFilter = self.trackers[selectedT].getCorrFrame()
+                        if miniFilter is not None:
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
+                            miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130)
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Correlation Filter",self.CorrFilter):
                     self.CamShiftFilter[0] = False
                     self.ColorFilter[0] = False
                     self.Hist[0] = False
 
-            if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Cam Shift Settings", self.FilterSetCS):
-                self.FilterSetCF[0] = False
+                    if not len(self.trackers) == 0:
+                        # LAB COLOR FILTER
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Color Filter")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        self.trackers[selectedT].setFilter("FILTER_LAB")
+                        miniFilter = self.trackers[selectedT].getFilteredFrame()
+                        miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
+                        x0 = WINDOW_FILS_X + 14
+                        w = WINDOW_FILS_WIDTH - 27
+                        h = np.asarray(miniFilter).shape[0]
+                        y0 = int(WINDOW_FILS_Y + 130)
+                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
-                # if cvui.checkbox(self.frame, WINDOW_FIL_X + 10, WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Cam Shift", self.CamShiftFilter):
-                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 90, "Cam Shift", self.CamShiftFilter):
+            elif self.CFCamShiftOnOff[0]:
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Cam Shift", self.CamShiftFilter):
                     self.ColorFilter[0] = False
                     self.CorrFilter[0] = False
                     self.Hist[0] = False
 
+                    if not len(self.trackers) == 0:
+                        # HISTOGRAM
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
 
-                # if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(1/3)) , WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Histogram", self.Hist):
-                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 110, "Histogram", self.Hist):
+                        # CORRELATION FILTER
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100  + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125  + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        miniFilter = self.trackers[selectedT].getCorrFrame()
+                        if miniFilter is not None:
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
+                            miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Histogram", self.Hist):
                     self.ColorFilter[0] = False
                     self.CorrFilter[0] = False
                     self.CamShiftFilter[0] = False
 
+                    if not len(self.trackers) == 0:
+                        # CORRELATION FILTER
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        miniFilter = self.trackers[selectedT].getCorrFrame()
+                        if miniFilter is not None:
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
+                            miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130)
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
+                        # LAB COLOR FILTER
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Cam Shift")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        self.trackers[selectedT].setFilter("FILTER_CSHIFT")
+                        miniFilter2 = self.trackers[selectedT].getFilteredFrame()
+                        miniFilter2 = self.rescale_frame_standar(miniFilter2, WINDOW_FILS_WIDTH - 27)
+                        x0 = WINDOW_FILS_X + 14
+                        w = WINDOW_FILS_WIDTH - 27
+                        h = np.asarray(miniFilter2).shape[0]
+                        y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
+
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 70, "Correlation Filter", self.CorrFilter):
+                    self.CamShiftFilter[0] = False
+                    self.ColorFilter[0] = False
+                    self.Hist[0] = False
+
+                    # LAB COLOR FILTER
+                    cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Cam Shift")
+                    cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                    self.trackers[selectedT].setFilter("FILTER_CSHIFT")
+                    miniFilter2 = self.trackers[selectedT].getFilteredFrame()
+                    miniFilter2 = self.rescale_frame_standar(miniFilter2, WINDOW_FILS_WIDTH - 27)
+                    x0 = WINDOW_FILS_X + 14
+                    w = WINDOW_FILS_WIDTH - 27
+                    h = np.asarray(miniFilter2).shape[0]
+                    y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                    self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
+
+                    # HISTOGRAM
+                    cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
+                    cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
 
             selectedT = self.IsTrackerSelected()
             if not (selectedT == -1) and self.lastTracker != selectedT:
@@ -827,22 +904,6 @@ class cvGui():
                     self.filteredFrame = None
             else:
                 self.filteredFrame = None
-
-
-        # if not len(self.trackers) == 0:
-        #     if self.ColorFilter[0]:
-        #         self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
-        #     elif self.CamShiftFilter[0]:
-        #         pass
-        #         # self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrameHist()
-        #     elif self.CorrFilter[0]:
-        #         self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
-        #         if self.filteredFrame is not None:
-        #             self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
-        #         else:
-        #             self.filteredFrame = None
-        #     else:
-        #         self.filteredFrame = None
 
         if self.CorrFilter[0] and self.filteredFrame is not None:
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
