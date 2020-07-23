@@ -35,11 +35,11 @@ class HistFilter:
         hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
         self.mask = cv.inRange(hsv, np.array((0., 60., 0.)), np.array((180., 255., 255.)))  #((0., 60., 32.))
         # self.mask = cv.medianBlur(self.mask,15)
-        hist = cv.calcHist([hsv], [0], self.mask, [hist_size], self.ranges)
-        cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
-        self.hist = hist.reshape(-1)
+        self.hist = cv.calcHist([hsv], [0], self.mask, [hist_size], self.ranges)
+        cv.normalize(self.hist, self.hist, 0, 255, cv.NORM_MINMAX)
+        self.hist = self.hist.reshape(-1)
         # self.show_hist(hist)
-        return hist
+        return self.hist
 
     def get_roi(self, bbox, src):
         """
@@ -78,6 +78,7 @@ class HistFilter:
 
     def apply_threshold(self, src):
         """
+        EXPERIMENTAL
         Aplica un threshold a una imagen monocromatica para conseguir un
         Parameters
         ----------
@@ -113,6 +114,20 @@ class HistFilter:
         img = cv.cvtColor(img, cv.COLOR_HSV2BGR)
         cv.imshow('hist', img)
 
+    def get_hist(self) -> None:
+        bin_count = self.hist.shape[0]
+        bin_w = 24
+        img = np.zeros((256, bin_count * bin_w, 3), np.uint8)
+        for i in range(bin_count):
+            h = int(self.hist[i])
+            cv.rectangle(img,
+                         (i * bin_w + 2, 255),
+                         ((i + 1) * bin_w - 2, 255 - h),
+                         (int(180.0 * i / bin_count), 255, 255),
+                         -1)
+        histogram_plot = cv.cvtColor(img, cv.COLOR_HSV2BGR)
+        return histogram_plot
+
     def get_mask(self, src):
         hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
         # 4 Aramamos una mascara generica que solo usa el Hue y un acotado rango de S y V
@@ -137,12 +152,12 @@ class HistFilter:
         self.bins = num
     def set_mask_blur(self,blur_size):
         if blur_size%2 != 1:
-            self.blur_size =  int(blur_size)+1
+            self.blur_size = int(blur_size)+1
         else:
-            self.blur_size =  int(blur_size)
+            self.blur_size = int(blur_size)
 
-    def set_kernel_blur(self,blur_size):
-        if blur_size%2 == 0:
+    def set_kernel_blur(self, blur_size):
+        if blur_size % 2 == 0:
             self.kernel_blur_size = int(blur_size)+1
         else:
             self.kernel_blur_size = int(blur_size)
