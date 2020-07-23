@@ -1,8 +1,5 @@
-\subsection{Implementación}
 
-
-
-\subsubsection{Primer diseño}
+\subsection{Primer diseño}
 
 A partir de una selección del video proporcionada por el usuario se obtienen las mejores features del objeto seleccionado utilizando el algoritmo de Shi-Tomasi. Luego, mediante el algoritmo de Lucas-Kanade de Optical Flow se obtiene la evolución de dichas features en el tiempo. A este cúmulo de puntos se le calcula el centro de masas $\mu$ y el centro de inercia $\sigma$. Se rechazan los puntos de este cúmulo que se encuentren a una distancia mayor a $k_{\sigma}\sigma$ respecto al centro de masas, para luego calcular nuevamente el centro de masas el cual es el que se introduce en el filtro de Kalman como medición de la posición.
 
@@ -96,7 +93,7 @@ Este algoritmo, hasta ahora explicado, cuenta con grandes problemas. Dados dos o
 \item Profundizando en el item anterior, existe una ambigüedad entre que $A$ pase de un movimiento MRU a que se quede completamente quieto y que $A$ pase por detras de $B$, dado que en ambas situaciones las features quedarán quietas en el lugar donde $A$ se haya quedado quieto o el lugar de la intersección entre $A$ y $B$
 \end{itemize}
 
-\subsubsection{Segundo diseño}
+\subsection{Segundo diseño}
 
 La mejora propuesta para sortear estos problemas consiste en agregar un filtro de color, para diferenciar a $A$ y a $B$ por su color. La implementación de este filtro de color comienza en el momento en el que el usuario selecciona el área a seguir. Se calcula la mediana del color de la zona elegida, y ese color es transformado de formato RGB a formato HSV, o Hue-Saturation-Value, dado que es más sencillo definir una máscara de este modo. Dado $x$ e $y$ las coordenadas de los píxeles de la imagen, $\vec{R_k}$, $\vec{G_k}$ y $\vec{B_k}$ los vectores de píxeles de la selección, $mediana(\vec{R_k}, \vec{G_k}, \vec{B_k}) = (m_R, m_G, m_B)$ el vector que define la mediana del color de la selección, $\mathbb{HSV}$ el operador de transformación del espacio de coordenadas RGB a HSV, y $\mathbb{HSV}(m_R, m_G, m_B) = (m_H, m_S, m_V)$ el vector de la mediana del color de la selección en el espacio HSV, queda entonces definida la máscara de color como
 
@@ -172,11 +169,15 @@ Sin embargo, el filtro de Kalman no puede estimar la posición del objeto indefi
 
 Finalmente, para reforzar el algoritmo de seguimiento, se implemento además una recalculación periódica de las features con el método de Shi-Tomasi, partiendo de la media del cúmulo de features, removiendo los outliers, volviendo a calcular nuevamente la media y utilizar esta posición para aplicar el algoritmo de Shi-Tomasi, de misma manera que se realiza sobre la primera selección proporcionada por el usuario. Todo esto nos permite subsanar varios de los problemas planteados anteriormente, sin embargo, existen aún varios otros problemas:
 
+\subsection{Escenarios de fallas}
+Algunos casos donde hasta ahora puede fallar el Tracker son:
 \begin{itemize}
-\item ACA PONER LOS PROBLEMAS QUE TENIAMOS EN LA ENTREGA PASADA
-\end{itemize}
+\item El cambio de trayectoria de un objeto una vez que desaparece, provocará una falla en la predicción.
+\item Interacción entre el objeto trackeado y un objeto de características similares, puede causar un error de detección
+\item Cambios bruscos de iluminación o en color del objeto.
 
-\subsubsection{Último diseño}
+
+\subsection{Último diseño}
 
 \begin{figure*}
 \centering
@@ -200,8 +201,11 @@ Para el algoritmo de correlacion no solo se utiliza el filtro explicado en la se
 \begin{align}
 MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (32,255)
 \end{align}
-luego se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, y se compara con el frame filtrado, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una mascara en la sección de mayor correlación y sobre este realizar nuevamente el cálculo de máxima correlación. Se realizan unas pocas iteraciones con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).
-
+luego se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, y se compara con el frame filtrado, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una mascara en la sección de mayor correlación y sobre este realizar nuevamente el cálculo de máxima correlación. Se realizan unas pocas iteraciones con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).\\
+Este algoritmo fue utilizado potencialmente en dos escenarios, para la busqueda de un objeto perdido, en el caso de oclusión se  utiliza el algoritmo para encontrar nuevamente el objeto, y en el caso de que se decida utilizar la correlación para el recálculo periódico de features, esto es beneficioso en el caso de que en la interacción de dos objetos $A$ y $B$ siendo $A$ el de interés y $B$ uno similar, $B$ pasa por delante de $A$ quitandole las features, si el calculo periódico es por correlación el algoritmo podrá detectar que se está siguiendo a $B$ y no a $A$ por lo que corregirá este error. Un caso en el que no es favorable utilizar el algoritmod e correlación y conviene utilizar el alternativo de Shi-Tomasi y medias moviles, es el caso en el que interactuen objetos de mismo color y forma, por lo que el tener información de la posición previa para el tracking resulta fundamental, otro caso en el que no sería favorable la correlación es cuando se sufre un cambio brusco de iluminación cosa de que la correlción con el kernel se ve seriamente afectado, en ese caso se recomienda la combinación de Shi-Tomasi con medias moviles y Camshift. 
+\begin{Huge}
+MIRAR ESTO
+\end{Huge}
 
 \subsection{Optimización del Código}
 Se realizó una optimización del codigo, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto y una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
@@ -276,12 +280,6 @@ while(cap.isOpened()):
 \end{figure}
 
 
-\subsection{Escenarios de fallas}
-Algunos casos donde puede fallar el Tracker son:
-\begin{itemize}
-\item El cambio de trayectoria de un objeto una vez que desaparece, provocará una falla en la predicción.
-\item Interacción entre el objeto trackeado y un objeto de características similares, puede causar un error de detección
-\item Cambios bruscos de iluminación o en color del objeto.
 
 \end{itemize}
 
