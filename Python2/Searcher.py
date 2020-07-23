@@ -39,7 +39,7 @@ class Searcher:
         self.debug=False
         self.corr_out=None
         self.y, self.x = np.shape(self.prevFrameGray)
-        self.MASKCONDITION = self.x*self.y*0.04**2
+        self.MASKCONDITION = selectionWidth_*selectionHeight_*0.8**2
         self.match_method = cv.TM_SQDIFF
 
 
