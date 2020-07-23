@@ -826,7 +826,7 @@ class cvGui():
         self.recAlgCorr[0] = [True]
         self.recAlgST[0] = [False]
 
-        self.maskCondition[0] = [MASK_COND]
+        self.maskCondition[0] = MASK_COND
 
         sT = self.IsTrackerSelected()
         if not sT == -1:
