@@ -17,10 +17,10 @@ class Searcher:
             CORR = 1,
     )
     usualAlgorithm = usualAlgorithmD["LK_ST"]
- #   missAlgorithm = missAlgorithmD["CORR"]
-    missAlgorithm = missAlgorithmD["ST"]
-    recalcAlgorithm = recalcAlgorithmD["ST"]
-#    recalcAlgorithm = recalcAlgorithmD["CORR"]
+    missAlgorithm = missAlgorithmD["CORR"]
+    #missAlgorithm = missAlgorithmD["ST"]
+    #recalcAlgorithm = recalcAlgorithmD["ST"]
+    recalcAlgorithm = recalcAlgorithmD["CORR"]
 
     def __init__(self,firstFrame,selectionHeight_,selectionWidth_,xSelection,ySelection,prevFrameGrayC):
         self.LK = OpticalFlow()
