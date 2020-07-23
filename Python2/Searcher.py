@@ -10,16 +10,15 @@ class Searcher:
     )
     recalcAlgorithmD = dict(
             ST = 0,
-            ST_CORR = 1,
-            CORR = 2
+            CORR = 1
     )
     missAlgorithmD = dict(
             ST = 0,
             CORR = 1,
     )
     usualAlgorithm = usualAlgorithmD["LK_ST"]
-#    missAlgorithm = missAlgorithmD["CORR"]
-    missAlgorithm = missAlgorithmD["ST"]
+    missAlgorithm = missAlgorithmD["CORR"]
+ #   missAlgorithm = missAlgorithmD["ST"]
 #    recalcAlgorithm = recalcAlgorithmD["ST"]
     recalcAlgorithm = recalcAlgorithmD["CORR"]
 
@@ -161,8 +160,7 @@ class Searcher:
         # Recalculate features?
         #           else would be tracking error true
 
-        elif self.usualAlgorithm== self.usualAlgorithmD["CORR"]:
-            pass
+
 
         return self.candidate[0],self.candidate[1]
 
