@@ -366,7 +366,7 @@ class cvGui():
                 self.ShiTProp[0] = False
 
                 if not selectedT == -1:
-                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")
+                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")#TOMI HACE ESTO DISCRETO
                     cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0)
 
             if cvui.checkbox(self.frame, 20, 340, "Mask Filter", self.CFProp):
@@ -1050,38 +1050,38 @@ class cvGui():
     def updateParameters(self):
         self.parameters.clear()
 
-        self.parameters.append(self.kalman_ptm[0])          #0
-        self.parameters.append(self.kalman_pc[0])          #1
-        self.parameters.append(self.kalman_mc[0])          #2
+        self.parameters.append(self.kalman_ptm[0])             #0x
+        self.parameters.append(self.kalman_pc[0])              #1x
+        self.parameters.append(self.kalman_mc[0])              #2x
 
-        self.parameters.append(self.lk_mr[0])          #3
+        self.parameters.append(self.lk_mr[0])                  #3x
 
-        self.parameters.append(self.CFPropOnOff[0])          #4
-        self.parameters.append(self.colorFilter_LihtThr[0])          #5
-        self.parameters.append(self.colorFilter_a[0])          #6
-        self.parameters.append(self.colorFilter_b[0])          #7
+        self.parameters.append(self.CFPropOnOff[0])            #4 (?????)
+        self.parameters.append(self.colorFilter_LihtThr[0])    #5X
+        self.parameters.append(self.colorFilter_a[0])          #6X
+        self.parameters.append(self.colorFilter_b[0])          #7X
 
-        self.parameters.append(self.CFCamShiftOnOff[0])          #8
+        self.parameters.append(self.CFCamShiftOnOff[0])        #8
         self.parameters.append(self.camShift_bins[0])          #9
-        self.parameters.append(self.camShift_mb[0])          #10
-        self.parameters.append(self.camShift_sb[0])          #11
+        self.parameters.append(self.camShift_mb[0])            #10
+        self.parameters.append(self.camShift_sb[0])            #11
         self.parameters.append(self.camShift_lbpt[0])          #12
 
-        self.parameters.append(self.shit_MaxFeat[0])          #13
+        self.parameters.append(self.shit_MaxFeat[0])           #13
         self.parameters.append(self.shit_FeatQual[0])          #14
-        self.parameters.append(self.shit_MinFeat[0])          #15
-        self.parameters.append(self.shit_Rec[0])          #16
+        self.parameters.append(self.shit_MinFeat[0])           #15
+        self.parameters.append(self.shit_Rec[0])               #16
 
         self.parameters.append(self.ShiTPropOnOff[0])          #17
-        self.parameters.append(self.shit_SPix[0])          #18
+        self.parameters.append(self.shit_SPix[0])              #18
 
-        self.parameters.append(self.missAlgCorr[0])         #19
-        self.parameters.append(self.missAlgST[0])         #20
+        self.parameters.append(self.missAlgCorr[0])            #19x
+        self.parameters.append(self.missAlgST[0])              #20x
 
-        self.parameters.append(self.recAlgCorr[0])         #21
-        self.parameters.append(self.recAlgST[0])         #22
+        self.parameters.append(self.recAlgCorr[0])             #21x
+        self.parameters.append(self.recAlgST[0])               #22x
 
-        self.parameters.append(self.maskCondition[0])         #23
+        self.parameters.append(self.maskCondition[0])          #23
 
         sT = self.IsTrackerSelected()
         if not sT == -1:

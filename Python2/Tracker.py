@@ -112,9 +112,11 @@ class Tracker:
         self.KM.PROCESS_COV = parametersNew[1]        #kalman_pc
         self.KM.MEAS_NOISE_COV = parametersNew[2]     #kalman_mc
 
-        #self.SC.LK.lkMaxLevel = parametersNew[3]           #lk_mr
+        self.SC.LK.lkMaxLevel = int(parametersNew[3])           #lk_mr
 
-        # = parametersNew[4]              #Color Filter OnOff
+        if  parametersNew[4] is False:              #Color Filter OnOff
+            self.MF.mask = self.MF.maskingType["FILTER_OFF"]
+
         MaskingFilter.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
         MaskingFilter.aSemiAmp = parametersNew[6]     #colorFilter_a
         MaskingFilter.bSemiAmp = parametersNew[7]     #colorFilter_b
@@ -127,7 +129,7 @@ class Tracker:
             self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["ST"]
         elif parametersNew[22] == False and parametersNew[21] == True:
             self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["CORR"]
-
+        self.SC.MASKCONDITION = parametersNew[23]
         #= parametersNew[8]     #Light R OnOff
         #= parametersNew[9]    #ligtRec_x)
         #= parametersNew[10]   #ligtRec_maxT
