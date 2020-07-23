@@ -40,8 +40,11 @@ class Tracker:
         self.SC.LK.prevFeatures = self.SC.features
 
 
-
-
+    def setFilter(self,filterType):
+        if filterType in self.MF.maskingType.keys():
+            self.MF.mask = self.MF.maskingType[filterType]
+        else:
+            print("Wrong filter type")
 
     def featureTranslate(self,x, y, features):
         if features is None:
@@ -133,7 +136,6 @@ class Tracker:
 
         self.KM.updateParams()
 
-
     def getFilteredFrame(self):
         return self.MF.filteredFrame
 
@@ -148,6 +150,4 @@ class Tracker:
 
     def getTrajectory(self):
         return self.KM.trajectory
-
-
 
