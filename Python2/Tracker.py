@@ -130,6 +130,7 @@ class Tracker:
         elif parametersNew[22] == False and parametersNew[21] == True:
             self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["CORR"]
         self.SC.MASKCONDITION = parametersNew[23]
+
         #= parametersNew[8]     #Light R OnOff
         #= parametersNew[9]    #ligtRec_x)
         #= parametersNew[10]   #ligtRec_maxT
@@ -145,6 +146,14 @@ class Tracker:
         #self.SC.ST.frameRecalculationNumber = parametersNew[17]        #shit_SPix
 
         #self.MF.mask = self.MF.maskingType[parametersNew[??]] #MENSAJE PARA TOMI: tiene que ser un string parametersNew[??] fijate en la clase
+
+        self.MF.hist_filter.set_bins(parametersNew[9])
+        self.MF.hist_filter.set_mask_blur(parametersNew[10])
+        self.MF.hist_filter.set_kernel_blur(parametersNew[11])
+        self.MF.hist_filter.set_low_pth(parametersNew[12])
+
+        self.MF.updateMaskFromSettings()
+
 
         self.KM.updateParams()
 

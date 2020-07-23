@@ -9,8 +9,13 @@ class HistFilter:
         self.ranges = [0, 180]
         self.hist = None
         self.mask = None
+        self.bins = 64
+        self.blur_size = 0
+        self.kernel_blur_size = 0
+        self.low_pth = 230
+        self.selection = None
 
-    def compute_hist(self, src, bins=100):
+    def compute_hist(self, src, bins=64):
         """
         This function computes the color distribuition probabilty
         for a given BGR image. Often used to compute Kernel histogram
@@ -29,11 +34,12 @@ class HistFilter:
         hist_size = max(bins, 2)
         hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
         self.mask = cv.inRange(hsv, np.array((0., 60., 0.)), np.array((180., 255., 255.)))  #((0., 60., 32.))
-        hist = cv.calcHist([hsv], [0], self.mask, [hist_size], self.ranges)
-        cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
-        self.hist = hist.reshape(-1)
+        # self.mask = cv.medianBlur(self.mask,15)
+        self.hist = cv.calcHist([hsv], [0], self.mask, [hist_size], self.ranges)
+        cv.normalize(self.hist, self.hist, 0, 255, cv.NORM_MINMAX)
+        self.hist = self.hist.reshape(-1)
         # self.show_hist(hist)
-        return hist
+        return self.hist
 
     def get_roi(self, bbox, src):
         """
@@ -72,6 +78,7 @@ class HistFilter:
 
     def apply_threshold(self, src):
         """
+        EXPERIMENTAL
         Aplica un threshold a una imagen monocromatica para conseguir un
         Parameters
         ----------
@@ -107,17 +114,32 @@ class HistFilter:
         img = cv.cvtColor(img, cv.COLOR_HSV2BGR)
         cv.imshow('hist', img)
 
+    def get_histogram_plot(self):
+        bin_count = self.hist.shape[0]
+        bin_w = 24
+        img = np.zeros((256, bin_count * bin_w, 3), np.uint8)
+        for i in range(bin_count):
+            h = int(self.hist[i])
+            cv.rectangle(img,
+                         (i * bin_w + 2, 255),
+                         ((i + 1) * bin_w - 2, 255 - h),
+                         (int(180.0 * i / bin_count), 255, 255),
+                         -1)
+        histogram_plot = cv.cvtColor(img, cv.COLOR_HSV2BGR)
+        return histogram_plot
+
     def get_mask(self, src):
         hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
         # 4 Aramamos una mascara generica que solo usa el Hue y un acotado rango de S y V
-        # res = cv.medianBlur(src, 11)
+        # hsv = cv.medianBlur(hsv, 11)
         # res = cv.dilate(hsv, (11, 11))
         mask = cv.inRange(hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
-
         prob = cv.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
-        cv.imshow("Mascara final", prob)
+        # cv.imshow("Mascara final", prob)
         prob &= mask
-        mask2 = cv.inRange(prob, 230, 255)
+        mask2 = cv.inRange(prob, self.low_pth, 255)
+        if self.kernel_blur_size != 0:
+            mask2 = cv.medianBlur(mask2,self.kernel_blur_size)
 
 
         # res = self.apply_hist_mask(src, self.hist)
@@ -125,6 +147,24 @@ class HistFilter:
         # res = cv.medianBlur(res, 11)
         # res = cv.dilate(res, (11, 11))
         return mask2
+
+    def set_bins(self,num):
+        self.bins = num
+    def set_mask_blur(self,blur_size):
+        if blur_size%2 != 1:
+            self.blur_size = int(blur_size)+1
+        else:
+            self.blur_size = int(blur_size)
+
+    def set_kernel_blur(self, blur_size):
+        if blur_size % 2 == 0:
+            self.kernel_blur_size = int(blur_size)+1
+        else:
+            self.kernel_blur_size = int(blur_size)
+
+    def set_low_pth(self,low_pth):
+
+        self.low_pth = low_pth
 
 class MaskingFilter:
 
@@ -186,8 +226,8 @@ class MaskingFilter:
                     self.upperThreshold[2] += np.clip(np.clip(np.int32(self.lab_mask[0, 0, :])[2] + self.LSemiAmp, 1, 255) - self.upperThreshold[2], -self.labMaxChange, self.labMaxChange)
 
             #Histogram Filter init
-            self.hist_filter.compute_hist(selection)
-            self.hist_filter.show_hist(self.hist_filter.hist)
+            self.hist_filter.selection = selection
+            self.hist_filter.compute_hist(selection,self.hist_filter.bins)
 
         self.init = False
 
@@ -215,8 +255,8 @@ class MaskingFilter:
             b_high = np.clip(np.int32(self.lab_mask[0, 0, :])[2] + self.bSemiAmp, 1, 255)
             self.lowerThreshold = np.array([L_low, a_low, b_low])
             self.upperThreshold = np.array([L_high, a_high, b_high])
-        else:
-            return
+        elif self.mask is self.maskingType["FILTER_CSHIFT"]:
+            self.hist_filter.compute_hist(self.hist_filter.selection, self.hist_filter.bins)
 
     # def change_masking_filter(self,mask_type):
     #     if mask_type ==

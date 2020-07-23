@@ -176,7 +176,7 @@ class cvGui():
         self.parametersNew = []
         self.boolForTrackers = []
         self.trackSelection = []
-        self.trackSelectionBGR = [None, None, None, None, None]
+        self.trackSelectionBGR = [0, 0, 0, 0, 0]
         self.lastTracker = -1
         self.configSelected = []
 
@@ -322,7 +322,7 @@ class cvGui():
                     del self.trackSelection[i]
                     self.trackerColors.append(self.trackerColors[i])
                     del self.trackerColors[i]
-                    self.trackSelectionBGR[i] = None
+                    self.trackSelectionBGR[i] = 0
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
                     break
@@ -392,6 +392,8 @@ class cvGui():
 
                         cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Number Of Bins")
                         cvui.trackbar(self.frame, 20, 465, 210, self.camShift_bins, 1.0, 200.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        if self.camShift_bins[0] < 1:
+                            self.camShift_bins[0] = 1
                         self.camShift_bins[0] = int(self.camShift_bins[0])
 
                         cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "Mask Blur")
@@ -518,19 +520,26 @@ class cvGui():
                         # HISTOGRAM
                         cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        miniFilter = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
+                        miniFilter = self.rescale_hist(miniFilter, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
+                        x0 = WINDOW_FILS_X + 14
+                        w = WINDOW_FILS_WIDTH - 27
+                        h = np.asarray(miniFilter).shape[0]
+                        y0 = int(WINDOW_FILS_Y + 125)
+                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
                         # CORRELATION FILTER
                         cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
-                        miniFilter = self.trackers[selectedT].getCorrFrame()
-                        if miniFilter is not None:
-                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
-                            miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
+                        miniFilter2 = self.trackers[selectedT].getCorrFrame()
+                        if miniFilter2 is not None:
+                            miniFilter2 = self.rescale_frame_standar(miniFilter2, WINDOW_FILS_WIDTH - 27)
+                            miniFilter2 = cv.cvtColor(miniFilter2, cv.COLOR_GRAY2BGR) * 255
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
-                            h = np.asarray(miniFilter).shape[0]
+                            h = np.asarray(miniFilter2).shape[0]
                             y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
-                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
                         else:
                             miniFilter = self.lastFrame.copy()
                             miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
@@ -599,6 +608,13 @@ class cvGui():
                     # HISTOGRAM
                     cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
                     cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                    miniFilter2 = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
+                    miniFilter2 = self.rescale_hist(miniFilter2, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
+                    x0 = WINDOW_FILS_X + 14
+                    w = WINDOW_FILS_WIDTH - 27
+                    h = np.asarray(miniFilter2).shape[0]
+                    y0 = int(WINDOW_FILS_Y + 125) + WINDOW_FILS_WIDTH
+                    self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
 
 
@@ -656,7 +672,7 @@ class cvGui():
                     else:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
-            if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0]):
+            if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0] or self.Hist[0]):
                 self.updateFilterFrame()
                 x0 = self.sourceX + WINDOW_SOU_WIDTH + WINDOW_VS_X
                 if self.filteredFrame is None:
@@ -773,7 +789,7 @@ class cvGui():
                 self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.maskCondition[0] == MASK_COND):
 
                 selected = self.IsTrackerSelected()
-                if selected == -1 or self.trackSelectionBGR[selected] == None:
+                if selected == -1 or self.trackSelectionBGR[selected] == 0:
                     return True
                 else:
                     return False
@@ -830,7 +846,7 @@ class cvGui():
 
         sT = self.IsTrackerSelected()
         if not sT == -1:
-            self.trackSelectionBGR[sT] == None
+            self.trackSelectionBGR[sT] == 0
 
 
     def initSource(self):
@@ -988,6 +1004,9 @@ class cvGui():
                     self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
                 else:
                     self.filteredFrame = None
+            elif self.Hist:
+                self.filteredFrame = self.trackers[filterOfInteres].MF.hist_filter.get_histogram_plot()
+                self.filteredFrame = self.rescale_hist(self.filteredFrame, STANDAR_WIDTH, self.sourceHEIGHT)
             else:
                 self.filteredFrame = None
 
@@ -1009,6 +1028,10 @@ class cvGui():
         width = int(frame.shape[1])
         height = int(frame.shape[0])
         dim = (int(maxWidth*width/height), maxWidth)
+        return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
+
+    def rescale_hist(self, frame, width, height):
+        dim = (int(width), int(height))
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
     def loadParameters(self, selected):
@@ -1084,10 +1107,7 @@ class cvGui():
         self.parameters.append(self.maskCondition[0])          #23
 
         sT = self.IsTrackerSelected()
-        if not sT == -1:
-            self.parameters.append(self.trackSelectionBGR[sT])          #24
-        else:
-            self.parameters.append(None)  # 24
+        self.parameters.append(self.trackSelectionBGR[sT])    #24
 
 
     def IsTrackerSelected(self):
@@ -1141,10 +1161,7 @@ class cvGui():
             self.parametersNew.append(self.maskCondition[0])       # 23
 
             sT = self.IsTrackerSelected()
-            if not sT == -1:
-                self.parametersNew.append(self.trackSelectionBGR[sT])  # 24
-            else:
-                self.parametersNew.append(None)  # 24
+            self.parametersNew.append(self.trackSelectionBGR[sT])  # 24
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
@@ -1177,7 +1194,7 @@ class cvGui():
                 changes = True      #Mask condition
 
             if not(self.parametersNew[24] == self.parameters[24]):
-                changes = True      #Tracker BGR
+                changes = True  # Tracker BGR
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
