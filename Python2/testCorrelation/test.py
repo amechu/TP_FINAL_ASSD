@@ -7,8 +7,11 @@ import sys
 # KCF tracker
 
 
-def correlationAllPic(frame):
-    match_method = cv.TM_SQDIFF
+def correlationAllPic(frame, a):
+    if a==1:
+        match_method = cv.TM_CCORR
+    else:
+        match_method = cv.TM_SQDIFF
     frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
     frame_hsv = cv.bitwise_and(frame_hsv, frame_hsv, mask)
@@ -70,7 +73,8 @@ if __name__ == '__main__':
         ret, frame = cap.read()
     cv.namedWindow('tracking')
     cv.namedWindow('kernel')
-    cv.namedWindow('Corr')
+    cv.namedWindow('CORR')
+    cv.namedWindow('SQ DIFF')
 
     first=True
     ret, frame = cap.read()
@@ -98,16 +102,18 @@ if __name__ == '__main__':
         deltay=h
         ux=x+(deltax/2.0)
         uy=y+(deltay/2.0)
-        [corrOut, points]= correlationAllPic(frame)
+        [corrSQ, points]= correlationAllPic(frame,0)
+        [corrOut, points]= correlationAllPic(frame,1)
    #     [corrOut,points] = correlationSection(frame,ux,uy,deltax+50,deltay+50,kernel)
 
 
-        cv.rectangle(frame,(int(points[0]),int(points[1])),(int(points[0]+deltax) , int(points[1] +deltay)),color,2)
+    #    cv.rectangle(frame,(int(points[0]),int(points[1])),(int(points[0]+deltax) , int(points[1] +deltay)),color,2)
 
    #     filteredFrame = cv.bitwise_and(frame, frame, mask=finalmask)
 
         cv.imshow('tracking', frame)
-        cv.imshow('Corr', corrOut)
+        cv.imshow('CORR', corrOut)
+        cv.imshow('SQ DIFF', corrSQ)
 
 
         c = cv.waitKey(30) & 0xFF
