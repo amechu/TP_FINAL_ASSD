@@ -603,6 +603,8 @@ class cvGui():
             if (cvui.button(self.frame, 60, 830, "Reset Settings")):
                 self.resetInitialCond()
 
+
+
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
                 if not (self.pause or self.replaceRoi):
@@ -798,6 +800,10 @@ class cvGui():
         self.recAlgST[0] = [False]
 
         self.masckCondition[0] = [MASK_COND]
+
+        sT = self.IsTrackerSelected()
+        if not sT == -1:
+            self.trackSelectionBGR[sT] == None
 
 
     def initSource(self):
@@ -1012,7 +1018,7 @@ class cvGui():
 
         self.masckCondition[0] = self.configSelected[selected][23]
 
-        self.trackSelectionBGR = self.configSelected[selected][24]
+        self.trackSelectionBGR[selected] = self.configSelected[selected][24]
 
     def updateParameters(self):
         self.parameters.clear()
@@ -1050,7 +1056,12 @@ class cvGui():
 
         self.parameters.append(self.masckCondition[0])         #23
 
-        self.parameters.append(self.trackSelectionBGR)          #24
+        sT = self.IsTrackerSelected()
+        if not sT == -1:
+            self.parameters.append(self.trackSelectionBGR[sT])          #24
+        else:
+            self.parameters.append(None)  # 24
+
 
     def IsTrackerSelected(self):
         filterOfInteres = -1
@@ -1102,7 +1113,11 @@ class cvGui():
 
             self.parametersNew.append(self.masckCondition[0])       # 23
 
-            self.parametersNew.append(self.trackSelectionBGR)          #24
+            sT = self.IsTrackerSelected()
+            if not sT == -1:
+                self.parametersNew.append(self.trackSelectionBGR[sT])  # 24
+            else:
+                self.parametersNew.append(None)  # 24
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
