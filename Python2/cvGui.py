@@ -155,6 +155,8 @@ class cvGui():
         self.CamShiftFilter = [False]
         self.Hist = [False]
 
+        self.filterConditions = []
+
         #Tracker elements
         self.trackerColors = [0xF5741B, 0x6CF12A, 0x2AACF1, 0x972AF1, 0xF12A33]
         self.parameters = []
@@ -185,11 +187,6 @@ class cvGui():
         selectedT = -1
         self.updateParameters()
         originalParam = self.parameters.copy()
-        originalParam.append(False)
-        originalParam.append(False)
-        originalParam.append(False)
-        originalParam.append(False)
-
 
         while True:
 
@@ -227,7 +224,6 @@ class cvGui():
                 else:
                     cvui.printf(self.frame, 17, 255, 0.4, 0x10dca1, "Source Will Be Playing.")
 
-
             #Video Source Buttons
             if (cvui.button(self.frame, 20, 70, "Use Video")):
                 if (self.openFile()):
@@ -255,12 +251,10 @@ class cvGui():
                    self.usingVideo = False
                    self.usingCamera = False
 
-
             #Settings Buttons
             a = len(self.trackers)
 
             for i in range(a):
-
                 if self.trackerAdded:
                     self.boolForTrackers.append([False])
                     self.trackerAdded = False
@@ -292,6 +286,11 @@ class cvGui():
                     for j in range(a):
                         if not j == i:
                             self.boolForTrackers[j] = [False]
+                        else:
+                            self.filterConditions[j][0] = self.ColorFilter[0]
+                            self.filterConditions[j][1] = self.CorrFilter[0]
+                            self.filterConditions[j][2] = self.CamShiftFilter[0]
+                            self.filterConditions[j][3] = self.Hist[0]
 
                     cvui.printf(self.frame, xB - 5, yTx + 50, 0.4, 0x000000, "Filter displayed is for")
                     cvui.printf(self.frame, xB + 25, yTx + 65, 0.4, 0x000000, "this tracker!")
@@ -313,6 +312,7 @@ class cvGui():
                     self.changeInTrackers = True
                     del self.configSelected[i]
                     del self.boolForTrackers[i]
+                    del self.filterConditions[i]
                     del self.trackers[i]
                     del self.trackSelection[i]
                     self.trackerColors.append(self.trackerColors[i])
@@ -346,7 +346,6 @@ class cvGui():
                 self.ShiTProp[0] = False
 
                 if not selectedT == -1:
-
                     cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Process Time Multiplier")
                     cvui.trackbar(self.frame, 20, 415, 210, self.kalman_ptm, 0.0, 2.0)
 
@@ -362,7 +361,6 @@ class cvGui():
                 self.ShiTProp[0] = False
 
                 if not selectedT == -1:
-
                     cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")
                     cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0)
 
@@ -558,10 +556,32 @@ class cvGui():
                     cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
                     cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
 
+            # if not len(self.filterConditions) == 0:
+            #     self.ColorFilter[0] = self.filterConditions[selectedT][0]
+            #     self.CorrFilter[0] = self.filterConditions[selectedT][1]
+            #     self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
+            #     self.Hist[0] = self.filterConditions[selectedT][3]
+            #
+            # if not len(self.filterConditions) == 0:
+            #     self.filterConditions[selectedT][0] = self.ColorFilter[0]
+            #     self.filterConditions[selectedT][1] = self.CorrFilter[0]
+            #     self.filterConditions[selectedT][2] = self.CamShiftFilter[0]
+            #     self.filterConditions[selectedT][3] = self.Hist[0]
+            #
+            # selectedT = self.IsTrackerSelected()
+            # if not (selectedT == -1) and (self.lastTracker != selectedT):
+            #     self.loadParameters(selectedT)
+            #     self.lastTracker = selectedT
+
             selectedT = self.IsTrackerSelected()
-            if not (selectedT == -1) and self.lastTracker != selectedT:
-                self.loadParameters(selectedT)
-                self.lastTracker = selectedT
+            if self.lastTracker != selectedT:
+                self.ColorFilter[0] = self.filterConditions[selectedT][0]
+                self.CorrFilter[0] = self.filterConditions[selectedT][1]
+                self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
+                self.Hist[0] = self.filterConditions[selectedT][3]
+                if not (selectedT == -1):
+                    self.loadParameters(selectedT)
+                    self.lastTracker = selectedT
 
             if (cvui.button(self.frame, 60, 830, "Reset Settings")):
                 self.resetInitialCond()
@@ -611,7 +631,6 @@ class cvGui():
 
                 if len(self.trackers) < MAX_TRACKERS:
                     self.replaceRoi = True
-                    # self.pause = True
 
                     posX = 0
                     posY = 0
@@ -664,6 +683,7 @@ class cvGui():
                                 self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source))
                                 toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
 
+                            self.filterConditions.append([False, False, False, False])
                             self.configSelected.append(originalParam)
                             w = int(np.asarray(toRescale).shape[1])
                             h = int(np.asarray(toRescale).shape[0])
@@ -674,15 +694,13 @@ class cvGui():
 
                         self.coordsRoi.clear()
                         self.replaceRoi = False
-                        # self.pause = False
+
                     if (cvui.button(self.frame, WINDOW_SET_X + 73, 910, "Redo")):
                         self.coordsRoi.clear()
                     if (cvui.button(self.frame, WINDOW_SET_X + 148, 910, "Cancel")):
                         self.coordsRoi.clear()
                         self.replaceRoi = False
                         self.pause = False
-
-
             else:
                 self.trackerAdded = False
 
@@ -959,11 +977,6 @@ class cvGui():
         self.ShiTPropOnOff[0] = self.configSelected[selected][16]
         self.shit_SPix[0] = self.configSelected[selected][17]
 
-        self.ColorFilter[0] = self.configSelected[selected][18]
-        self.CorrFilter[0] = self.configSelected[selected][19]
-        self.CamShiftFilter[0] = self.configSelected[selected][20]
-        self.Hist[0] = self.configSelected[selected][21]
-
     def updateParameters(self):
         self.parameters.clear()
 
@@ -1068,16 +1081,6 @@ class cvGui():
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
-            # self.configSelected[filterOfInteres].append(False)
-            # self.configSelected[filterOfInteres].append(False)
-            # self.configSelected[filterOfInteres].append(False)
-            # self.configSelected[filterOfInteres].append(False)
-
-            self.configSelected[filterOfInteres].append(self.ColorFilter[0])
-            self.configSelected[filterOfInteres].append(self.CorrFilter[0])
-            self.configSelected[filterOfInteres].append(self.CamShiftFilter[0])
-            self.configSelected[filterOfInteres].append(self.Hist[0])
-
             self.lastTracker = filterOfInteres
 
         return changes
