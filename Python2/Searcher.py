@@ -17,10 +17,10 @@ class Searcher:
             CORR = 1,
     )
     usualAlgorithm = usualAlgorithmD["LK_ST"]
- #   missAlgorithm = missAlgorithmD["CORR"]
-    missAlgorithm = missAlgorithmD["ST"]
-    recalcAlgorithm = recalcAlgorithmD["ST"]
-#    recalcAlgorithm = recalcAlgorithmD["CORR"]
+    missAlgorithm = missAlgorithmD["CORR"]
+    #missAlgorithm = missAlgorithmD["ST"]
+    #recalcAlgorithm = recalcAlgorithmD["ST"]
+    recalcAlgorithm = recalcAlgorithmD["CORR"]
 
     def __init__(self,firstFrame,selectionHeight_,selectionWidth_,xSelection,ySelection,prevFrameGrayC):
         self.LK = OpticalFlow()
@@ -123,6 +123,7 @@ class Searcher:
         if self.usualAlgorithm== self.usualAlgorithmD["LK_ST"]:
             frameGray = cv.cvtColor(filteredFrame, cv.COLOR_BGR2GRAY)
             # Apply LK algorithm
+            self.candidate=[None,None]
             self.features, self.trackingError = self.LK.updateFeatures(self.prevFrameGray, frameGray)
             if self.trackingError is False:  # Tracking error?
                 # recaulculate features?

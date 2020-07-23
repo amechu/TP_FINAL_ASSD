@@ -39,6 +39,8 @@ class Tracker:
         self.SC.features = self.SC.featureTranslate(initialPosition[0] - initialWidth / 2,initialPosition[1] - initialHeight / 2, self.SC.features)
         self.SC.LK.prevFeatures = self.SC.features
 
+    def getTrackingError(self):
+        return self.SC.trackingError
 
     def setFilter(self,filterType):
         if filterType in self.MF.maskingType.keys():
@@ -116,7 +118,6 @@ class Tracker:
         MaskingFilter.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
         MaskingFilter.aSemiAmp = parametersNew[6]     #colorFilter_a
         MaskingFilter.bSemiAmp = parametersNew[7]     #colorFilter_b
-        self.MF.updateMaskFromSettings()
 
         #= parametersNew[8]     #Light R OnOff
         #= parametersNew[9]    #ligtRec_x)
@@ -133,6 +134,14 @@ class Tracker:
         #self.SC.ST.frameRecalculationNumber = parametersNew[17]        #shit_SPix
 
         #self.MF.mask = self.MF.maskingType[parametersNew[??]] #MENSAJE PARA TOMI: tiene que ser un string parametersNew[??] fijate en la clase
+
+        self.MF.hist_filter.set_bins(parametersNew[9])
+        self.MF.hist_filter.set_mask_blur(parametersNew[10])
+        self.MF.hist_filter.set_kernel_blur(parametersNew[11])
+        self.MF.hist_filter.set_low_pth(parametersNew[12])
+
+        self.MF.updateMaskFromSettings()
+
 
         self.KM.updateParams()
 
