@@ -149,10 +149,10 @@ class cvGui():
         cvui.init(WINDOW_NAME)
 
         #Filter Edit
-        self.FilterSetCF = [True]           #Color Filter
+        self.FilterSetCF = [False]           #Color Filter
         self.FilterSetCS = [False]          #Cam Shift
 
-        self.ColorFilter = [True]
+        self.ColorFilter = [False]
         self.CorrFilter = [False]
 
         self.CamShiftFilter = [False]
@@ -465,12 +465,14 @@ class cvGui():
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 90, "Cam Shift", self.CamShiftFilter):
                     self.ColorFilter[0] = False
                     self.CorrFilter[0] = False
+                    self.Hist[0] = False
+
 
                 # if cvui.checkbox(self.frame, int(WINDOW_FIL_X + (WINDOW_FIL_WIDTH)*(1/3)) , WINDOW_FIL_Y - 30 + WINDOW_SOU_HEIGHT, "Histogram", self.Hist):
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 110, "Histogram", self.Hist):
                     self.ColorFilter[0] = False
                     self.CorrFilter[0] = False
-                    self.CamShiftFilter[0]
+                    self.CamShiftFilter[0] = False
 
 
 
