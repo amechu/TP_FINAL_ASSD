@@ -114,7 +114,7 @@ class HistFilter:
         img = cv.cvtColor(img, cv.COLOR_HSV2BGR)
         cv.imshow('hist', img)
 
-    def get_hist(self) -> None:
+    def get_histogram_plot(self):
         bin_count = self.hist.shape[0]
         bin_w = 24
         img = np.zeros((256, bin_count * bin_w, 3), np.uint8)
