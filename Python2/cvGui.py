@@ -322,7 +322,7 @@ class cvGui():
                     del self.trackSelection[i]
                     self.trackerColors.append(self.trackerColors[i])
                     del self.trackerColors[i]
-                    self.trackSelectionBGR = [None, None, None, None, None]
+                    self.trackSelectionBGR[i] = None
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
                     break
@@ -386,14 +386,6 @@ class cvGui():
 
                         cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B Semiamplitude")
                         cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
-
-                        # if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
-                        #
-                        #     cvui.printf(self.frame, 20, 695, 0.4, 0xdd97fb, "Every X Frames")
-                        #     cvui.trackbar(self.frame, 20, 710, 210, self.ligtRec_x, 0.0, 150.0)
-                        #
-                        #     cvui.printf(self.frame, 20, 765, 0.4, 0xdd97fb, "Maximum Threshold Change")
-                        #     cvui.trackbar(self.frame, 20, 780, 210, self.ligtRec_maxT, 0.0, 30.0)
 
                     if cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff):
                         self.CFPropOnOff[0] = False
@@ -750,7 +742,12 @@ class cvGui():
                 self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
                 self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
                 self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.masckCondition[0] == MASK_COND):
-            return True
+
+                selected = self.IsTrackerSelected()
+                if selected == -1 or self.trackSelectionBGR[selected] == None:
+                    return True
+                else:
+                    return False
         else:
             return False
 
@@ -1015,6 +1012,8 @@ class cvGui():
 
         self.masckCondition[0] = self.configSelected[selected][23]
 
+        self.trackSelectionBGR = self.configSelected[selected][24]
+
     def updateParameters(self):
         self.parameters.clear()
 
@@ -1050,6 +1049,8 @@ class cvGui():
         self.parameters.append(self.recAlgST[0])         #22
 
         self.parameters.append(self.masckCondition[0])         #23
+
+        self.parameters.append(self.trackSelectionBGR)          #24
 
     def IsTrackerSelected(self):
         filterOfInteres = -1
@@ -1093,13 +1094,15 @@ class cvGui():
             self.parametersNew.append(self.ShiTPropOnOff[0])           #17      #
             self.parametersNew.append(self.shit_SPix[0])           #18
 
-            self.parametersNew.append(self.missAlgCorr[0])  # 19
-            self.parametersNew.append(self.missAlgST[0])  # 20
+            self.parametersNew.append(self.missAlgCorr[0])           # 19
+            self.parametersNew.append(self.missAlgST[0])         # 20
 
-            self.parametersNew.append(self.recAlgCorr[0])  # 21
-            self.parametersNew.append(self.recAlgST[0])  # 22
+            self.parametersNew.append(self.recAlgCorr[0])       # 21
+            self.parametersNew.append(self.recAlgST[0])         # 22
 
-            self.parametersNew.append(self.masckCondition[0])  # 23
+            self.parametersNew.append(self.masckCondition[0])       # 23
+
+            self.parametersNew.append(self.trackSelectionBGR)          #24
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
@@ -1130,6 +1133,9 @@ class cvGui():
 
             if not(self.parametersNew[23] == self.parameters[23]):
                 changes = True      #Mask condition
+
+            if not(self.parametersNew[24] == self.parameters[24]):
+                changes = True      #Tracker BGR
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
