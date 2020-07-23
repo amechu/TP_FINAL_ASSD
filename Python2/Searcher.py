@@ -123,6 +123,7 @@ class Searcher:
         if self.usualAlgorithm== self.usualAlgorithmD["LK_ST"]:
             frameGray = cv.cvtColor(filteredFrame, cv.COLOR_BGR2GRAY)
             # Apply LK algorithm
+            self.candidate=[None,None]
             self.features, self.trackingError = self.LK.updateFeatures(self.prevFrameGray, frameGray)
             if self.trackingError is False:  # Tracking error?
                 # recaulculate features?
