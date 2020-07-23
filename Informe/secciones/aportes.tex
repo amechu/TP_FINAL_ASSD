@@ -1,4 +1,12 @@
 \subsection{Implementación}
+
+\begin{figure*}
+\centering
+	\includegraphics[width=0.9\textwidth]{../flowchart.jpg}
+	\caption{Flow-chart del algoritmo.}
+	\label{fig:Flowchart}
+\end{figure*}
+
 A partir de una selección del video proporcionada por el usuario se obtienen las mejores features del objeto seleccionado utilizando el algoritmo de Shi-Tomasi. Luego, mediante el algoritmo de Lucas-Kanade de Optical Flow se obtiene la evolución de las features en el tiempo. A este cúmulo de puntos se le calcula el centro de masas $\mu$ y el centro de inercia $\sigma$. Se rechazan los puntos de este cúmulo que se encuentren a una distancia mayor a $k_{\sigma}\sigma$ respecto al centro de masas, para luego calcular nuevamente el centro de masas el cual es el que se introduce en el filtro de Kalman como medición de la posición.
 
 La dimensión del vector de estados del filtro de Kalman es de cuatro, poseyendo la posición y la velocidad tanto horizontal como vertical. La dimensión del vector de observación es de dos dado que solamente se mide la posición horizontal y vertical del centro de masas. La matriz $A$ queda definida por las ecuaciones que caracterizan el movimiento del objeto a seguir que, por simplicidad, se consideraron las ecuaciones cinemáticas de MRU, quedando entonces
@@ -178,13 +186,6 @@ Se realizó una optimización del codigo, quitando redundancias y utilizando ún
 
 
 \subsection{KTN}
-
-\begin{figure}[H]
-\centering
-	\includegraphics[width=0.4\textwidth]{../flowchart.jpg}
-	\caption{Flow-chart del algoritmo.}
-	\label{fig:Flowchart}
-\end{figure}
 
 Se decidió implementar código en \textbf{Python}, apoyándose en la librería \href{https://opencv.org/}{OpenCV}.
 El pseudocódigo que corresponde es:
