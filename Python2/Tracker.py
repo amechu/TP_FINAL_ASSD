@@ -119,6 +119,14 @@ class Tracker:
         MaskingFilter.aSemiAmp = parametersNew[6]     #colorFilter_a
         MaskingFilter.bSemiAmp = parametersNew[7]     #colorFilter_b
         self.MF.updateMaskFromSettings()
+        if parametersNew[20] == True and parametersNew[19] == False :
+            self.SC.missAlgorithm = self.SC.missAlgorithmD["ST"]
+        elif parametersNew[20] == False and parametersNew[19] == True:
+            self.SC.missAlgorithm = self.SC.missAlgorithmD["CORR"]
+        if parametersNew[22] == True and parametersNew[21] == False:
+            self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["ST"]
+        elif parametersNew[22] == False and parametersNew[21] == True:
+            self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["CORR"]
 
         #= parametersNew[8]     #Light R OnOff
         #= parametersNew[9]    #ligtRec_x)
