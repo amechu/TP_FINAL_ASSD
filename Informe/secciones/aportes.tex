@@ -1,11 +1,6 @@
 \subsection{Implementación}
 
-\begin{figure*}
-\centering
-	\includegraphics[width=0.9\textwidth]{../flowchart.jpg}
-	\caption{Flow-chart del algoritmo.}
-	\label{fig:Flowchart}
-\end{figure*}
+
 
 \subsubsection{Primer diseño}
 
@@ -175,7 +170,29 @@ Volviendo al caso de los objetos $A$ y $B$:
 Sin embargo, el filtro de Kalman no puede estimar la posición del objeto indefinidamente. Es por esto que cuando el objeto se pierde, es decir, no se logran detectar más features, se entra en otra fase del programa. En esta fase, se realiza una búsqueda del objeto en cada frame del video a partir de la estimación del filtro de Kalman y el tamaño original del área seleccionada. La altura y el ancho del área de búsqueda se incrementará por un factor constante por cada frame en la que la búsqueda falle. Esta búsqueda se basa en aplicar el algoritmo de Shi-Tomasi sobre el área mencionada.
 
 
-Finalmente, para reforzar el algoritmo de seguimiento, se implemento además una recalculación periódica de las features con el método de Shi-Tomasi, partiendo de la media del cúmulo de features, removiendo los outliers, volviendo a calcular nuevamente la media y utilizar esta posición para aplicar el algoritmo de Shi-Tomasi, de misma manera que se realiza sobre la primera selección proporcionada por el usuario.
+Finalmente, para reforzar el algoritmo de seguimiento, se implemento además una recalculación periódica de las features con el método de Shi-Tomasi, partiendo de la media del cúmulo de features, removiendo los outliers, volviendo a calcular nuevamente la media y utilizar esta posición para aplicar el algoritmo de Shi-Tomasi, de misma manera que se realiza sobre la primera selección proporcionada por el usuario. Todo esto nos permite subsanar varios de los problemas planteados anteriormente, sin embargo, existen aún varios otros problemas:
+
+\begin{itemize}
+\item ACA PONER LOS PROBLEMAS QUE TENIAMOS EN LA ENTREGA PASADA
+\end{itemize}
+
+\subsubsection{Último diseño}
+
+\begin{figure*}
+\centering
+	\includegraphics[width=0.9\textwidth]{../flowchart.jpg}
+	\caption{Flow-chart del algoritmo.}
+	\label{fig:Flowchart}
+\end{figure*}
+
+EXPLICAR LO SIGUIENTE
+\begin{itemize}
+\item Filtro de color pasó del espacio HSV a CIE-LAB, explicar que es para mas invarianza a la iluminacion
+\item Al filtro de color se le unió una alternativa, el de camshift, explicar en qué situaciones es mejor uno o el otro
+\item ahora la busqueda de objeto perdido se puede hacer con correlacion, explicar en que casos conviene uno o el otro, explicar el proceso de parcheamiento
+\item ahora el recalculo periodico se puede realizar con correlacion, explicar en que casos combiene uno o el otro
+\item mencionar la gui?
+\end{itemize}
 
 \subsection{Algoritmo correlación}
 Para el algoritmo de correlacion no solo se utiliza el filtro explicado en la sección \ref{sec:corr} se realiza un filtrado de tanto el frame como el kernel, haciendo un cambio a \textbf{HSV} y un filtrado del frame en este espacio bajo las siguientes especificaciones: 
