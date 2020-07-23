@@ -561,7 +561,7 @@ class cvGui():
                     x0 = WINDOW_FILS_X + 14
                     w = WINDOW_FILS_WIDTH - 27
                     h = np.asarray(miniFilter2).shape[0]
-                    y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                    y0 = int(WINDOW_FILS_Y + 130)
                     self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
                     # HISTOGRAM
