@@ -355,7 +355,7 @@ class cvGui():
                     cvui.trackbar(self.frame, 20, 415, 210, self.kalman_ptm, 0.0, 2.0)
 
                     cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Process Covariance")
-                    cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 0.1, 1, "%0.3Lf", )
+                    cvui.trackbar(self.frame, 20, 485, 210, self.kalman_pc, 0.0, 0.1, 1, "%0.3Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
                     cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Measurement Covariance")
                     cvui.trackbar(self.frame, 20, 555, 210, self.kalman_mc, 0.0, 1.0)
@@ -626,7 +626,7 @@ class cvGui():
             
             if (self.missAlgCorr[0] or self.recAlgCorr[0]) and not self.replaceRoi:
                 cvui.printf(self.frame, 20, 850, 0.4, 0xdd97fb, "Mask Correlation")
-                cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1)
+                cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
             if not self.replaceRoi:
                 if (cvui.button(self.frame, 60, 915, "Reset Settings")):
