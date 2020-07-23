@@ -24,10 +24,11 @@ INITIAL_ST_ONOFF = False
 COLORFILTER_LIGHTTHR = 50.0
 COLORFILTER_A = 15.0
 COLORFILTER_B = 15.0
-LIGHTTHR_X = 1.0
-LIGHTTHR_MACT = 1.0
 
 CAMSHIFT_BIN = 64.0
+CAMSHIFT_MB = 0.0
+CAMSHIFT_SB = 0.0
+CAMSHIFT_LBPT = 230.0
 
 SHIT_MAXFEAT = 100.0
 SHIT_FEATQUAL = 0.001
@@ -124,16 +125,16 @@ class cvGui():
         #CF Properties
         self.CFProp = [False]
         self.CFPropOnOff = [INITIAL_CF_ONOFF]
-        self.CFLRPropOnOff = [INITIAL_LR_ONOFF]
         self.CFCamShiftOnOff = [INITIAL_CS_ONOFF]
 
-    
         self.colorFilter_LihtThr = [COLORFILTER_LIGHTTHR]
         self.colorFilter_a = [COLORFILTER_A]
         self.colorFilter_b = [COLORFILTER_B]
-        self.ligtRec_x = [LIGHTTHR_X]
-        self.ligtRec_maxT = [LIGHTTHR_MACT]
+
         self.camShift_bins = [CAMSHIFT_BIN]
+        self.camShift_mb = [CAMSHIFT_MB]
+        self.camShift_sb = [CAMSHIFT_SB]
+        self.camShift_lbpt = [CAMSHIFT_LBPT]
     
         #Shi - Tomasi Properties
         self.ShiTProp = [False]
@@ -144,7 +145,15 @@ class cvGui():
         self.shit_MinFeat = [SHIT_MINFEAT]
         self.shit_Rec = [SHIT_REC]
         self.shit_SPix = [SHIT_SPIX]
-        
+
+        #Miss Algorithm
+        self.missAlgCorr = [True]
+        self.missAlgST = [False]
+
+        #Recalculation Algorithm
+        self.recAlgCorr = [True]
+        self.recAlgST = [False]
+
         cv.namedWindow(WINDOW_NAME, cv.WINDOW_NORMAL)
         cvui.init(WINDOW_NAME)
 
@@ -299,9 +308,6 @@ class cvGui():
                     if status == cvui.CLICK:
                         cursor = cvui.mouse(WINDOW_NAME)
                         self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
-                elif self.boolForTrackers == checking and i == a-1:
-                    cvui.printf(self.frame, xB - 5, yTx+50, 0.4, 0x000000,"Filter displayed is for")
-                    cvui.printf(self.frame, xB + 25, yTx+65, 0.4, 0x000000,"this tracker!")
 
                 if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
                     self.changeInTrackers = True
@@ -368,40 +374,46 @@ class cvGui():
                     if cvui.checkbox(self.frame, 20, 400, "LAB Color Filter", self.CFPropOnOff):
                         self.CFCamShiftOnOff[0] = False
 
-                        cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "L")
+                        cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "L Semiamplitude")
                         cvui.trackbar(self.frame, 20, 465, 210, self.colorFilter_LihtThr, 0.0, 150.0)
 
-                        cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "A")
+                        cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "A Semiamplitude")
                         cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 200.0)
 
-                        cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B")
+                        cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B Semiamplitude")
                         cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
 
-                        if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
-
-                            cvui.printf(self.frame, 20, 695, 0.4, 0xdd97fb, "Every X Frames")
-                            cvui.trackbar(self.frame, 20, 710, 210, self.ligtRec_x, 0.0, 150.0)
-
-                            cvui.printf(self.frame, 20, 765, 0.4, 0xdd97fb, "Maximum Threshold Change")
-                            cvui.trackbar(self.frame, 20, 780, 210, self.ligtRec_maxT, 0.0, 30.0)
+                        # if (cvui.checkbox(self.frame, 20, 665, "Lightness Recalculation", self.CFLRPropOnOff)):
+                        #
+                        #     cvui.printf(self.frame, 20, 695, 0.4, 0xdd97fb, "Every X Frames")
+                        #     cvui.trackbar(self.frame, 20, 710, 210, self.ligtRec_x, 0.0, 150.0)
+                        #
+                        #     cvui.printf(self.frame, 20, 765, 0.4, 0xdd97fb, "Maximum Threshold Change")
+                        #     cvui.trackbar(self.frame, 20, 780, 210, self.ligtRec_maxT, 0.0, 30.0)
 
                     if cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff):
                         self.CFPropOnOff[0] = False
-                        self.CFLRPropOnOff[0] = False
 
                         cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Number Of Bins")
                         cvui.trackbar(self.frame, 20, 465, 210, self.camShift_bins, 1.0, 200.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
                         self.camShift_bins[0] = int(self.camShift_bins[0])
 
+                        cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "Mask Blur")
+                        cvui.trackbar(self.frame, 20, 535, 210, self.camShift_mb, 0.0, 20.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        self.camShift_bins[0] = int(self.camShift_mb[0])
+
+                        cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "Selection Blur")
+                        cvui.trackbar(self.frame, 20, 605, 210, self.camShift_sb, 0.0, 20.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        self.camShift_bins[0] = int(self.camShift_sb[0])
+
+                        cvui.printf(self.frame, 20, 660, 0.4, 0xdd97fb, "Lower Bound Prob. Thr.")
+                        cvui.trackbar(self.frame, 20, 675, 210, self.camShift_lbpt, 0.0, 254.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        self.camShift_bins[0] = int(self.camShift_lbpt[0])
 
                     #Printeo ONS/OFFS
                     if (self.CFPropOnOff[0]):
                         cvui.printf(self.frame, 145, 402, 0.4, 0x10dcA1, "On")
                         cvui.printf(self.frame, 145, 422, 0.4, 0xdc1076, "Off")
-                        if self.CFLRPropOnOff[0]:
-                            cvui.printf(self.frame, 200, 667, 0.4, 0x10dcA1, "On")
-                        else:
-                            cvui.printf(self.frame, 200, 667, 0.4, 0xdc1076, "Off")
                     elif (self.CFCamShiftOnOff[0]):
                         cvui.printf(self.frame, 145, 402, 0.4, 0xdc1076, "Off")
                         cvui.printf(self.frame, 145, 422, 0.4, 0x10dcA1, "On")
@@ -473,6 +485,14 @@ class cvGui():
                             h = np.asarray(miniFilter).shape[0]
                             y0 = int(WINDOW_FILS_Y + 130)
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                        else:
+                            miniFilter = self.lastFrame.copy()
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130)
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Correlation Filter",self.CorrFilter):
                     self.CamShiftFilter[0] = False
@@ -504,12 +524,20 @@ class cvGui():
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
 
                         # CORRELATION FILTER
-                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100  + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
-                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125  + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter = self.trackers[selectedT].getCorrFrame()
                         if miniFilter is not None:
                             miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                        else:
+                            miniFilter = self.lastFrame.copy()
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
@@ -529,6 +557,14 @@ class cvGui():
                         if miniFilter is not None:
                             miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
+                            x0 = WINDOW_FILS_X + 14
+                            w = WINDOW_FILS_WIDTH - 27
+                            h = np.asarray(miniFilter).shape[0]
+                            y0 = int(WINDOW_FILS_Y + 130)
+                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                        else:
+                            miniFilter = self.lastFrame.copy()
+                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
@@ -706,10 +742,10 @@ class cvGui():
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
                 self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
                 self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
-                self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (
-                self.CFLRPropOnOff[0] == INITIAL_LR_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF) and (self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF):
-            # and (self.camShift_bins[0] == CAMSHIFT_BIN)
-
+                self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF) and (
+                self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
+                self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
+                self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False):
             return True
         else:
             return False
@@ -740,12 +776,11 @@ class cvGui():
         self.colorFilter_a[0] = COLORFILTER_A
         self.colorFilter_b[0] = COLORFILTER_B
 
-        self.CFLRPropOnOff[0] = INITIAL_LR_ONOFF
-        self.ligtRec_x[0] = LIGHTTHR_X
-        self.ligtRec_maxT[0] = LIGHTTHR_MACT
-
         # self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF                    #Queda mejor sin reestablecer esto
-        # self.camShift_bins[0] = CAMSHIFT_BIN
+        self.camShift_bins[0] = CAMSHIFT_BIN
+        self.camShift_mb[0] = CAMSHIFT_MB
+        self.camShift_sb[0] = CAMSHIFT_SB
+        self.camShift_lbpt[0] = CAMSHIFT_LBPT
 
         self.shit_MaxFeat[0] = SHIT_MAXFEAT
         self.shit_FeatQual[0] = SHIT_FEATQUAL
@@ -754,6 +789,12 @@ class cvGui():
 
         self.ShiTPropOnOff[0] = INITIAL_ST_ONOFF
         self.shit_SPix[0] = SHIT_SPIX
+
+        self.missAlgCorr[0] = [True]
+        self.missAlgST[0] = [False]
+
+        self.recAlgCorr[0] = [True]
+        self.recAlgST[0] = [False]
 
     def initSource(self):
         self.source = []
@@ -921,7 +962,6 @@ class cvGui():
             self.filterWIDTH = self.sourceWIDTH
             self.filterHEIGHT = self.sourceHEIGHT
 
-
     def rescale_frame_standar(self, frame, maxWidth):
         width = int(frame.shape[1])
         height = int(frame.shape[0])
@@ -935,7 +975,6 @@ class cvGui():
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
     def loadParameters(self, selected):
-
         self.kalman_ptm[0] = self.configSelected[selected][0]
         self.kalman_pc[0] = self.configSelected[selected][1]
         self.kalman_mc[0] = self.configSelected[selected][2]
@@ -947,49 +986,59 @@ class cvGui():
         self.colorFilter_a[0] = self.configSelected[selected][6]
         self.colorFilter_b[0] = self.configSelected[selected][7]
 
-        self.CFLRPropOnOff[0] = self.configSelected[selected][8]
-        self.ligtRec_x[0] = self.configSelected[selected][9]
-        self.ligtRec_maxT[0] = self.configSelected[selected][10]
+        self.CFCamShiftOnOff[0] = self.configSelected[selected][8]
+        self.camShift_bins[0] = self.configSelected[selected][9]
+        self.camShift_mb[0] = self.configSelected[selected][10]
+        self.camShift_sb[0] = self.configSelected[selected][11]
+        self.camShift_lbpt[0] = self.configSelected[selected][12]
 
-        self.CFCamShiftOnOff[0] = self.configSelected[selected][11]
-        # self.camShift_bins[0] = self.configSelected[selected][12]
+        self.shit_MaxFeat[0] = self.configSelected[selected][13]
+        self.shit_FeatQual[0] = self.configSelected[selected][14]
+        self.shit_MinFeat[0] = self.configSelected[selected][15]
+        self.shit_Rec[0] = self.configSelected[selected][16]
 
-        self.shit_MaxFeat[0] = self.configSelected[selected][12]
-        self.shit_FeatQual[0] = self.configSelected[selected][13]
-        self.shit_MinFeat[0] = self.configSelected[selected][14]
-        self.shit_Rec[0] = self.configSelected[selected][15]
+        self.ShiTPropOnOff[0] = self.configSelected[selected][17]
+        self.shit_SPix[0] = self.configSelected[selected][18]
 
-        self.ShiTPropOnOff[0] = self.configSelected[selected][16]
-        self.shit_SPix[0] = self.configSelected[selected][17]
+        self.missAlgCorr[0] = self.configSelected[selected][19]
+        self.missAlgST[0] = self.configSelected[selected][20]
+
+        self.recAlgCorr[0] = self.configSelected[selected][21]
+        self.recAlgST[0] = self.configSelected[selected][22]
 
     def updateParameters(self):
         self.parameters.clear()
 
-        self.parameters.append(self.kalman_ptm[0])
-        self.parameters.append(self.kalman_pc[0])
-        self.parameters.append(self.kalman_mc[0])
+        self.parameters.append(self.kalman_ptm[0])          #0
+        self.parameters.append(self.kalman_pc[0])          #1
+        self.parameters.append(self.kalman_mc[0])          #2
 
-        self.parameters.append(self.lk_mr[0])
+        self.parameters.append(self.lk_mr[0])          #3
 
-        self.parameters.append(self.CFPropOnOff[0])
-        self.parameters.append(self.colorFilter_LihtThr[0])
-        self.parameters.append(self.colorFilter_a[0])
-        self.parameters.append(self.colorFilter_b[0])
+        self.parameters.append(self.CFPropOnOff[0])          #4
+        self.parameters.append(self.colorFilter_LihtThr[0])          #5
+        self.parameters.append(self.colorFilter_a[0])          #6
+        self.parameters.append(self.colorFilter_b[0])          #7
 
-        self.parameters.append(self.CFLRPropOnOff[0])
-        self.parameters.append(self.ligtRec_x[0])
-        self.parameters.append(self.ligtRec_maxT[0])
+        self.parameters.append(self.CFCamShiftOnOff[0])          #8
+        self.parameters.append(self.camShift_bins[0])          #9
+        self.parameters.append(self.camShift_mb[0])          #10
+        self.parameters.append(self.camShift_sb[0])          #11
+        self.parameters.append(self.camShift_lbpt[0])          #12
 
-        self.parameters.append(self.CFCamShiftOnOff[0])
-        # self.parameters.append(self.camShift_bins[0])
+        self.parameters.append(self.shit_MaxFeat[0])          #13
+        self.parameters.append(self.shit_FeatQual[0])          #14
+        self.parameters.append(self.shit_MinFeat[0])          #15
+        self.parameters.append(self.shit_Rec[0])          #16
 
-        self.parameters.append(self.shit_MaxFeat[0])
-        self.parameters.append(self.shit_FeatQual[0])
-        self.parameters.append(self.shit_MinFeat[0])
-        self.parameters.append(self.shit_Rec[0])
+        self.parameters.append(self.ShiTPropOnOff[0])          #17
+        self.parameters.append(self.shit_SPix[0])          #18
 
-        self.parameters.append(self.ShiTPropOnOff[0])
-        self.parameters.append(self.shit_SPix[0])
+        self.parameters.append(self.missAlgCorr[0])         #19
+        self.parameters.append(self.missAlgST[0])         #20
+
+        self.parameters.append(self.recAlgCorr[0])         #21
+        self.parameters.append(self.recAlgST[0])         #22
 
     def IsTrackerSelected(self):
         filterOfInteres = -1
@@ -1008,32 +1057,36 @@ class cvGui():
         if not filterOfInteres == -1:
             self.parametersNew.clear()
 
-            self.parametersNew.append(self.kalman_ptm[0])
-            self.parametersNew.append(self.kalman_pc[0])
-            self.parametersNew.append(self.kalman_mc[0])
+            self.parametersNew.append(self.kalman_ptm[0])           #0
+            self.parametersNew.append(self.kalman_pc[0])           #1
+            self.parametersNew.append(self.kalman_mc[0])           #2
 
-            self.parametersNew.append(self.lk_mr[0])
+            self.parametersNew.append(self.lk_mr[0])           #3
 
-            self.parametersNew.append(self.CFPropOnOff[0])              #
-            self.parametersNew.append(self.colorFilter_LihtThr[0])
-            self.parametersNew.append(self.colorFilter_a[0])
-            self.parametersNew.append(self.colorFilter_b[0])
+            self.parametersNew.append(self.CFPropOnOff[0])                  #4       #
+            self.parametersNew.append(self.colorFilter_LihtThr[0])           #5
+            self.parametersNew.append(self.colorFilter_a[0])           #6
+            self.parametersNew.append(self.colorFilter_b[0])           #7
 
-            self.parametersNew.append(self.CFLRPropOnOff[0])            #
-            self.parametersNew.append(self.ligtRec_x[0])
-            self.parametersNew.append(self.ligtRec_maxT[0])
+            self.parametersNew.append(self.CFCamShiftOnOff[0])           #8          #
+            self.parametersNew.append(self.camShift_bins[0])           #9
+            self.parametersNew.append(self.camShift_mb[0])           #10
+            self.parametersNew.append(self.camShift_sb[0])           #11
+            self.parametersNew.append(self.camShift_lbpt[0])           #12
 
-            self.parametersNew.append(self.CFCamShiftOnOff[0])          #
-            #self.parametersNew.append(self.camShift_bins[0])
+            self.parametersNew.append(self.shit_MaxFeat[0])           #13
+            self.parametersNew.append(self.shit_FeatQual[0])           #14
+            self.parametersNew.append(self.shit_MinFeat[0])           #15
+            self.parametersNew.append(self.shit_Rec[0])           #16
 
+            self.parametersNew.append(self.ShiTPropOnOff[0])           #17      #
+            self.parametersNew.append(self.shit_SPix[0])           #18
 
-            self.parametersNew.append(self.shit_MaxFeat[0])
-            self.parametersNew.append(self.shit_FeatQual[0])
-            self.parametersNew.append(self.shit_MinFeat[0])
-            self.parametersNew.append(self.shit_Rec[0])
+            self.parametersNew.append(self.missAlgCorr[0])  # 19
+            self.parametersNew.append(self.missAlgST[0])  # 20
 
-            self.parametersNew.append(self.ShiTPropOnOff[0])               #
-            self.parametersNew.append(self.shit_SPix[0])
+            self.parametersNew.append(self.recAlgCorr[0])  # 21
+            self.parametersNew.append(self.recAlgST[0])  # 22
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
@@ -1043,26 +1096,24 @@ class cvGui():
 
             if not(self.parametersNew[4] == self.parameters[4]):
                 changes = True        #Color Filter On/Off
-            elif not ((self.parametersNew[5] == self.parameters[5]) & (self.parametersNew[6] == self.parameters[6]) & (self.parametersNew[7] == self.parameters[7])):
+            elif not ((self.parametersNew[5] == self.parameters[5]) and (self.parametersNew[6] == self.parameters[6]) and (self.parametersNew[7] == self.parameters[7])):
                 changes = True      #Chequeo Params de CF
 
             if not(self.parametersNew[8] == self.parameters[8]):
-                changes = True        #LR On/Off
-            elif not(self.parametersNew[9] == self.parameters[9] and self.parametersNew[10] == self.parameters[10]):
-                changes = True   #Chequeo Params de CF
-
-            if not(self.parametersNew[11] == self.parameters[11]):
                 changes = True        #Cam Shift On/Off
-            #elif not(self.parametersNew[12] == self.parameters[12]):       #BINS
-            #    changes = True
+            elif not(self.parametersNew[9] == self.parameters[9] and self.parametersNew[10] == self.parameters[10] and self.parametersNew[11] == self.parameters[11] and self.parametersNew[12] == self.parameters[12]):       #BINS
+                changes = True
 
-            if not(self.parametersNew[12] == self.parameters[12] and self.parametersNew[13] == self.parameters[13] and self.parametersNew[14] == self.parameters[14]):
+            if not(self.parametersNew[13] == self.parameters[13] and self.parametersNew[14] == self.parameters[14] and self.parametersNew[15] == self.parameters[15] and self.parametersNew[16] == self.parameters[16]):
                 changes = True         #Chequeo Shi-Tomasi
 
-            if not(self.parametersNew[15] == self.parameters[15]):
+            if not(self.parametersNew[17] == self.parameters[17]):
                 changes = True        #Shi-Tomasi On/Off
-            elif not(self.parametersNew[16] == self.parameters[16]):
+            elif not(self.parametersNew[18] == self.parameters[18]):
                 changes = True   #Chequeo Params Shi
+
+            if not(self.parametersNew[19] == self.parameters[19] and self.parametersNew[20] == self.parameters[20] and  self.parametersNew[21] == self.parameters[21] and  self.parametersNew[22] == self.parameters[22]):
+                changes = True
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
