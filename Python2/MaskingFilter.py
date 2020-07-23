@@ -228,7 +228,6 @@ class MaskingFilter:
             #Histogram Filter init
             self.hist_filter.selection = selection
             self.hist_filter.compute_hist(selection,self.hist_filter.bins)
-            self.hist_filter.show_hist(self.hist_filter.hist)
 
         self.init = False
 
@@ -258,7 +257,6 @@ class MaskingFilter:
             self.upperThreshold = np.array([L_high, a_high, b_high])
         elif self.mask is self.maskingType["FILTER_CSHIFT"]:
             self.hist_filter.compute_hist(self.hist_filter.selection, self.hist_filter.bins)
-            self.hist_filter.show_hist(self.hist_filter.hist)
 
     # def change_masking_filter(self,mask_type):
     #     if mask_type ==
