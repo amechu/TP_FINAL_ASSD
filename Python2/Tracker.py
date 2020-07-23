@@ -39,6 +39,8 @@ class Tracker:
         self.SC.features = self.SC.featureTranslate(initialPosition[0] - initialWidth / 2,initialPosition[1] - initialHeight / 2, self.SC.features)
         self.SC.LK.prevFeatures = self.SC.features
 
+    def getTrackingError(self):
+        return self.SC.trackingError
 
     def setFilter(self,filterType):
         if filterType in self.MF.maskingType.keys():
