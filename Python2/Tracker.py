@@ -47,7 +47,7 @@ class Tracker:
 
         #res = optimize.shgo(self.costChangeParams, x_bounds, options={'disp': True ,'eps' : 5e0})
 
-       # print(res.x)
+        #print(res.x)
 
     def getTrackingError(self):
         return self.SC.trackingError
@@ -160,7 +160,7 @@ class Tracker:
         self.MF.hist_filter.set_mask_blur(parametersNew[10])
         self.MF.hist_filter.set_kernel_blur(parametersNew[11])
         self.MF.hist_filter.set_low_pth(parametersNew[12])
-
+        self.MF.ksize = (parametersNew[24])
         self.MF.updateMaskFromSettings()
         self.KM.updateParams()
 
@@ -182,8 +182,8 @@ class Tracker:
     def costChangeParams(self, x): # x = [parametersNew[9], parametersNew[11], parametersNew[12]]
 
         x[0] = int(x[0])
-        x[1] = int(x[1])
-        x[2] = int(x[2])
+        x[1] = int(x[1]/25)
+        x[2] = int(x[2]/25)
         x[3] = int(x[3])
         self.MF.hist_filter.set_bins(x[0])
         self.MF.hist_filter.set_kernel_blur(x[2])
