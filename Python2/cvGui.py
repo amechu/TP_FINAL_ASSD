@@ -325,6 +325,12 @@ class cvGui():
                     self.trackSelectionBGR[i] = 0
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
+                        self.resetInitialCond()
+                        #self.ShiTPropOnOff[0] = False
+                        self.ShiTProp[0] = False
+                        self.LKProp[0] = False
+                        self.KalmanProp[0] = False
+                        self.CFProp[0] = False
                     break
 
             if a == 0:
@@ -481,7 +487,7 @@ class cvGui():
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
-                            y0 = int(WINDOW_FILS_Y + 130)
+                            y0 = int(WINDOW_FILS_Y + 130)   # int((2*(WINDOW_FILS_Y + 125) + h)/2.0 - h/2.0)
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
                         else:
                             miniFilter = self.lastFrame.copy()
@@ -615,8 +621,6 @@ class cvGui():
                     h = np.asarray(miniFilter2).shape[0]
                     y0 = int(WINDOW_FILS_Y + 125) + WINDOW_FILS_WIDTH
                     self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
-
-
 
             cvui.printf(self.frame, 20, 775, 0.4, 0xdd97fb, "Missing Algorithm")
             if cvui.checkbox(self.frame, 20, 790, "Correlation", self.missAlgCorr):
