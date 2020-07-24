@@ -178,7 +178,7 @@ class cvGui():
         self.parametersNew = []
         self.boolForTrackers = []
         self.trackSelection = []
-        self.trackSelectionBGR = [0, 0, 0, 0, 0]
+        self.trackSelectionBGR = []
         self.lastTracker = -1
         self.configSelected = []
 
@@ -293,7 +293,7 @@ class cvGui():
                     checking.append([False])
 
                 cvui.printf(self.frame, xTx + 25, yTx + 85, 0.4, 0x000000, f'X = {int(xx)}')
-                cvui.printf(self.frame, xTx + 125, yTx + 85, 0.4, 0x000000, f'Y = {int(-yy)}')
+                cvui.printf(self.frame, xTx + 125, yTx + 85, 0.4, 0x000000, f'Y = {int(yy)}')
                 cvui.printf(self.frame, xTx + 25, yTx + 100, 0.4, 0x000000, f'Vx = {round(vx, 1)}')
                 cvui.printf(self.frame, xTx + 125, yTx + 100, 0.4, 0x000000, f'Vy = {round(-vy, 1)}')
 
@@ -313,7 +313,10 @@ class cvGui():
                 status = cvui.iarea(xFrame, yFrame, w, h)
                 if status == cvui.CLICK:
                     cursor = cvui.mouse(WINDOW_NAME)
-                    self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
+                    if i < len(self.trackSelectionBGR):
+                        self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
+                    else:
+                        self.trackSelectionBGR.append(self.frame[cursor.y, cursor.x])
 
                 if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
                     self.changeInTrackers = True
@@ -324,7 +327,8 @@ class cvGui():
                     del self.trackSelection[i]
                     self.trackerColors.append(self.trackerColors[i])
                     del self.trackerColors[i]
-                    self.trackSelectionBGR[i] = 0
+                    if i < len(self.trackSelectionBGR):
+                        del self.trackSelectionBGR[i]
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
                         self.resetInitialCond()
@@ -859,11 +863,6 @@ class cvGui():
 
         self.maskCondition[0] = MASK_COND
 
-        sT = self.IsTrackerSelected()
-        if not sT == -1:
-            self.trackSelectionBGR[sT] == 0
-
-
     def initSource(self):
         self.source = []
         self.arrayVideoLoaded.clear()
@@ -1083,7 +1082,8 @@ class cvGui():
 
         self.maskCondition[0] = self.configSelected[selected][23]
 
-        self.trackSelectionBGR[selected] = self.configSelected[selected][24]
+        if not len(self.configSelected[selected]) == 24:
+            self.trackSelectionBGR[selected] = self.configSelected[selected][24]
 
     def updateParameters(self):
         self.parameters.clear()
@@ -1122,7 +1122,9 @@ class cvGui():
         self.parameters.append(self.maskCondition[0])          #23x
 
         sT = self.IsTrackerSelected()
-        self.parameters.append(self.trackSelectionBGR[sT])    #24
+        # if not len(self.trackSelectionBGR) == 0:
+        if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
+            self.parameters.append(self.trackSelectionBGR[sT])    #24
 
 
     def IsTrackerSelected(self):
@@ -1176,7 +1178,9 @@ class cvGui():
             self.parametersNew.append(self.maskCondition[0])       # 23
 
             sT = self.IsTrackerSelected()
-            self.parametersNew.append(self.trackSelectionBGR[sT])  # 24
+            # if not len(self.trackSelectionBGR[sT]) == 0:
+            if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
+                self.parametersNew.append(self.trackSelectionBGR[sT])  # 24
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
@@ -1208,8 +1212,13 @@ class cvGui():
             if not(self.parametersNew[23] == self.parameters[23]):
                 changes = True      #Mask condition
 
-            if not(self.parametersNew[24] == self.parameters[24]):
-                changes = True  # Tracker BGR
+            #if not len(self.trackSelectionBGR[sT]) == 0:
+            if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
+                if len(self.parametersNew) == len(self.parameters):
+                    if not(self.parametersNew[24][0] == self.parameters[24][0] and self.parametersNew[24][1] == self.parameters[24][1] and self.parametersNew[24][2] == self.parameters[24][2]):
+                        changes = True  # Tracker BGR
+                else:
+                    changes = True
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
