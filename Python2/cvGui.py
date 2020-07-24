@@ -1260,7 +1260,7 @@ class cvGui():
                     if not(self.parametersNew[25][0] == self.parameters[25][0] and self.parametersNew[25][1] == self.parameters[25][1] and self.parametersNew[25][2] == self.parameters[25][2]):
                         changes = True  # Tracker BGR
                         self.trackers[sT].colorKernelChange(self.parametersNew[25])
-                        # self.trackers[sT].updateBGR(self.parametersNew[25])
+                        self.trackers[sT].updateBGR(self.parametersNew[25])
                 else:
                     changes = True
                     self.trackers[sT].colorKernelChange(self.parametersNew[25])

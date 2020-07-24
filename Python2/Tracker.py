@@ -115,6 +115,8 @@ class Tracker:
 
 
 
+    def updateBGR(self,color):
+        self.MF.calculateNewMask(None,None,True,color)
 
     def changeSettings(self, parametersNew):
 
