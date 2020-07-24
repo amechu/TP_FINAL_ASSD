@@ -991,7 +991,7 @@ class cvGui():
         if self.checkParametersChange():
             for tracker in self.trackers:
                 if len(self.parametersNew) == 25:
-                    del self.parametersNew[24]
+                    del self.parametersNew[25]
                 tracker.changeSettings(self.parametersNew)
 
         for tracker in self.trackers:
