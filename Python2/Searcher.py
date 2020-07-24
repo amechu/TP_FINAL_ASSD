@@ -79,7 +79,7 @@ class Searcher:
 
             frame_to_search =frameGray[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight ),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth )]
 
-            if np.count_nonzero(filteredframe[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight ),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth )])  > (self.MASKCONDITION* self.selectionHeight * self.selectionWidth):
+            if np.count_nonzero(filteredframe[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight ),int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth )])  > (self.MASKCONDITION**2* self.selectionHeight * self.selectionWidth):
                 self.features, self.trackingError = self.ST.recalculateFeatures(frame_to_search)
                 self.features = self.featureTranslate(int(matchLoc[0]), int(matchLoc[1]), self.features)
                 self.LK.prevFeatures = self.features
@@ -108,7 +108,7 @@ class Searcher:
                     frame_to_search = frameGray[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
                                       int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]
                     if np.count_nonzero(filteredframe[int(matchLoc[1]): int(matchLoc[1] + self.selectionHeight),
-                                        int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]) > (self.MASKCONDITION* self.selectionHeight * self.selectionWidth ):
+                                        int(matchLoc[0]): int(matchLoc[0] + self.selectionWidth)]) > (self.MASKCONDITION**2 * self.selectionHeight * self.selectionWidth ):
                         self.features, self.trackingError = self.ST.recalculateFeatures(frame_to_search)
                         self.features = self.featureTranslate(int(matchLoc[0]), int(matchLoc[1]), self.features)
                         self.LK.prevFeatures = self.features
