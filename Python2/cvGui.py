@@ -780,7 +780,6 @@ class cvGui():
                     if (cvui.button(self.frame, WINDOW_SET_X + 148, 890, "Cancel")):
                         self.coordsRoi.clear()
                         self.replaceRoi = False
-                        self.pause = False
             else:
                 self.trackerAdded = False
 
