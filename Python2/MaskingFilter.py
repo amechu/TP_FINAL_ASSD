@@ -10,8 +10,8 @@ class HistFilter:
         self.hist = None
         self.mask = None
         self.bins = 64
-        self.blur_size = 0
-        self.kernel_blur_size = 0
+        self.mask_blur_size = 11 # Applies blur to the whole mask. LPF
+        self.kernel_blur_size = 5 # Applies blur to the selection to spread the color. LPF
         self.low_pth = 230
         self.selection = None
 
@@ -32,7 +32,10 @@ class HistFilter:
 
         bins = bins
         hist_size = max(bins, 2)
-        hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
+        hsv = src
+        if self.kernel_blur_size != 0:
+            hsv = cv.medianBlur(hsv,int(self.kernel_blur_size))
+        hsv = cv.cvtColor(hsv, cv.COLOR_BGR2HSV)
         self.mask = cv.inRange(hsv, np.array((0., 60., 0.)), np.array((180., 255., 255.)))  #((0., 60., 32.))
         # self.mask = cv.medianBlur(self.mask,15)
         self.hist = cv.calcHist([hsv], [0], self.mask, [hist_size], self.ranges)
@@ -130,40 +133,31 @@ class HistFilter:
 
     def get_mask(self, src):
         hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
-        # 4 Aramamos una mascara generica que solo usa el Hue y un acotado rango de S y V
-        # hsv = cv.medianBlur(hsv, 11)
-        # res = cv.dilate(hsv, (11, 11))
         mask = cv.inRange(hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+        # mask = cv.inRange(hsv, np.array((0., 60., 0)), np.array((180., 255., 255.)))
+
         prob = cv.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
-        # cv.imshow("Mascara final", prob)
         prob &= mask
         mask2 = cv.inRange(prob, self.low_pth, 255)
-        if self.kernel_blur_size != 0:
-            mask2 = cv.medianBlur(mask2,self.kernel_blur_size)
-
-
-        # res = self.apply_hist_mask(src, self.hist)
-        # res = self.apply_threshold(res)
-        # res = cv.medianBlur(res, 11)
-        # res = cv.dilate(res, (11, 11))
+        if self.mask_blur_size != 0:
+            mask2 = cv.medianBlur(mask2, int(self.mask_blur_size))
         return mask2
 
-    def set_bins(self,num):
+    def set_bins(self, num):
         self.bins = num
-    def set_mask_blur(self,blur_size):
-        if blur_size%2 != 1:
-            self.blur_size = int(blur_size)+1
+    def set_mask_blur(self, blur_size):
+        if int(blur_size) %2 == 0:
+            self.mask_blur_size = int(blur_size)+1
         else:
-            self.blur_size = int(blur_size)
+            self.mask_blur_size = int(blur_size)
 
     def set_kernel_blur(self, blur_size):
-        if blur_size % 2 == 0:
+        if int(blur_size) % 2 == 0:
             self.kernel_blur_size = int(blur_size)+1
         else:
             self.kernel_blur_size = int(blur_size)
 
-    def set_low_pth(self,low_pth):
-
+    def set_low_pth(self, low_pth):
         self.low_pth = low_pth
 
 class MaskingFilter:
@@ -229,7 +223,7 @@ class MaskingFilter:
 
             #Histogram Filter init
             self.hist_filter.selection = selection
-            self.hist_filter.compute_hist(selection,self.hist_filter.bins)
+            self.hist_filter.compute_hist(selection, self.hist_filter.bins)
 
         self.init = False
 
