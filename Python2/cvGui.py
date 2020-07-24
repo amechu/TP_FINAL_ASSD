@@ -957,10 +957,14 @@ class cvGui():
                 self.sourceWIDTH = int(self.source.shape[1])
                 self.sourceHEIGHT = int(self.source.shape[0])
 
-            if self.checkParametersChange():
-                selectedTr = self.IsTrackerSelected()
-                if selectedTr != -1: # and not self.trackerChanged:
-                    self.trackers[selectedTr].changeSettings(self.parametersNew)
+            # if self.checkParametersChange():
+            #     selectedTr = self.IsTrackerSelected()
+            #     if selectedTr != -1: # and not self.trackerChanged:
+            #         self.trackers[selectedTr].changeSettings(self.parametersNew)
+
+            selectedTr = self.IsTrackerSelected()
+            if selectedTr != -1: # and not self.trackerChanged:
+                self.checkParametersChange()
 
             for tracker in self.trackers:
                 tracker.update(self.source)
@@ -989,11 +993,12 @@ class cvGui():
         else:
             self.source = self.lastFrame.copy()
 
-        if self.checkParametersChange():
-            for tracker in self.trackers:
-                if len(self.parametersNew) == 26:
-                    del self.parametersNew[25]
-                tracker.changeSettings(self.parametersNew)
+        # if self.checkParametersChange():
+        #     for tracker in self.trackers:
+        #         if len(self.parametersNew) == 26:
+        #             del self.parametersNew[25]
+        #         tracker.changeSettings(self.parametersNew)
+        self.checkParametersChange()
 
         for tracker in self.trackers:
             tracker.MF.updateMaskFromSettings()
@@ -1214,44 +1219,44 @@ class cvGui():
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
-                #self.trackers[sT].updateKalman(self.parametersNew[0], self.parametersNew[1], self.parametersNew[2])
+                self.trackers[sT].updateKalman(self.parametersNew[0], self.parametersNew[1], self.parametersNew[2])
 
             if not(self.parametersNew[3] == self.parameters[3]):
                 changes = True         #Chequeo Lucas-Kanade
-                # self.trackers[sT].updateLK(self.parametersNew[3])
+                self.trackers[sT].updateLK(self.parametersNew[3])
 
             if not(self.parametersNew[4] == self.parameters[4]):
                 changes = True        #Color Filter On/Off
-                # self.trackers[sT].updateColorFilter(self.parametersNew[4], self.parametersNew[5], self.parametersNew[6], self.parametersNew[7], self.parametersNew[24])
+                self.trackers[sT].updateColorFilter(self.parametersNew[4], self.parametersNew[5], self.parametersNew[6], self.parametersNew[7], self.parametersNew[24])
             elif not ((self.parametersNew[5] == self.parameters[5]) and (self.parametersNew[6] == self.parameters[6]) and (self.parametersNew[7] == self.parameters[7]) and (self.parametersNew[24] == self.parameters[24])):
                 changes = True      #Chequeo Params de CF
-                # self.trackers[sT].updateColorFilter(self.parametersNew[4], self.parametersNew[5], self.parametersNew[6], self.parametersNew[7], self.parametersNew[24])
+                self.trackers[sT].updateColorFilter(self.parametersNew[4], self.parametersNew[5], self.parametersNew[6], self.parametersNew[7], self.parametersNew[24])
 
             if not(self.parametersNew[8] == self.parameters[8]):
                 changes = True        #Cam Shift On/Off
-                # self.trackers[sT].updateCamShift(self.parametersNew[8], self.parametersNew[9], self.parametersNew[10], self.parametersNew[11], self.parametersNew[12])
+                self.trackers[sT].updateCamShift(self.parametersNew[8], self.parametersNew[9], self.parametersNew[10], self.parametersNew[11], self.parametersNew[12])
             elif not(self.parametersNew[9] == self.parameters[9] and self.parametersNew[10] == self.parameters[10] and self.parametersNew[11] == self.parameters[11] and self.parametersNew[12] == self.parameters[12]):       #BINS
                 changes = True
-                # self.trackers[sT].updateCamShift(self.parametersNew[8], self.parametersNew[9], self.parametersNew[10], self.parametersNew[11], self.parametersNew[12])
+                self.trackers[sT].updateCamShift(self.parametersNew[8], self.parametersNew[9], self.parametersNew[10], self.parametersNew[11], self.parametersNew[12])
 
             if not(self.parametersNew[13] == self.parameters[13] and self.parametersNew[14] == self.parameters[14] and self.parametersNew[15] == self.parameters[15] and self.parametersNew[16] == self.parameters[16]):
                 changes = True         #Chequeo Shi-Tomasi
-                # self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
+                self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
 
             if not(self.parametersNew[17] == self.parameters[17]):
                 changes = True        #Shi-Tomasi On/Off
-                # self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
+                self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
             elif not(self.parametersNew[18] == self.parameters[18]):
                 changes = True   #Chequeo Params Shi
-                # self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
+                self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
 
             if not(self.parametersNew[19] == self.parameters[19] and self.parametersNew[20] == self.parameters[20] and  self.parametersNew[21] == self.parameters[21] and  self.parametersNew[22] == self.parameters[22]):
                 changes = True      #Missing and Search algorithm
-                # self.trackers[sT].updateMissinSearch(self.parametersNew[19], self.parametersNew[80], self.parametersNew[21], self.parametersNew[21], self.parametersNew[22])
+                self.trackers[sT].updateMissinSearch(self.parametersNew[19], self.parametersNew[20], self.parametersNew[21], self.parametersNew[21], self.parametersNew[22])
 
             if not(self.parametersNew[23] == self.parameters[23]):
                 changes = True      #Mask condition
-                # self.trackers[sT].updateMaskCond(self.parametersNew[23])
+                self.trackers[sT].updateMaskCond(self.parametersNew[23])
 
             #if not len(self.trackSelectionBGR[sT]) == 0:
             if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
