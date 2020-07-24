@@ -959,8 +959,12 @@ class cvGui():
                 self.sourceHEIGHT = int(self.source.shape[0])
 
             if self.checkParametersChange():
-                for tracker in self.trackers:
-                    tracker.changeSettings(self.parametersNew)
+                selectedTr = self.IsTrackerSelected()
+                if selectedTr != -1:
+                    self.trackers[selectedTr].changeSettings(self.parametersNew)
+
+                # for tracker in self.trackers:
+                #     tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
