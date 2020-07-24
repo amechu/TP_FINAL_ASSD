@@ -760,10 +760,10 @@ class cvGui():
                             self.changeInTrackers = True
                             self.trackerAdded = True
                             if self.boolVideoLoaded:
-                                self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.arrayVideoLoaded[0]))
+                                self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.arrayVideoLoaded[0], self.parameters))
                                 toRescale = self.arrayVideoLoaded[0][posY:posY + hei, posX:posX + wid].copy()
                             else:
-                                self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source))
+                                self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source, self.parameters))
                                 toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
 
                             self.trackers[-1].changeSettings(self.makeInitial())
