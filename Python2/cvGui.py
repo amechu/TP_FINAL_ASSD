@@ -873,6 +873,9 @@ class cvGui():
         self.trackSelectionBGR.clear()
         self.kernel.clear()
 
+        self.replaceRoi = False
+        self.coordsRoi.clear()
+
         self.source = []
         # self.source[:] = (49, 52, 49)
 
@@ -892,7 +895,6 @@ class cvGui():
         self.Hist[0] = False
         self.CFPropOnOff[0] = COLORFILTER_ONOFF
         self.CFCamShiftOnOff[0] = CAMSHIFT_ONOFF
-
 
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
@@ -962,9 +964,6 @@ class cvGui():
                 selectedTr = self.IsTrackerSelected()
                 if selectedTr != -1:
                     self.trackers[selectedTr].changeSettings(self.parametersNew)
-
-                # for tracker in self.trackers:
-                #     tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
