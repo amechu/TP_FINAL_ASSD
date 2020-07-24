@@ -964,7 +964,6 @@ class cvGui():
             for tracker in self.trackers:
                 tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
 
-
             self.updateFilterFrame()
 
             i = 0
@@ -992,6 +991,8 @@ class cvGui():
 
         if self.checkParametersChange():
             for tracker in self.trackers:
+                if len(self.parametersNew) == 25:
+                    del self.parametersNew[24]
                 tracker.changeSettings(self.parametersNew)
 
         for tracker in self.trackers:
@@ -1239,8 +1240,10 @@ class cvGui():
                 if len(self.parametersNew) == len(self.parameters):
                     if not(self.parametersNew[24][0] == self.parameters[24][0] and self.parametersNew[24][1] == self.parameters[24][1] and self.parametersNew[24][2] == self.parameters[24][2]):
                         changes = True  # Tracker BGR
+                        self.trackers[sT].colorKernelChange(self.parametersNew[24])
                 else:
                     changes = True
+                    self.trackers[sT].colorKernelChange(self.parametersNew[24])
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()

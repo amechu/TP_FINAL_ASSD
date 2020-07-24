@@ -169,3 +169,8 @@ class Tracker:
     def getTrajectory(self):
         return self.KM.trajectory
 
+    def colorKernelChange(self, bgr):
+        b = bgr[0]
+        g = bgr[1]
+        r = bgr[2]
+
