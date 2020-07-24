@@ -177,7 +177,7 @@ class cvGui():
         self.parameters = []
         self.parametersNew = []
         self.boolForTrackers = []
-        self.trackSelection = []
+        self.kernel = []
         self.trackSelectionBGR = []
         self.lastTracker = -1
         self.configSelected = []
@@ -306,11 +306,11 @@ class cvGui():
                     cvui.printf(self.frame, xB - 5, yTx + 50, 0.4, 0x000000, "Filter displayed is for")
                     cvui.printf(self.frame, xB + 25, yTx + 65, 0.4, 0x000000, "this tracker!")
 
-                w = int(self.trackSelection[i].shape[1])
-                h = int(self.trackSelection[i].shape[0])
+                w = int(self.kernel[i].shape[1])
+                h = int(self.kernel[i].shape[0])
                 xFrame = int((windowWidth + 2*(xTx))/2 - w/2)   #int((windowWidth + 2*(xTx-30))/2 - w/2)
                 yFrame = yTx + 150
-                self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.trackSelection[i]
+                self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.kernel[i]
                 status = cvui.iarea(xFrame, yFrame, w, h)
                 if status == cvui.CLICK:
                     cursor = cvui.mouse(WINDOW_NAME)
@@ -325,7 +325,7 @@ class cvGui():
                     del self.boolForTrackers[i]
                     del self.filterConditions[i]
                     del self.trackers[i]
-                    del self.trackSelection[i]
+                    del self.kernel[i]
                     self.trackerColors.append(self.trackerColors[i])
                     del self.trackerColors[i]
                     selectedT = self.IsTrackerSelected()
@@ -664,8 +664,10 @@ class cvGui():
                 cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
             if not self.replaceRoi:
-                if (cvui.button(self.frame, 60, 915, "Reset Settings")):
+                if (cvui.button(self.frame, 50, 915, "Reset")):
                     self.resetInitialCond()
+                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 100, 915, "Auto")):
+                    pass
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
@@ -770,9 +772,9 @@ class cvGui():
                             w = int(np.asarray(toRescale).shape[1])
                             h = int(np.asarray(toRescale).shape[0])
                             if w >= h:
-                                self.trackSelection.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
+                                self.kernel.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
                             else:
-                                self.trackSelection.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
+                                self.kernel.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
 
                         self.coordsRoi.clear()
                         self.replaceRoi = False
@@ -868,7 +870,7 @@ class cvGui():
         self.resetInitialCond()
         self.trackers.clear()
         self.trackSelectionBGR.clear()
-        self.trackSelection.clear()
+        self.kernel.clear()
 
         self.source = []
         # self.source[:] = (49, 52, 49)
