@@ -19,7 +19,7 @@ COLORFILTER_ONOFF = False
 COLORFILTER_LIGHTTHR = 50.0
 COLORFILTER_A = 15.0
 COLORFILTER_B = 15.0
-MASKBLUR_LAB = 0.2
+MASKBLUR_LAB = 1
 
 CAMSHIFT_ONOFF = False
 CAMSHIFT_BIN = 64.0
@@ -410,7 +410,8 @@ class cvGui():
                         cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
 
                         cvui.printf(self.frame, 20, 660, 0.4, 0xdd97fb, "Mask Blur")
-                        cvui.trackbar(self.frame, 20, 675, 210, self.maskBlur_lab, 0.0, 20.0)
+                        cvui.trackbar(self.frame, 20, 675, 210, self.maskBlur_lab, 0.0, 20.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        self.maskBlur_lab[0] = int(self.maskBlur_lab[0])
 
                     if cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff):
                         self.CFPropOnOff[0] = False
@@ -1104,8 +1105,8 @@ class cvGui():
 
         self.maskCondition[0] = self.configSelected[selected][23]
 
-        if not len(self.configSelected[selected]) == 24:
-            self.trackSelectionBGR[selected] = self.configSelected[selected][24]
+        if not len(self.configSelected[selected]) == 25:
+            self.trackSelectionBGR[selected] = self.configSelected[selected][25]
 
     def updateParameters(self):
         self.parameters.clear()
@@ -1120,7 +1121,7 @@ class cvGui():
         self.parameters.append(self.colorFilter_LihtThr[0])    #5X
         self.parameters.append(self.colorFilter_a[0])          #6X
         self.parameters.append(self.colorFilter_b[0])          #7X
-        # self.parameters.append(self.maskBlur_lab[0])
+
 
         self.parameters.append(self.CFCamShiftOnOff[0])        #8 (???????)
         self.parameters.append(self.camShift_bins[0])          #9x
@@ -1144,10 +1145,12 @@ class cvGui():
 
         self.parameters.append(self.maskCondition[0])          #23x
 
+        self.parameters.append(self.maskBlur_lab[0])        #24
+
         sT = self.IsTrackerSelected()
         # if not len(self.trackSelectionBGR) == 0:
         if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
-            self.parameters.append(self.trackSelectionBGR[sT])    #24
+            self.parameters.append(self.trackSelectionBGR[sT])    #25
 
 
     def IsTrackerSelected(self):
@@ -1201,10 +1204,14 @@ class cvGui():
 
             self.parametersNew.append(self.maskCondition[0])       # 23
 
+            self.parametersNew.append(self.maskBlur_lab[0])     # 24
+
             sT = self.IsTrackerSelected()
             # if not len(self.trackSelectionBGR[sT]) == 0:
             if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
-                self.parametersNew.append(self.trackSelectionBGR[sT])  # 24
+                self.parametersNew.append(self.trackSelectionBGR[sT])  # 25
+
+
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
