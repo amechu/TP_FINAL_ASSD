@@ -5,16 +5,18 @@ from MaskingFilter import MaskingFilter
 from ShiTomasi import ShiTomasi
 from OpticalFlow import OpticalFlow
 from Searcher import Searcher
+from scipy import optimize
 
 class Tracker:
     LIG_THR_EVERY_FRAMES = 15
 
-    def __init__(self, initialPosition, initialWidth, initialHeight,frame):
+    def __init__(self, initialPosition, initialWidth, initialHeight,frame, parametersNew):
 
         #########################################
 
         #########################################
-        frameReal = frame
+        self.initFrame = frame
+        self.initPos = initialPosition
         self.KM = KalmanFilter()
         self.MF= MaskingFilter()
         self.KM.setStatePost(np.array([initialPosition[0], initialPosition[1], 0., 0.]).reshape(4, 1))
@@ -34,10 +36,17 @@ class Tracker:
 
         self.prevFrameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-        self.SC = Searcher(frameReal, initialHeight, initialWidth, initialPosition[0], initialPosition[1],cv.cvtColor(frame, cv.COLOR_BGR2GRAY))
+        self.SC = Searcher(self.initFrame, initialHeight, initialWidth, initialPosition[0], initialPosition[1],cv.cvtColor(frame, cv.COLOR_BGR2GRAY))
         self.SC.features, self.SC.trackingError = self.SC.ST.recalculateFeatures(self.prevFrameGray[int(initialPosition[1] - initialHeight / 2): int(initialPosition[1] + initialHeight / 2),int(initialPosition[0] - initialWidth / 2): int(initialPosition[0] + initialWidth / 2)])
         self.SC.features = self.SC.featureTranslate(initialPosition[0] - initialWidth / 2,initialPosition[1] - initialHeight / 2, self.SC.features)
         self.SC.LK.prevFeatures = self.SC.features
+
+        x = [parametersNew[9], parametersNew[10], parametersNew[11], parametersNew[12]]
+
+        x_bounds = [(1, 200), (0, 20), (0, 20), (0, 250)]
+        #res = optimize.minimize(self.costChangeParams, x_bounds, method='trust-constr'
+        #res = optimize.shgo(self.costChangeParams, x_bounds)
+        #print(res.x)
 
     def getTrackingError(self):
         return self.SC.trackingError
@@ -169,3 +178,28 @@ class Tracker:
     def getTrajectory(self):
         return self.KM.trajectory
 
+    def costChangeParams(self, x): # x = [parametersNew[9], parametersNew[11], parametersNew[12]]
+
+        x[0] = int(x[0])
+        x[1] = int(x[1])
+        x[2] = int(x[2])
+        x[3] = int(x[3])
+
+        self.MF.hist_filter.set_bins(x[0])
+        self.MF.hist_filter.set_kernel_blur(x[2])
+        self.MF.hist_filter.set_mask_blur(x[1])
+        self.MF.hist_filter.set_low_pth(x[3])
+        self.MF.updateMaskFromSettings()
+        testFrame = self.MF.filterFrame(self.initFrame)
+
+        countTotal = np.count_nonzero(testFrame)
+        countInside = np.count_nonzero(testFrame[int(self.initPos[1] - self.selectionHeight / 2): int(self.initPos[1] + self.selectionHeight / 2),int(self.initPos[0] - self.selectionWidth / 2): int(self.initPos[0] + self.selectionWidth / 2)])
+
+        countOutside = countTotal - countInside
+        print(countOutside-countInside)
+        return countOutside - countInside
+
+    def colorKernelChange(self, bgr):
+        b = bgr[0]
+        g = bgr[1]
+        r = bgr[2]
