@@ -127,9 +127,9 @@ class Tracker:
         if  parametersNew[4] is False:              #Color Filter OnOff
             self.MF.mask = self.MF.maskingType["FILTER_OFF"]
 
-        MaskingFilter.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
-        MaskingFilter.aSemiAmp = parametersNew[6]     #colorFilter_a
-        MaskingFilter.bSemiAmp = parametersNew[7]     #colorFilter_b
+        self.MF.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
+        self.MF.aSemiAmp = parametersNew[6]     #colorFilter_a
+        self.MF.bSemiAmp = parametersNew[7]     #colorFilter_b
 
         if parametersNew[20] == True and parametersNew[19] == False :
             self.SC.missAlgorithm = self.SC.missAlgorithmD["ST"]
