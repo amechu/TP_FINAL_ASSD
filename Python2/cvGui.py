@@ -177,7 +177,7 @@ class cvGui():
         self.parameters = []
         self.parametersNew = []
         self.boolForTrackers = []
-        self.trackSelection = []
+        self.kernel = []
         self.trackSelectionBGR = []
         self.lastTracker = -1
         self.configSelected = []
@@ -247,7 +247,7 @@ class cvGui():
                     if(self.initSource()):                                                                #Chequear si se inicia bien
                         self.VideoLoaded = self.videoPath
                         self.CurrentSource = "Video Loaded: " + self.videoName
-                        self.trackers.clear()
+                        selectedT = -1
                         self.pause = True
                     else:
                         self.usingCamera = False
@@ -262,6 +262,7 @@ class cvGui():
                self.usingCamera = True
                if (self.initSource()):                  #Chequear si se inicia bien
                    self.CurrentSource = "Camera On"
+                   selectedT = -1
                else:
                    self.usingVideo = False
                    self.usingCamera = False
@@ -305,11 +306,11 @@ class cvGui():
                     cvui.printf(self.frame, xB - 5, yTx + 50, 0.4, 0x000000, "Filter displayed is for")
                     cvui.printf(self.frame, xB + 25, yTx + 65, 0.4, 0x000000, "this tracker!")
 
-                w = int(self.trackSelection[i].shape[1])
-                h = int(self.trackSelection[i].shape[0])
+                w = int(self.kernel[i].shape[1])
+                h = int(self.kernel[i].shape[0])
                 xFrame = int((windowWidth + 2*(xTx))/2 - w/2)   #int((windowWidth + 2*(xTx-30))/2 - w/2)
                 yFrame = yTx + 150
-                self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.trackSelection[i]
+                self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.kernel[i]
                 status = cvui.iarea(xFrame, yFrame, w, h)
                 if status == cvui.CLICK:
                     cursor = cvui.mouse(WINDOW_NAME)
@@ -324,9 +325,10 @@ class cvGui():
                     del self.boolForTrackers[i]
                     del self.filterConditions[i]
                     del self.trackers[i]
-                    del self.trackSelection[i]
+                    del self.kernel[i]
                     self.trackerColors.append(self.trackerColors[i])
                     del self.trackerColors[i]
+                    selectedT = self.IsTrackerSelected()
                     if i < len(self.trackSelectionBGR):
                         del self.trackSelectionBGR[i]
                     if len(self.trackers) == 0:
@@ -463,6 +465,9 @@ class cvGui():
                 if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (not self.boolForTrackers[self.lastTracker][0])):
                     self.lastTracker = -1
                 else:
+                    if not (selectedT == -1):
+                        self.loadParameters(selectedT)
+                        self.lastTracker = selectedT
                     if not len(self.filterConditions) == 0:
                         self.ColorFilter[0] = self.filterConditions[selectedT][0]
                         self.CorrFilter[0] = self.filterConditions[selectedT][1]
@@ -470,9 +475,6 @@ class cvGui():
                         self.Hist[0] = self.filterConditions[selectedT][3]
                         self.CFPropOnOff[0] = self.filterConditions[selectedT][4]
                         self.CFCamShiftOnOff[0] = self.filterConditions[selectedT][5]
-                    if not (selectedT == -1):
-                        self.loadParameters(selectedT)
-                        self.lastTracker = selectedT
             elif not len(self.filterConditions) == 0:
                 self.filterConditions[selectedT][0] = self.ColorFilter[0]
                 self.filterConditions[selectedT][1] = self.CorrFilter[0]
@@ -662,8 +664,10 @@ class cvGui():
                 cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
             if not self.replaceRoi:
-                if (cvui.button(self.frame, 60, 915, "Reset Settings")):
+                if (cvui.button(self.frame, 50, 915, "Reset")):
                     self.resetInitialCond()
+                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 100, 915, "Auto")):
+                    pass
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
@@ -768,9 +772,9 @@ class cvGui():
                             w = int(np.asarray(toRescale).shape[1])
                             h = int(np.asarray(toRescale).shape[0])
                             if w >= h:
-                                self.trackSelection.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
+                                self.kernel.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
                             else:
-                                self.trackSelection.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
+                                self.kernel.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
 
                         self.coordsRoi.clear()
                         self.replaceRoi = False
@@ -780,7 +784,6 @@ class cvGui():
                     if (cvui.button(self.frame, WINDOW_SET_X + 148, 890, "Cancel")):
                         self.coordsRoi.clear()
                         self.replaceRoi = False
-                        self.pause = False
             else:
                 self.trackerAdded = False
 
@@ -864,17 +867,35 @@ class cvGui():
         self.maskCondition[0] = MASK_COND
 
     def initSource(self):
+        self.resetInitialCond()
+        self.trackers.clear()
+        self.trackSelectionBGR.clear()
+        self.kernel.clear()
+
         self.source = []
+        # self.source[:] = (49, 52, 49)
+
         self.arrayVideoLoaded.clear()
-        self.filteredFrame = None
-        self.source[:] = (49, 52, 49)
         self.boolVideoLoaded = False
         self.lastFrame = []
         self.lastFilterFrame = []
-        self.trackSelection.clear()
+        self.filteredFrame = None
+
+        self.KalmanProp[0] = False
+        self.LKProp[0] = False
+        self.ShiTProp[0] = False
+        self.CFProp[0] = False
+        self.ColorFilter[0] = False
+        self.CorrFilter[0] = False
+        self.CamShiftFilter[0] = False
+        self.Hist[0] = False
+        self.CFPropOnOff[0] = COLORFILTER_ONOFF
+        self.CFCamShiftOnOff[0] = CAMSHIFT_ONOFF
+
 
         if self.usingCamera:
             self.cap = cv.VideoCapture(0)
+            self.pause = False
         else:
             self.cap = cv.VideoCapture(self.videoPath)
 
