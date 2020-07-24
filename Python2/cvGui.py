@@ -184,6 +184,7 @@ class cvGui():
 
         self.changeInTrackers = False
         self.trackerAdded = False
+        self.trackerChanged = False
 
         #Video Loaded elements
         self.boolVideoLoaded = False
@@ -206,6 +207,7 @@ class cvGui():
         while True:
 
             self.updateParameters()
+            selectedT = self.IsTrackerSelected()
 
             self.frame[:] = (49, 52, 49)
 
@@ -339,6 +341,8 @@ class cvGui():
                         self.KalmanProp[0] = False
                         self.CFProp[0] = False
                     break
+
+            self.trackerChanged = not(selectedT == self.IsTrackerSelected())
 
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No Trackers Added. Try Selecting A New Area!")
@@ -962,7 +966,7 @@ class cvGui():
 
             if self.checkParametersChange():
                 selectedTr = self.IsTrackerSelected()
-                if selectedTr != -1:
+                if selectedTr != -1 and not self.trackerChanged:
                     self.trackers[selectedTr].changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
