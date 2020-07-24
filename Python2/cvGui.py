@@ -303,15 +303,15 @@ class cvGui():
                     cvui.printf(self.frame, xB - 5, yTx + 50, 0.4, 0x000000, "Filter displayed is for")
                     cvui.printf(self.frame, xB + 25, yTx + 65, 0.4, 0x000000, "this tracker!")
 
-                    w = int(self.trackSelection[i].shape[1])
-                    h = int(self.trackSelection[i].shape[0])
-                    xFrame = int((windowWidth + 2*(xTx))/2 - w/2)   #int((windowWidth + 2*(xTx-30))/2 - w/2)
-                    yFrame = yTx + 150
-                    self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.trackSelection[i]
-                    status = cvui.iarea(xFrame, yFrame, w, h)
-                    if status == cvui.CLICK:
-                        cursor = cvui.mouse(WINDOW_NAME)
-                        self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
+                w = int(self.trackSelection[i].shape[1])
+                h = int(self.trackSelection[i].shape[0])
+                xFrame = int((windowWidth + 2*(xTx))/2 - w/2)   #int((windowWidth + 2*(xTx-30))/2 - w/2)
+                yFrame = yTx + 150
+                self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.trackSelection[i]
+                status = cvui.iarea(xFrame, yFrame, w, h)
+                if status == cvui.CLICK:
+                    cursor = cvui.mouse(WINDOW_NAME)
+                    self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
 
                 if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
                     self.changeInTrackers = True
