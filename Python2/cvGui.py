@@ -15,10 +15,6 @@ INITIAL_KALMAN_MC = 0.4
 
 INITIAL_LK_MR = 4.0
 
-INITIAL_CF_ONOFF = False
-INITIAL_LR_ONOFF = False
-INITIAL_CS_ONOFF = False
-
 INITIAL_ST_ONOFF = False
 
 COLORFILTER_LIGHTTHR = 50.0
@@ -126,8 +122,8 @@ class cvGui():
     
         #CF Properties
         self.CFProp = [False]
-        self.CFPropOnOff = [INITIAL_CF_ONOFF]
-        self.CFCamShiftOnOff = [INITIAL_CS_ONOFF]
+        self.CFPropOnOff = [False]
+        self.CFCamShiftOnOff = [False]
 
         self.colorFilter_LihtThr = [COLORFILTER_LIGHTTHR]
         self.colorFilter_a = [COLORFILTER_A]
@@ -326,7 +322,6 @@ class cvGui():
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
                         self.resetInitialCond()
-                        # self.ShiTPropOnOff[0] = False
                         self.ShiTProp[0] = False
                         self.LKProp[0] = False
                         self.KalmanProp[0] = False
@@ -455,19 +450,26 @@ class cvGui():
 
             selectedT = self.IsTrackerSelected()
             if self.lastTracker != selectedT:
-                if not len(self.filterConditions) == 0:
-                    self.ColorFilter[0] = self.filterConditions[selectedT][0]
-                    self.CorrFilter[0] = self.filterConditions[selectedT][1]
-                    self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
-                    self.Hist[0] = self.filterConditions[selectedT][3]
-                if not (selectedT == -1):
-                    self.loadParameters(selectedT)
-                    self.lastTracker = selectedT
+                if (selectedT == -1) and (not self.boolForTrackers[self.lastTracker][0]):
+                    self.lastTracker = -1
+                else:
+                    if not len(self.filterConditions) == 0:
+                        self.ColorFilter[0] = self.filterConditions[selectedT][0]
+                        self.CorrFilter[0] = self.filterConditions[selectedT][1]
+                        self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
+                        self.Hist[0] = self.filterConditions[selectedT][3]
+                        self.CFPropOnOff[0] = self.filterConditions[selectedT][4]
+                        self.CFCamShiftOnOff[0] = self.filterConditions[selectedT][5]
+                    if not (selectedT == -1):
+                        self.loadParameters(selectedT)
+                        self.lastTracker = selectedT
             elif not len(self.filterConditions) == 0:
                 self.filterConditions[selectedT][0] = self.ColorFilter[0]
                 self.filterConditions[selectedT][1] = self.CorrFilter[0]
                 self.filterConditions[selectedT][2] = self.CamShiftFilter[0]
                 self.filterConditions[selectedT][3] = self.Hist[0]
+                self.filterConditions[selectedT][4] = self.CFPropOnOff[0]
+                self.filterConditions[selectedT][5] = self.CFCamShiftOnOff[0]
 
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if self.CFPropOnOff[0] and not len(self.filterConditions) == 0:
@@ -750,7 +752,7 @@ class cvGui():
                                 self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source))
                                 toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
 
-                            self.filterConditions.append([False, False, False, False])
+                            self.filterConditions.append([False, False, False, False, False, False])
                             self.configSelected.append(originalParam)
                             w = int(np.asarray(toRescale).shape[1])
                             h = int(np.asarray(toRescale).shape[0])
@@ -788,7 +790,7 @@ class cvGui():
         if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
                 self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
                 self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
-                self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF) and (
+                self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == False) and (self.CFCamShiftOnOff[0] == False) and (
                 self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
                 self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
                 self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.maskCondition[0] == MASK_COND):
@@ -822,12 +824,12 @@ class cvGui():
 
         self.lk_mr[0] = INITIAL_LK_MR
 
-        # self.CFPropOnOff[0] = INITIAL_CF_ONOFF                    #Queda mejor sin reestablecer esto
+        # self.CFPropOnOff[0] = False                    #Queda mejor sin reestablecer esto
         self.colorFilter_LihtThr[0] = COLORFILTER_LIGHTTHR
         self.colorFilter_a[0] = COLORFILTER_A
         self.colorFilter_b[0] = COLORFILTER_B
 
-        # self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF                    #Queda mejor sin reestablecer esto
+        # self.CFCamShiftOnOff[0] = False                    #Queda mejor sin reestablecer esto
         self.camShift_bins[0] = CAMSHIFT_BIN
         self.camShift_mb[0] = CAMSHIFT_MB
         self.camShift_sb[0] = CAMSHIFT_SB
