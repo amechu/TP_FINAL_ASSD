@@ -1090,10 +1090,10 @@ class cvGui():
         self.parameters.append(self.camShift_sb[0])            #11
         self.parameters.append(self.camShift_lbpt[0])          #12
 
-        self.parameters.append(self.shit_MaxFeat[0])           #13
-        self.parameters.append(self.shit_FeatQual[0])          #14
-        self.parameters.append(self.shit_MinFeat[0])           #15
-        self.parameters.append(self.shit_Rec[0])               #16
+        self.parameters.append(self.shit_MaxFeat[0])           #13x
+        self.parameters.append(self.shit_FeatQual[0])          #14x
+        self.parameters.append(self.shit_MinFeat[0])           #15x
+        self.parameters.append(self.shit_Rec[0])               #16x
 
         self.parameters.append(self.ShiTPropOnOff[0])          #17
         self.parameters.append(self.shit_SPix[0])              #18

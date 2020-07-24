@@ -137,7 +137,7 @@ class Tracker:
 
         #= parametersNew[11]    #Cam shift On/Off
 
-        #self.SC.ST.maxcorners = parametersNew[12]                       #shit_MaxFeat
+        #self.SC.ST.maxcorners = int(parametersNew[12])                       #shit_MaxFeat
         #self.SC.ST.qLevel = parametersNew[13]                           #shit_FeatQual
         #self.SC.ST.minDist = parametersNew[14]                          #shit_MinFeat
         #self.SC.ST.searchEnlargementThreshold = parametersNew[15]       #shit_Rec
