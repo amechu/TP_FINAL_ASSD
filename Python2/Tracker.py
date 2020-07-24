@@ -120,7 +120,7 @@ class Tracker:
         MaskingFilter.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
         MaskingFilter.aSemiAmp = parametersNew[6]     #colorFilter_a
         MaskingFilter.bSemiAmp = parametersNew[7]     #colorFilter_b
-        self.MF.updateMaskFromSettings()
+
         if parametersNew[20] == True and parametersNew[19] == False :
             self.SC.missAlgorithm = self.SC.missAlgorithmD["ST"]
         elif parametersNew[20] == False and parametersNew[19] == True:
@@ -152,8 +152,6 @@ class Tracker:
         self.MF.hist_filter.set_low_pth(parametersNew[12])
 
         self.MF.updateMaskFromSettings()
-
-
         self.KM.updateParams()
 
     def getFilteredFrame(self):
