@@ -163,10 +163,6 @@ class HistFilter:
 
 class MaskingFilter:
 
-
-
-
-
     def __init__(self):
         self.maskingType = dict(
             FILTER_OFF=0,
@@ -194,11 +190,14 @@ class MaskingFilter:
 
         #CORRELATION INIT
 
-    def calculateNewMask(self, frame, selection):
+    def calculateNewMask(self, frame, selection,newColor = False,color= None):
         if self.mask is self.maskingType["FILTER_OFF"]:
             pass
         else:
-            medb, medg, medr = np.median(selection[:, :, 0]), np.median(selection[:, :, 1]), np.median(selection[:, :, 2])
+            if newColor is True:
+                medb, medg, medr = color[0], color[1], color[2]
+            else:
+                medb, medg, medr = np.median(selection[:, :, 0]), np.median(selection[:, :, 1]), np.median(selection[:, :, 2])
             if ~np.isnan(medb)&~np.isnan(medg)&~np.isnan(medr):
                 bgr_mask = np.uint8([[[medb, medg, medr]]])
                 self.bgrmask = [medb, medg, medr]
@@ -223,8 +222,9 @@ class MaskingFilter:
                     self.upperThreshold[2] += np.clip(np.clip(np.int32(self.lab_mask[0, 0, :])[2] + self.LSemiAmp, 1, 255) - self.upperThreshold[2], -self.labMaxChange, self.labMaxChange)
 
             #Histogram Filter init
-            self.hist_filter.selection = selection
-            self.hist_filter.compute_hist(selection, self.hist_filter.bins)
+            if (newColor is False):
+                self.hist_filter.selection = selection
+                self.hist_filter.compute_hist(selection, self.hist_filter.bins)
 
         self.init = False
 
