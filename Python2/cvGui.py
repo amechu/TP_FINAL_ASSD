@@ -19,6 +19,7 @@ COLORFILTER_ONOFF = False
 COLORFILTER_LIGHTTHR = 50.0
 COLORFILTER_A = 15.0
 COLORFILTER_B = 15.0
+MASKBLUR_LAB = 0.2
 
 CAMSHIFT_ONOFF = False
 CAMSHIFT_BIN = 64.0
@@ -134,6 +135,7 @@ class cvGui():
         self.colorFilter_LihtThr = [COLORFILTER_LIGHTTHR]
         self.colorFilter_a = [COLORFILTER_A]
         self.colorFilter_b = [COLORFILTER_B]
+        self.maskBlur_lab = [MASKBLUR_LAB]
 
         self.camShift_bins = [CAMSHIFT_BIN]
         self.camShift_mb = [CAMSHIFT_MB] #Blur sobre toda la mascara
@@ -406,6 +408,9 @@ class cvGui():
 
                         cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B Semiamplitude")
                         cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
+
+                        cvui.printf(self.frame, 20, 660, 0.4, 0xdd97fb, "Mask Blur")
+                        cvui.trackbar(self.frame, 20, 675, 210, self.maskBlur_lab, 0.0, 20.0)
 
                     if cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff):
                         self.CFPropOnOff[0] = False
@@ -833,6 +838,7 @@ class cvGui():
         self.colorFilter_LihtThr[0] = COLORFILTER_LIGHTTHR
         self.colorFilter_a[0] = COLORFILTER_A
         self.colorFilter_b[0] = COLORFILTER_B
+        self.maskBlur_lab[0] = MASKBLUR_LAB
 
         # self.CFCamShiftOnOff[0] = False                    #Queda mejor sin reestablecer esto
         self.camShift_bins[0] = CAMSHIFT_BIN
@@ -1074,6 +1080,7 @@ class cvGui():
         self.colorFilter_LihtThr[0] = self.configSelected[selected][5]
         self.colorFilter_a[0] = self.configSelected[selected][6]
         self.colorFilter_b[0] = self.configSelected[selected][7]
+        #self.maskBlur_lab[0] = self.configSelected[selected][]
 
         self.CFCamShiftOnOff[0] = self.configSelected[selected][8]
         self.camShift_bins[0] = self.configSelected[selected][9]
@@ -1113,6 +1120,7 @@ class cvGui():
         self.parameters.append(self.colorFilter_LihtThr[0])    #5X
         self.parameters.append(self.colorFilter_a[0])          #6X
         self.parameters.append(self.colorFilter_b[0])          #7X
+        # self.parameters.append(self.maskBlur_lab[0])
 
         self.parameters.append(self.CFCamShiftOnOff[0])        #8 (???????)
         self.parameters.append(self.camShift_bins[0])          #9x
@@ -1169,6 +1177,7 @@ class cvGui():
             self.parametersNew.append(self.colorFilter_LihtThr[0])           #5
             self.parametersNew.append(self.colorFilter_a[0])           #6
             self.parametersNew.append(self.colorFilter_b[0])           #7
+            # self.parametersNew.append(self.maskBlur_lab[0])
 
             self.parametersNew.append(self.CFCamShiftOnOff[0])           #8          #
             self.parametersNew.append(self.camShift_bins[0])           #9
