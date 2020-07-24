@@ -326,7 +326,7 @@ class cvGui():
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
                         self.resetInitialCond()
-                        #self.ShiTPropOnOff[0] = False
+                        # self.ShiTPropOnOff[0] = False
                         self.ShiTProp[0] = False
                         self.LKProp[0] = False
                         self.KalmanProp[0] = False
@@ -599,28 +599,29 @@ class cvGui():
                     self.ColorFilter[0] = False
                     self.Hist[0] = False
 
-                    # LAB COLOR FILTER
-                    cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Cam Shift")
-                    cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
-                    self.trackers[selectedT].setFilter("FILTER_CSHIFT")
-                    miniFilter2 = self.trackers[selectedT].getFilteredFrame()
-                    miniFilter2 = self.rescale_frame_standar(miniFilter2, WINDOW_FILS_WIDTH - 27)
-                    x0 = WINDOW_FILS_X + 14
-                    w = WINDOW_FILS_WIDTH - 27
-                    h = np.asarray(miniFilter2).shape[0]
-                    y0 = int(WINDOW_FILS_Y + 130)
-                    self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
+                    if not len(self.trackers) == 0:
+                        # LAB COLOR FILTER
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Cam Shift")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        self.trackers[selectedT].setFilter("FILTER_CSHIFT")
+                        miniFilter2 = self.trackers[selectedT].getFilteredFrame()
+                        miniFilter2 = self.rescale_frame_standar(miniFilter2, WINDOW_FILS_WIDTH - 27)
+                        x0 = WINDOW_FILS_X + 14
+                        w = WINDOW_FILS_WIDTH - 27
+                        h = np.asarray(miniFilter2).shape[0]
+                        y0 = int(WINDOW_FILS_Y + 130)
+                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
-                    # HISTOGRAM
-                    cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
-                    cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
-                    miniFilter2 = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
-                    miniFilter2 = self.rescale_hist(miniFilter2, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
-                    x0 = WINDOW_FILS_X + 14
-                    w = WINDOW_FILS_WIDTH - 27
-                    h = np.asarray(miniFilter2).shape[0]
-                    y0 = int(WINDOW_FILS_Y + 125) + WINDOW_FILS_WIDTH
-                    self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
+                        # HISTOGRAM
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
+                        cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
+                        miniFilter2 = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
+                        miniFilter2 = self.rescale_hist(miniFilter2, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
+                        x0 = WINDOW_FILS_X + 14
+                        w = WINDOW_FILS_WIDTH - 27
+                        h = np.asarray(miniFilter2).shape[0]
+                        y0 = int(WINDOW_FILS_Y + 125) + WINDOW_FILS_WIDTH
+                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
             cvui.printf(self.frame, 20, 775, 0.4, 0xdd97fb, "Missing Algorithm")
             if cvui.checkbox(self.frame, 20, 790, "Correlation", self.missAlgCorr):
