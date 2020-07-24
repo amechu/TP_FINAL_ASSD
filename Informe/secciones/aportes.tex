@@ -196,19 +196,19 @@ EXPLICAR LO SIGUIENTE
 \end{itemize}
 
 \subsection{Algoritmo correlación}
-Para el algoritmo de correlacion no solo se utiliza el filtro explicado en la sección \ref{sec:corr} se realiza un filtrado de tanto el frame como el kernel, haciendo un cambio a \textbf{HSV} y un filtrado del frame en este espacio bajo las siguientes especificaciones: 
+Para el algoritmo de correlación no solo se utiliza el filtro explicado en la sección \ref{sec:corr}, sino que ademas se trata tanto al frame como al kernel, aplicando una transformación al espacio \textbf{HSV} y allí un filtrado bajo las siguientes especificaciones: 
             
 \begin{align}
 MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (32,255)
 \end{align}
-luego se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, y se compara con el frame filtrado, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una mascara en la sección de mayor correlación y sobre este realizar nuevamente el cálculo de máxima correlación. Se realizan unas pocas iteraciones con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).\\
-Este algoritmo fue utilizado potencialmente en dos escenarios, para la busqueda de un objeto perdido, en el caso de oclusión se  utiliza el algoritmo para encontrar nuevamente el objeto, y en el caso de que se decida utilizar la correlación para el recálculo periódico de features, esto es beneficioso en el caso de que en la interacción de dos objetos $A$ y $B$ siendo $A$ el de interés y $B$ uno similar, $B$ pasa por delante de $A$ quitandole las features, si el calculo periódico es por correlación el algoritmo podrá detectar que se está siguiendo a $B$ y no a $A$ por lo que corregirá este error. Un caso en el que no es favorable utilizar el algoritmod e correlación y conviene utilizar el alternativo de Shi-Tomasi y medias moviles, es el caso en el que interactuen objetos de mismo color y forma, por lo que el tener información de la posición previa para el tracking resulta fundamental, otro caso en el que no sería favorable la correlación es cuando se sufre un cambio brusco de iluminación cosa de que la correlción con el kernel se ve seriamente afectado, en ese caso se recomienda la combinación de Shi-Tomasi con medias moviles y Camshift. 
-\begin{Huge}
-MIRAR ESTO
-\end{Huge}
+Una vez que se hace esto se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, se toma una sección al rededor de este punto proporcional a la selección inicial y se compara con el frame original, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una máscara en la sección del frame de mayor correlación, sobre este se realiza nuevamente el cálculo de máxima correlación, este proceso se realizan unas pocas veces con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).\\
+
+Este algoritmo es utilizado en dos escenarios, para la búsqueda de un objeto perdido, en el caso de oclusión se  utiliza el algoritmo para encontrar nuevamente el objeto, este es efectivo siemrpe que no haya objetos que compartan tanto forma y color con el de interés, en el caso de que así sea y el objeto de interés se encuentre oculto es posible que el algoritmo devuelva un falso positivo, en ese caso conviene utilizar el alternativo de Shi-Tomasi y medias móviles, dado que el tener información de la posición previa para el tracking resulta fundamental para poder distinguir entre estos.
+Otro escenario es  utilizar la correlación para el recálculo periódico de features, esto es beneficioso en el caso de la interacción de dos objetos $A$ y $B$ siendo $A$ el de interés y $B$ uno similar, si $B$ pasa por delante de $A$ quitandole las features, el cálculo periódico por correlación podrá detectar que se está siguiendo a $B$ y no a $A$ por lo que corregirá este error. Una situación similar a esta no puede ser resuelta por el algoritmo de Shi-Tomasi con medias moviles.
+
 
 \subsection{Optimización del Código}
-Se realizó una optimización del codigo, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto y una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
+Se realizó una optimización del codigo, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto y obtener una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
 
 
 \subsection{KTN}

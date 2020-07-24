@@ -162,23 +162,25 @@ class HistFilter:
 
 class MaskingFilter:
 
-    maskingType = dict(
-            FILTER_OFF = 0,
-            FILTER_LAB = 1,
-            FILTER_CSHIFT = 2,
-            FILTER_CORR = 3
-    )
-    mask = maskingType["FILTER_LAB"]
 
-    LSemiAmp = 50
-    aSemiAmp = 15
-    bSemiAmp = 15
-    labMaxChange = 1
-    CIELabRecalculationNumber = 1
-    labPeriodicRecalculations = False # NO
+
+
 
     def __init__(self):
-        self.mask = self.maskingType["FILTER_LAB"]
+        self.maskingType = dict(
+            FILTER_OFF=0,
+            FILTER_LAB=1,
+            FILTER_CSHIFT=2,
+        )
+        self.LSemiAmp = 50
+        self.aSemiAmp = 15
+        self.bSemiAmp = 15
+
+        self.labMaxChange = 1
+        self.CIELabRecalculationNumber = 1
+        self.labPeriodicRecalculations = False  # NO
+
+        self.mask = self.maskingType["FILTER_CSHIFT"]
         self.filteredFrame = None
         self.init = True
         #CIE LAB INIT

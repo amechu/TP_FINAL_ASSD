@@ -15,21 +15,18 @@ INITIAL_KALMAN_MC = 0.4
 
 INITIAL_LK_MR = 4.0
 
-INITIAL_CF_ONOFF = False
-INITIAL_LR_ONOFF = False
-INITIAL_CS_ONOFF = False
-
-INITIAL_ST_ONOFF = False
-
+COLORFILTER_ONOFF = False
 COLORFILTER_LIGHTTHR = 50.0
 COLORFILTER_A = 15.0
 COLORFILTER_B = 15.0
 
+CAMSHIFT_ONOFF = False
 CAMSHIFT_BIN = 64.0
 CAMSHIFT_MB = 11.0
 CAMSHIFT_SB = 4.0
 CAMSHIFT_LBPT = 200.0
 
+INITIAL_ST_ONOFF = False
 SHIT_MAXFEAT = 100.0
 SHIT_FEATQUAL = 0.001
 SHIT_MINFEAT = 0.01
@@ -37,6 +34,11 @@ SHIT_REC = 20.0
 SHIT_SPIX = 4.0
 
 MASK_COND = 0.2
+
+MIS_COR = True
+MIS_ST = False
+REC_COR = True
+REC_ST = True
 
 Y_SCREEN = 960
 X_SCREEN = 1500 #1310 #1280
@@ -126,8 +128,8 @@ class cvGui():
     
         #CF Properties
         self.CFProp = [False]
-        self.CFPropOnOff = [INITIAL_CF_ONOFF]
-        self.CFCamShiftOnOff = [INITIAL_CS_ONOFF]
+        self.CFPropOnOff = [COLORFILTER_ONOFF]
+        self.CFCamShiftOnOff = [CAMSHIFT_ONOFF]
 
         self.colorFilter_LihtThr = [COLORFILTER_LIGHTTHR]
         self.colorFilter_a = [COLORFILTER_A]
@@ -140,7 +142,7 @@ class cvGui():
     
         #Shi - Tomasi Properties
         self.ShiTProp = [False]
-        self.ShiTPropOnOff = [False]
+        self.ShiTPropOnOff = [INITIAL_ST_ONOFF]
 
         self.shit_MaxFeat = [SHIT_MAXFEAT]
         self.shit_FeatQual = [SHIT_FEATQUAL]
@@ -149,12 +151,12 @@ class cvGui():
         self.shit_SPix = [SHIT_SPIX]
 
         #Miss Algorithm
-        self.missAlgCorr = [True]
-        self.missAlgST = [False]
+        self.missAlgCorr = [MIS_COR]
+        self.missAlgST = [MIS_ST]
 
         #Recalculation Algorithm
-        self.recAlgCorr = [True]
-        self.recAlgST = [False]
+        self.recAlgCorr = [REC_COR]
+        self.recAlgST = [REC_ST]
 
         self.maskCondition = [MASK_COND]
 
@@ -221,8 +223,8 @@ class cvGui():
 
             if selectedT == -1:
                 cvui.printf(self.frame, 17, 275, 0.4, 0xdd97fb, "No Tracker Selected To Modify")        #0xd11616
-            elif self.verifyInitialCond():
-                cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Settings By Default For Tracker " + str(selectedT + 1) + "!")
+            # elif self.verifyInitialCond():
+            #     cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Settings By Default For Tracker " + str(selectedT + 1) + "!")
             else:
                 cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Changes Saved For Tracker " + str(selectedT + 1) + "!")
 
@@ -326,7 +328,6 @@ class cvGui():
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
                         self.resetInitialCond()
-                        # self.ShiTPropOnOff[0] = False
                         self.ShiTProp[0] = False
                         self.LKProp[0] = False
                         self.KalmanProp[0] = False
@@ -455,19 +456,26 @@ class cvGui():
 
             selectedT = self.IsTrackerSelected()
             if self.lastTracker != selectedT:
-                if not len(self.filterConditions) == 0:
-                    self.ColorFilter[0] = self.filterConditions[selectedT][0]
-                    self.CorrFilter[0] = self.filterConditions[selectedT][1]
-                    self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
-                    self.Hist[0] = self.filterConditions[selectedT][3]
-                if not (selectedT == -1):
-                    self.loadParameters(selectedT)
-                    self.lastTracker = selectedT
+                if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (not self.boolForTrackers[self.lastTracker][0])):
+                    self.lastTracker = -1
+                else:
+                    if not len(self.filterConditions) == 0:
+                        self.ColorFilter[0] = self.filterConditions[selectedT][0]
+                        self.CorrFilter[0] = self.filterConditions[selectedT][1]
+                        self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
+                        self.Hist[0] = self.filterConditions[selectedT][3]
+                        self.CFPropOnOff[0] = self.filterConditions[selectedT][4]
+                        self.CFCamShiftOnOff[0] = self.filterConditions[selectedT][5]
+                    if not (selectedT == -1):
+                        self.loadParameters(selectedT)
+                        self.lastTracker = selectedT
             elif not len(self.filterConditions) == 0:
                 self.filterConditions[selectedT][0] = self.ColorFilter[0]
                 self.filterConditions[selectedT][1] = self.CorrFilter[0]
                 self.filterConditions[selectedT][2] = self.CamShiftFilter[0]
                 self.filterConditions[selectedT][3] = self.Hist[0]
+                self.filterConditions[selectedT][4] = self.CFPropOnOff[0]
+                self.filterConditions[selectedT][5] = self.CFCamShiftOnOff[0]
 
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if self.CFPropOnOff[0] and not len(self.filterConditions) == 0:
@@ -734,10 +742,10 @@ class cvGui():
                             hei = self.coordsRoi[3] - self.coordsRoi[1]
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
 
-                    cvui.window(self.frame, WINDOW_SET_X + 5, 885, WINDOW_SET_WIDTH - 10, Y_SCREEN - 880 - WINDOW_VS_Y*2, "Selection Options")
-                    cvui.rect(self.frame, WINDOW_SET_X + 7, 905, WINDOW_SET_WIDTH - 13, Y_SCREEN - 912 - WINDOW_VS_Y, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                    cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y*2, "Selection Options")
+                    cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y*2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
                     asiAndaBienElEnter = (cv.waitKey(1) == 13)
-                    if ((cvui.button(self.frame, WINDOW_SET_X + 10, 910, "Ok") or asiAndaBienElEnter)  and (len(self.coordsRoi) >= 4) ):
+                    if ((cvui.button(self.frame, WINDOW_SET_X + 10, 890, "Ok") or asiAndaBienElEnter)  and (len(self.coordsRoi) >= 4)):
                         if not (wid == 0 or hei == 0):
                             posX = posX - self.sourceX
                             posY = posY - self.sourceY
@@ -750,7 +758,8 @@ class cvGui():
                                 self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source))
                                 toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
 
-                            self.filterConditions.append([False, False, False, False])
+                            self.trackers[-1].changeSettings(self.makeInitial())
+                            self.filterConditions.append([False, False, False, False, COLORFILTER_ONOFF, CAMSHIFT_ONOFF])
                             self.configSelected.append(originalParam)
                             w = int(np.asarray(toRescale).shape[1])
                             h = int(np.asarray(toRescale).shape[0])
@@ -762,9 +771,9 @@ class cvGui():
                         self.coordsRoi.clear()
                         self.replaceRoi = False
 
-                    if (cvui.button(self.frame, WINDOW_SET_X + 73, 910, "Redo")):
+                    if (cvui.button(self.frame, WINDOW_SET_X + 73, 890, "Redo")):
                         self.coordsRoi.clear()
-                    if (cvui.button(self.frame, WINDOW_SET_X + 148, 910, "Cancel")):
+                    if (cvui.button(self.frame, WINDOW_SET_X + 148, 890, "Cancel")):
                         self.coordsRoi.clear()
                         self.replaceRoi = False
                         self.pause = False
@@ -784,22 +793,23 @@ class cvGui():
 
         return True
 
-    def verifyInitialCond(self):
-        if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
-                self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
-                self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
-                self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == INITIAL_CF_ONOFF) and (self.CFCamShiftOnOff[0] == INITIAL_CS_ONOFF) and (
-                self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
-                self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
-                self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.maskCondition[0] == MASK_COND):
-
-                selected = self.IsTrackerSelected()
-                if selected == -1 or self.trackSelectionBGR[selected] == 0:
-                    return True
-                else:
-                    return False
-        else:
-            return False
+    # def verifyInitialCond(self):
+    #
+    #     if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
+    #             self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
+    #             self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
+    #             self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == False) and (self.CFCamShiftOnOff[0] == False) and (
+    #             self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
+    #             self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
+    #             self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.maskCondition[0] == MASK_COND):
+    #
+    #             selected = self.IsTrackerSelected()
+    #             if selected == -1 or self.trackSelectionBGR[selected] == 0:
+    #                 return True
+    #             else:
+    #                 return False
+    #     else:
+    #         return False
 
     def openFile(self):
         root = tk.Tk()
@@ -822,12 +832,12 @@ class cvGui():
 
         self.lk_mr[0] = INITIAL_LK_MR
 
-        # self.CFPropOnOff[0] = INITIAL_CF_ONOFF                    #Queda mejor sin reestablecer esto
+        # self.CFPropOnOff[0] = False                    #Queda mejor sin reestablecer esto
         self.colorFilter_LihtThr[0] = COLORFILTER_LIGHTTHR
         self.colorFilter_a[0] = COLORFILTER_A
         self.colorFilter_b[0] = COLORFILTER_B
 
-        # self.CFCamShiftOnOff[0] = INITIAL_CS_ONOFF                    #Queda mejor sin reestablecer esto
+        # self.CFCamShiftOnOff[0] = False                    #Queda mejor sin reestablecer esto
         self.camShift_bins[0] = CAMSHIFT_BIN
         self.camShift_mb[0] = CAMSHIFT_MB
         self.camShift_sb[0] = CAMSHIFT_SB
@@ -1089,16 +1099,16 @@ class cvGui():
         self.parameters.append(self.colorFilter_a[0])          #6X
         self.parameters.append(self.colorFilter_b[0])          #7X
 
-        self.parameters.append(self.CFCamShiftOnOff[0])        #8
-        self.parameters.append(self.camShift_bins[0])          #9
-        self.parameters.append(self.camShift_mb[0])            #10
-        self.parameters.append(self.camShift_sb[0])            #11
-        self.parameters.append(self.camShift_lbpt[0])          #12
+        self.parameters.append(self.CFCamShiftOnOff[0])        #8 (???????)
+        self.parameters.append(self.camShift_bins[0])          #9x
+        self.parameters.append(self.camShift_mb[0])            #10x
+        self.parameters.append(self.camShift_sb[0])            #11x
+        self.parameters.append(self.camShift_lbpt[0])          #12x
 
-        self.parameters.append(self.shit_MaxFeat[0])           #13
-        self.parameters.append(self.shit_FeatQual[0])          #14
-        self.parameters.append(self.shit_MinFeat[0])           #15
-        self.parameters.append(self.shit_Rec[0])               #16
+        self.parameters.append(self.shit_MaxFeat[0])           #13x
+        self.parameters.append(self.shit_FeatQual[0])          #14x
+        self.parameters.append(self.shit_MinFeat[0])           #15x
+        self.parameters.append(self.shit_Rec[0])               #16x
 
         self.parameters.append(self.ShiTPropOnOff[0])          #17
         self.parameters.append(self.shit_SPix[0])              #18
@@ -1109,7 +1119,7 @@ class cvGui():
         self.parameters.append(self.recAlgCorr[0])             #21x
         self.parameters.append(self.recAlgST[0])               #22x
 
-        self.parameters.append(self.maskCondition[0])          #23
+        self.parameters.append(self.maskCondition[0])          #23x
 
         sT = self.IsTrackerSelected()
         self.parameters.append(self.trackSelectionBGR[sT])    #24
@@ -1226,6 +1236,44 @@ class cvGui():
         self.sourceHEIGHT = int(self.arrayVideoLoaded[0].shape[0])
 
         return todoPiola
+
+    def makeInitial(self):
+        vect = []
+        vect.append(INITIAL_KALMAN_PTM)  # 0
+        vect.append(INITIAL_KALMAN_PC)  # 1
+        vect.append(INITIAL_KALMAN_MC)  # 2
+
+        vect.append(INITIAL_LK_MR)  # 3
+
+        vect.append(COLORFILTER_ONOFF)  # 4       # self.CFPropOnOff[0] == COLORFILTER_ONOFF = False
+        vect.append(COLORFILTER_LIGHTTHR)  # 5
+        vect.append(COLORFILTER_A)  # 6
+        vect.append(COLORFILTER_B)  # 7
+
+        vect.append(CAMSHIFT_ONOFF)  # 8          # self.CFCamShiftOnOff[0] == CAMSHIFT_ONOFF = False
+        vect.append(CAMSHIFT_BIN)  # 9
+        vect.append(CAMSHIFT_MB)  # 10
+        vect.append(CAMSHIFT_SB)  # 11
+        vect.append(CAMSHIFT_LBPT)  # 12
+
+        vect.append(SHIT_MAXFEAT)  # 13
+        vect.append(SHIT_FEATQUAL)  # 14
+        vect.append(SHIT_MINFEAT)  # 15
+        vect.append(SHIT_REC)  # 16
+
+        vect.append(INITIAL_ST_ONOFF)  # 17            # self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF = Flase
+        vect.append(SHIT_SPIX)  # 18
+
+        vect.append(MIS_COR)  # 19                        # self.missAlgCorr[0] == MIS_COR = True
+        vect.append(MIS_ST)  # 20                          # self.missAlgST[0] == MIS_ST = False
+
+        vect.append(REC_COR)  # 21                         # self.recAlgCorr[0] == REC_COR = True
+        vect.append(REC_ST)  # 22                          # self.recAlgST[0] == REC_ST = True
+
+        vect.append(MASK_COND)  # 23
+
+        vect.append(0)  # 24
+        return vect
 
 def main():
     myGui = cvGui()
