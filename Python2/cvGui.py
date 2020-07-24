@@ -19,6 +19,7 @@ COLORFILTER_ONOFF = False
 COLORFILTER_LIGHTTHR = 50.0
 COLORFILTER_A = 15.0
 COLORFILTER_B = 15.0
+MASKBLUR_LAB = 0.2
 
 CAMSHIFT_ONOFF = False
 CAMSHIFT_BIN = 64.0
@@ -134,6 +135,7 @@ class cvGui():
         self.colorFilter_LihtThr = [COLORFILTER_LIGHTTHR]
         self.colorFilter_a = [COLORFILTER_A]
         self.colorFilter_b = [COLORFILTER_B]
+        self.maskBlur_lab = [MASKBLUR_LAB]
 
         self.camShift_bins = [CAMSHIFT_BIN]
         self.camShift_mb = [CAMSHIFT_MB] #Blur sobre toda la mascara
@@ -184,6 +186,7 @@ class cvGui():
 
         self.changeInTrackers = False
         self.trackerAdded = False
+        self.trackerChanged = False
 
         #Video Loaded elements
         self.boolVideoLoaded = False
@@ -206,6 +209,7 @@ class cvGui():
         while True:
 
             self.updateParameters()
+            selectedT = self.IsTrackerSelected()
 
             self.frame[:] = (49, 52, 49)
 
@@ -340,6 +344,11 @@ class cvGui():
                         self.CFProp[0] = False
                     break
 
+            self.trackerChanged = not(selectedT == self.IsTrackerSelected())
+            # if self.trackerChanged:
+            #     selectedT = self.IsTrackerSelected()
+
+
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No Trackers Added. Try Selecting A New Area!")
                 self.filteredFrame = None
@@ -399,6 +408,9 @@ class cvGui():
 
                         cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B Semiamplitude")
                         cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
+
+                        cvui.printf(self.frame, 20, 660, 0.4, 0xdd97fb, "Mask Blur")
+                        cvui.trackbar(self.frame, 20, 675, 210, self.maskBlur_lab, 0.0, 20.0)
 
                     if cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff):
                         self.CFPropOnOff[0] = False
@@ -801,24 +813,6 @@ class cvGui():
 
         return True
 
-    # def verifyInitialCond(self):
-    #
-    #     if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
-    #             self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
-    #             self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
-    #             self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == False) and (self.CFCamShiftOnOff[0] == False) and (
-    #             self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
-    #             self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
-    #             self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.maskCondition[0] == MASK_COND):
-    #
-    #             selected = self.IsTrackerSelected()
-    #             if selected == -1 or self.trackSelectionBGR[selected] == 0:
-    #                 return True
-    #             else:
-    #                 return False
-    #     else:
-    #         return False
-
     def openFile(self):
         root = tk.Tk()
         root.withdraw()
@@ -844,6 +838,7 @@ class cvGui():
         self.colorFilter_LihtThr[0] = COLORFILTER_LIGHTTHR
         self.colorFilter_a[0] = COLORFILTER_A
         self.colorFilter_b[0] = COLORFILTER_B
+        self.maskBlur_lab[0] = MASKBLUR_LAB
 
         # self.CFCamShiftOnOff[0] = False                    #Queda mejor sin reestablecer esto
         self.camShift_bins[0] = CAMSHIFT_BIN
@@ -962,17 +957,16 @@ class cvGui():
 
             if self.checkParametersChange():
                 selectedTr = self.IsTrackerSelected()
-                if selectedTr != -1:
+                if selectedTr != -1: # and not self.trackerChanged:
                     self.trackers[selectedTr].changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
-                tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
+                tracker.update(self.source)
 
             self.updateFilterFrame()
 
             i = 0
             for tracker in self.trackers:
-                # [b,g,r] = tracker.MF.bgrmask
                 r = (self.trackerColors[i] >> 16) & 0xff
                 g = (self.trackerColors[i] >> 8) & 0xff
                 b = self.trackerColors[i] & 0xff
@@ -1086,6 +1080,7 @@ class cvGui():
         self.colorFilter_LihtThr[0] = self.configSelected[selected][5]
         self.colorFilter_a[0] = self.configSelected[selected][6]
         self.colorFilter_b[0] = self.configSelected[selected][7]
+        #self.maskBlur_lab[0] = self.configSelected[selected][]
 
         self.CFCamShiftOnOff[0] = self.configSelected[selected][8]
         self.camShift_bins[0] = self.configSelected[selected][9]
@@ -1125,6 +1120,7 @@ class cvGui():
         self.parameters.append(self.colorFilter_LihtThr[0])    #5X
         self.parameters.append(self.colorFilter_a[0])          #6X
         self.parameters.append(self.colorFilter_b[0])          #7X
+        # self.parameters.append(self.maskBlur_lab[0])
 
         self.parameters.append(self.CFCamShiftOnOff[0])        #8 (???????)
         self.parameters.append(self.camShift_bins[0])          #9x
@@ -1181,6 +1177,7 @@ class cvGui():
             self.parametersNew.append(self.colorFilter_LihtThr[0])           #5
             self.parametersNew.append(self.colorFilter_a[0])           #6
             self.parametersNew.append(self.colorFilter_b[0])           #7
+            # self.parametersNew.append(self.maskBlur_lab[0])
 
             self.parametersNew.append(self.CFCamShiftOnOff[0])           #8          #
             self.parametersNew.append(self.camShift_bins[0])           #9
