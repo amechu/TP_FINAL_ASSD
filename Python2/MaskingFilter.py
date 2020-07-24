@@ -172,7 +172,7 @@ class MaskingFilter:
         self.LSemiAmp = 50
         self.aSemiAmp = 15
         self.bSemiAmp = 15
-
+        self.ksize = 3
         self.labMaxChange = 1
         self.CIELabRecalculationNumber = 1
         self.labPeriodicRecalculations = False  # NO
@@ -230,6 +230,8 @@ class MaskingFilter:
         elif self.mask is self.maskingType["FILTER_LAB"]:
             frameLab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
             mask = cv.inRange(frameLab, self.lowerThreshold, self.upperThreshold)
+            if self.ksize > 1:
+                mask = cv.medianBlur(mask, self.ksize)
             self.filteredFrame = cv.bitwise_and(frame, frame, mask=mask)
         elif self.mask is self.maskingType["FILTER_CSHIFT"]:
             mask1 = self.hist_filter.get_mask(frame)
