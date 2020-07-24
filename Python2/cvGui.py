@@ -1089,11 +1089,11 @@ class cvGui():
         self.parameters.append(self.colorFilter_a[0])          #6X
         self.parameters.append(self.colorFilter_b[0])          #7X
 
-        self.parameters.append(self.CFCamShiftOnOff[0])        #8
-        self.parameters.append(self.camShift_bins[0])          #9
-        self.parameters.append(self.camShift_mb[0])            #10
-        self.parameters.append(self.camShift_sb[0])            #11
-        self.parameters.append(self.camShift_lbpt[0])          #12
+        self.parameters.append(self.CFCamShiftOnOff[0])        #8 (???????)
+        self.parameters.append(self.camShift_bins[0])          #9x
+        self.parameters.append(self.camShift_mb[0])            #10x
+        self.parameters.append(self.camShift_sb[0])            #11x
+        self.parameters.append(self.camShift_lbpt[0])          #12x
 
         self.parameters.append(self.shit_MaxFeat[0])           #13x
         self.parameters.append(self.shit_FeatQual[0])          #14x
@@ -1109,7 +1109,7 @@ class cvGui():
         self.parameters.append(self.recAlgCorr[0])             #21x
         self.parameters.append(self.recAlgST[0])               #22x
 
-        self.parameters.append(self.maskCondition[0])          #23
+        self.parameters.append(self.maskCondition[0])          #23x
 
         sT = self.IsTrackerSelected()
         self.parameters.append(self.trackSelectionBGR[sT])    #24

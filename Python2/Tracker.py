@@ -137,13 +137,12 @@ class Tracker:
 
         #= parametersNew[11]    #Cam shift On/Off
 
-        #self.SC.ST.maxcorners = int(parametersNew[12])                       #shit_MaxFeat
-        #self.SC.ST.qLevel = parametersNew[13]                           #shit_FeatQual
-        #self.SC.ST.minDist = parametersNew[14]                          #shit_MinFeat
-        #self.SC.ST.searchEnlargementThreshold = parametersNew[15]       #shit_Rec
+        self.SC.ST.maxcorners = int(parametersNew[13])                       #shit_MaxFeat
+        self.SC.ST.qLevel = parametersNew[14]                           #shit_FeatQual
+        self.SC.ST.minDist = parametersNew[15]                          #shit_MinFeat
 
         #= parametersNew[16]                #ShiTomasiOn/ Off
-        #self.SC.ST.frameRecalculationNumber = parametersNew[17]        #shit_SPix
+        self.SC.ST.frameRecalculationNumber = parametersNew[16]        #shit_SPix
 
         #self.MF.mask = self.MF.maskingType[parametersNew[??]] #MENSAJE PARA TOMI: tiene que ser un string parametersNew[??] fijate en la clase
 
