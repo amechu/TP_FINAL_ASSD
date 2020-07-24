@@ -234,7 +234,6 @@ class MaskingFilter:
         elif self.mask is self.maskingType["FILTER_LAB"]:
             frameLab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
             mask = cv.inRange(frameLab, self.lowerThreshold, self.upperThreshold)
-            print(self.ksize)
             if self.ksize > 1:
                 mask = cv.medianBlur(mask, self.ksize)
             self.filteredFrame = cv.bitwise_and(frame, frame, mask=mask)

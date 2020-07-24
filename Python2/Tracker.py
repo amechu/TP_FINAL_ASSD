@@ -160,7 +160,13 @@ class Tracker:
         self.MF.hist_filter.set_mask_blur(parametersNew[10])
         self.MF.hist_filter.set_kernel_blur(parametersNew[11])
         self.MF.hist_filter.set_low_pth(parametersNew[12])
+
         self.MF.ksize = parametersNew[24]
+        if int(self.MF.ksize) %2 == 0:
+            self.MF.ksize = int(self.MF.ksize)+1
+        else:
+            self.MF.ksize = int(self.MF.ksize)
+
         self.MF.updateMaskFromSettings()
         self.KM.updateParams()
 
