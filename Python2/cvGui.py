@@ -466,7 +466,8 @@ class cvGui():
 
                     if (cvui.checkbox(self.frame, 20, 680, "Feature Recalculation", self.ShiTPropOnOff)):
                         cvui.printf(self.frame, 20, 710, 0.4, 0xdd97fb, "Recalculation Number")
-                        cvui.trackbar(self.frame, 20, 725, 210, self.shit_Rec, 1.0, 100.0)
+                        cvui.trackbar(self.frame, 20, 725, 210, self.shit_Rec, 1.0, 100.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        self.shit_Rec[0] = int(self.shit_Rec[0])
                         cvui.printf(self.frame, 185, 682, 0.4, 0x10dcA1, "%s", "On")
                     else:
                         cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
@@ -1210,8 +1211,6 @@ class cvGui():
             # if not len(self.trackSelectionBGR[sT]) == 0:
             if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
                 self.parametersNew.append(self.trackSelectionBGR[sT])  # 25
-
-
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
