@@ -343,6 +343,9 @@ class cvGui():
                     break
 
             self.trackerChanged = not(selectedT == self.IsTrackerSelected())
+            # if self.trackerChanged:
+            #     selectedT = self.IsTrackerSelected()
+
 
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No Trackers Added. Try Selecting A New Area!")
@@ -805,24 +808,6 @@ class cvGui():
 
         return True
 
-    # def verifyInitialCond(self):
-    #
-    #     if (self.kalman_ptm[0] == INITIAL_KALMAN_PTM) and (self.kalman_pc[0] == INITIAL_KALMAN_PC) and (
-    #             self.kalman_mc[0] == INITIAL_KALMAN_MC) and (self.lk_mr[0] == INITIAL_LK_MR) and (self.shit_MaxFeat[0] == SHIT_MAXFEAT) and (
-    #             self.shit_FeatQual[0] == SHIT_FEATQUAL) and (self.shit_MinFeat[0] == SHIT_MINFEAT) and (
-    #             self.shit_SPix[0] == SHIT_SPIX) and (self.CFPropOnOff[0] == False) and (self.CFCamShiftOnOff[0] == False) and (
-    #             self.ShiTPropOnOff[0] == INITIAL_ST_ONOFF) and (self.camShift_bins[0] == CAMSHIFT_BIN) and (self.camShift_mb[0] == CAMSHIFT_MB) and (
-    #             self.camShift_sb[0] == CAMSHIFT_SB) and (self.camShift_lbpt[0] == CAMSHIFT_LBPT) and (self.missAlgCorr[0] == True) and (
-    #             self.missAlgST[0] == False) and (self.recAlgCorr[0] == True) and (self.recAlgST[0] == False) and (self.maskCondition[0] == MASK_COND):
-    #
-    #             selected = self.IsTrackerSelected()
-    #             if selected == -1 or self.trackSelectionBGR[selected] == 0:
-    #                 return True
-    #             else:
-    #                 return False
-    #     else:
-    #         return False
-
     def openFile(self):
         root = tk.Tk()
         root.withdraw()
@@ -966,17 +951,16 @@ class cvGui():
 
             if self.checkParametersChange():
                 selectedTr = self.IsTrackerSelected()
-                if selectedTr != -1 and not self.trackerChanged:
+                if selectedTr != -1: # and not self.trackerChanged:
                     self.trackers[selectedTr].changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
-                tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
+                tracker.update(self.source)
 
             self.updateFilterFrame()
 
             i = 0
             for tracker in self.trackers:
-                # [b,g,r] = tracker.MF.bgrmask
                 r = (self.trackerColors[i] >> 16) & 0xff
                 g = (self.trackerColors[i] >> 8) & 0xff
                 b = self.trackerColors[i] & 0xff
