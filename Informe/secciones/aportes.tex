@@ -186,6 +186,13 @@ Algunos casos donde hasta ahora puede fallar el Tracker son:
 	\label{fig:Flowchart}
 \end{figure*}
 
+
+\begin{figure*}
+\centering
+	\includegraphics[width=0.5\textwidth]{Imagenes/classd.png}
+	\caption{Diagrama de Clases.}
+	\label{fig:class}
+\end{figure*}
 EXPLICAR LO SIGUIENTE
 \begin{itemize}
 \item Filtro de color pasó del espacio HSV a CIE-LAB, explicar que es para mas invarianza a la iluminacion
@@ -203,73 +210,15 @@ MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (
 \end{align}
 Una vez que se hace esto se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, se toma una sección al rededor de este punto proporcional a la selección inicial y se compara con el frame original, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una máscara en la sección del frame de mayor correlación, sobre este se realiza nuevamente el cálculo de máxima correlación, este proceso se realizan unas pocas veces con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).\\
 
-Este algoritmo es utilizado en dos escenarios, para la búsqueda de un objeto perdido, en el caso de oclusión se  utiliza el algoritmo para encontrar nuevamente el objeto, este es efectivo siemrpe que no haya objetos que compartan tanto forma y color con el de interés, en el caso de que así sea y el objeto de interés se encuentre oculto es posible que el algoritmo devuelva un falso positivo, en ese caso conviene utilizar el alternativo de Shi-Tomasi y medias móviles, dado que el tener información de la posición previa para el tracking resulta fundamental para poder distinguir entre estos.
-Otro escenario es  utilizar la correlación para el recálculo periódico de features, esto es beneficioso en el caso de la interacción de dos objetos $A$ y $B$ siendo $A$ el de interés y $B$ uno similar, si $B$ pasa por delante de $A$ quitandole las features, el cálculo periódico por correlación podrá detectar que se está siguiendo a $B$ y no a $A$ por lo que corregirá este error. Una situación similar a esta no puede ser resuelta por el algoritmo de Shi-Tomasi con medias moviles.
+Este algoritmo es utilizado en dos escenarios, para la búsqueda de un objeto perdido, en el caso de oclusión se  utiliza el algoritmo para encontrar nuevamente el objeto, este es efectivo siempre que no haya objetos que compartan tanto forma y color con el de interés, en el caso de que así sea y el objeto de interés se encuentre oculto es posible que el algoritmo devuelva un falso positivo, en ese caso conviene utilizar el alternativo de Shi-Tomasi y medias móviles, dado que el tener información de la posición previa para el tracking resulta fundamental para poder distinguir entre estos.
+Otro escenario es  utilizar la correlación para el recálculo periódico de features, esto es beneficioso en el caso de la interacción de dos objetos $A$ y $B$ siendo $A$ el de interés y $B$ uno similar, si $B$ pasa por delante de $A$ quitandole las features, el cálculo periódico por correlación podrá detectar que se está siguiendo a $B$ y no a $A$ por lo que corregirá este error. Una situación similar a esta no puede ser resuelta por el algoritmo de Shi-Tomasi con medias móviles.
 
 
 \subsection{Optimización del Código}
-Se realizó una optimización del codigo, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto y obtener una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
+Se realizó una optimización del código, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto y obtener una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
 
 
-\subsection{KTN}
 
-Se decidió implementar código en \textbf{Python}, apoyándose en la librería \href{https://opencv.org/}{OpenCV}.
-El pseudocódigo que corresponde es:
-
-
-\definecolor{keywords}{RGB}{255,0,90}
-\definecolor{comments}{RGB}{0,0,113}
-\definecolor{red}{RGB}{160,0,0}
-\definecolor{green}{RGB}{0,150,0}
- 
-\lstset{language=Python, 
-        basicstyle=\ttfamily\small, 
-        keywordstyle=\color{keywords},
-        commentstyle=\color{comments},
-        stringstyle=\color{red},
-        showstringspaces=false,
-        identifierstyle=\color{green},
-        procnamekeys={def,class}}
-\begin{figure}[H]
-
-\begin{lstlisting}
-kalman = KalmanFilter()
-
-cap = VideoCapture()
-
-lower_thr, upper_thr = [],[]
-
-prev = captureROI(cap)
-
-prev = space_translate(x, y, prev)
-
-frame = cap.read()
-
-while(cap.isOpened()):
-
-    frame_num++
-    frame_real = cap.read()
-
-
-    hsv = cvtColor(frame, COLOR_BGR2HSV)
-    mask = inRange(hsv, lower_thr, upper_thr)
-    frame = bitwise_and(frame, mask)
-
-    if(recalc and not error):
-        frame_num = 0
-        prev, x, y = recalculateFeatures()
-
-    if error:
-        prev=  searchObject(kalman)
-        dyn_h, dyn_w = new_dyn_h, new_dyn_w
-
-
-    good_new, good_old,prev= measureFeatures()
-
-    drawEstimate(good_new, kalman, frame)
-
-\end{lstlisting}
-\end{figure} 
  
  Finalmente se presenta un diagrama en bloques del programa, donde se puede apreciar como interaccionan todos los algoritmos trabajando en armonía.
 \begin{figure}[H]
