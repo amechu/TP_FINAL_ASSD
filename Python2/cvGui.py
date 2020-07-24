@@ -742,10 +742,10 @@ class cvGui():
                             hei = self.coordsRoi[3] - self.coordsRoi[1]
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
 
-                    cvui.window(self.frame, WINDOW_SET_X + 5, 885, WINDOW_SET_WIDTH - 10, Y_SCREEN - 880 - WINDOW_VS_Y*2, "Selection Options")
-                    cvui.rect(self.frame, WINDOW_SET_X + 7, 905, WINDOW_SET_WIDTH - 13, Y_SCREEN - 912 - WINDOW_VS_Y, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                    cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y*2, "Selection Options")
+                    cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y*2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
                     asiAndaBienElEnter = (cv.waitKey(1) == 13)
-                    if ((cvui.button(self.frame, WINDOW_SET_X + 10, 910, "Ok") or asiAndaBienElEnter)  and (len(self.coordsRoi) >= 4)):
+                    if ((cvui.button(self.frame, WINDOW_SET_X + 10, 890, "Ok") or asiAndaBienElEnter)  and (len(self.coordsRoi) >= 4)):
                         if not (wid == 0 or hei == 0):
                             posX = posX - self.sourceX
                             posY = posY - self.sourceY
@@ -771,9 +771,9 @@ class cvGui():
                         self.coordsRoi.clear()
                         self.replaceRoi = False
 
-                    if (cvui.button(self.frame, WINDOW_SET_X + 73, 910, "Redo")):
+                    if (cvui.button(self.frame, WINDOW_SET_X + 73, 890, "Redo")):
                         self.coordsRoi.clear()
-                    if (cvui.button(self.frame, WINDOW_SET_X + 148, 910, "Cancel")):
+                    if (cvui.button(self.frame, WINDOW_SET_X + 148, 890, "Cancel")):
                         self.coordsRoi.clear()
                         self.replaceRoi = False
                         self.pause = False
