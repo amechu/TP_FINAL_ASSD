@@ -6,6 +6,8 @@ from ShiTomasi import ShiTomasi
 from OpticalFlow import OpticalFlow
 from Searcher import Searcher
 from scipy import optimize
+from scipy.optimize import Bounds
+
 
 class Tracker:
     LIG_THR_EVERY_FRAMES = 15
@@ -41,11 +43,10 @@ class Tracker:
         self.SC.features = self.SC.featureTranslate(initialPosition[0] - initialWidth / 2,initialPosition[1] - initialHeight / 2, self.SC.features)
         self.SC.LK.prevFeatures = self.SC.features
 
-        x = [parametersNew[9], parametersNew[10], parametersNew[11], parametersNew[12]]
-
         x_bounds = [(1, 200), (0, 20), (0, 20), (0, 250)]
-        #res = optimize.minimize(self.costChangeParams, x_bounds, method='trust-constr'
-        #res = optimize.shgo(self.costChangeParams, x_bounds)
+
+        #res = optimize.shgo(self.costChangeParams, x_bounds, options={'disp': True ,'eps' : 5e0})
+
         #print(res.x)
 
     def getTrackingError(self):
@@ -184,7 +185,6 @@ class Tracker:
         x[1] = int(x[1])
         x[2] = int(x[2])
         x[3] = int(x[3])
-
         self.MF.hist_filter.set_bins(x[0])
         self.MF.hist_filter.set_kernel_blur(x[2])
         self.MF.hist_filter.set_mask_blur(x[1])
