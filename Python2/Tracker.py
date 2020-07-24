@@ -198,3 +198,8 @@ class Tracker:
         countOutside = countTotal - countInside
         print(countOutside-countInside)
         return countOutside - countInside
+
+    def colorKernelChange(self, bgr):
+        b = bgr[0]
+        g = bgr[1]
+        r = bgr[2]

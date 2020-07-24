@@ -501,7 +501,7 @@ class cvGui():
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
-                            y0 = int(WINDOW_FILS_Y + 130)   # int((2*(WINDOW_FILS_Y + 125) + h)/2.0 - h/2.0)
+                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
                         else:
                             miniFilter = self.lastFrame.copy()
@@ -509,7 +509,7 @@ class cvGui():
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
-                            y0 = int(WINDOW_FILS_Y + 130)
+                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Correlation Filter",self.CorrFilter):
@@ -527,7 +527,7 @@ class cvGui():
                         x0 = WINDOW_FILS_X + 14
                         w = WINDOW_FILS_WIDTH - 27
                         h = np.asarray(miniFilter).shape[0]
-                        y0 = int(WINDOW_FILS_Y + 130)
+                        y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
                         self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
             elif self.CFCamShiftOnOff[0] and not len(self.filterConditions) == 0:
@@ -558,7 +558,7 @@ class cvGui():
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter2).shape[0]
-                            y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2) + WINDOW_FILS_WIDTH
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
                         else:
                             miniFilter = self.lastFrame.copy()
@@ -566,7 +566,7 @@ class cvGui():
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
-                            y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2) + WINDOW_FILS_WIDTH
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Histogram", self.Hist):
@@ -585,15 +585,16 @@ class cvGui():
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
-                            y0 = int(WINDOW_FILS_Y + 130)
+                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+
                         else:
                             miniFilter = self.lastFrame.copy()
                             miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
                             x0 = WINDOW_FILS_X + 14
                             w = WINDOW_FILS_WIDTH - 27
                             h = np.asarray(miniFilter).shape[0]
-                            y0 = int(WINDOW_FILS_Y + 130)
+                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
                         # LAB COLOR FILTER
@@ -605,7 +606,7 @@ class cvGui():
                         x0 = WINDOW_FILS_X + 14
                         w = WINDOW_FILS_WIDTH - 27
                         h = np.asarray(miniFilter2).shape[0]
-                        y0 = int(WINDOW_FILS_Y + 130) + WINDOW_FILS_WIDTH
+                        y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2) + WINDOW_FILS_WIDTH
                         self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 70, "Correlation Filter", self.CorrFilter):
@@ -623,7 +624,7 @@ class cvGui():
                         x0 = WINDOW_FILS_X + 14
                         w = WINDOW_FILS_WIDTH - 27
                         h = np.asarray(miniFilter2).shape[0]
-                        y0 = int(WINDOW_FILS_Y + 130)
+                        y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
                         self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
                         # HISTOGRAM
@@ -732,7 +733,7 @@ class cvGui():
                         del self.coordsRoi[5]
                         del self.coordsRoi[4]
 
-                    if not len(self.coordsRoi) == 0:
+                    if not len(self.coordsRoi) == 0 and (self.coordsRoi[0] != 0 or self.coordsRoi[1] != 0):
                         cvui.rect(self.frame, self.coordsRoi[0]-1, self.coordsRoi[1]-1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
 
                     if len(self.coordsRoi) == 4:
@@ -958,12 +959,15 @@ class cvGui():
                 self.sourceHEIGHT = int(self.source.shape[0])
 
             if self.checkParametersChange():
-                for tracker in self.trackers:
-                    tracker.changeSettings(self.parametersNew)
+                selectedTr = self.IsTrackerSelected()
+                if selectedTr != -1:
+                    self.trackers[selectedTr].changeSettings(self.parametersNew)
+
+                # for tracker in self.trackers:
+                #     tracker.changeSettings(self.parametersNew)
 
             for tracker in self.trackers:
                 tracker.update(self.source)          #Hay que agregar: Color seleccionado y parametros nuevos. Que tracker está seleccionado debería estar
-
 
             self.updateFilterFrame()
 
@@ -992,6 +996,8 @@ class cvGui():
 
         if self.checkParametersChange():
             for tracker in self.trackers:
+                if len(self.parametersNew) == 25:
+                    del self.parametersNew[24]
                 tracker.changeSettings(self.parametersNew)
 
         for tracker in self.trackers:
@@ -1239,8 +1245,10 @@ class cvGui():
                 if len(self.parametersNew) == len(self.parameters):
                     if not(self.parametersNew[24][0] == self.parameters[24][0] and self.parametersNew[24][1] == self.parameters[24][1] and self.parametersNew[24][2] == self.parameters[24][2]):
                         changes = True  # Tracker BGR
+                        self.trackers[sT].colorKernelChange(self.parametersNew[24])
                 else:
                     changes = True
+                    self.trackers[sT].colorKernelChange(self.parametersNew[24])
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
