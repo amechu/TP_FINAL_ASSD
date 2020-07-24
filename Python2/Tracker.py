@@ -43,11 +43,11 @@ class Tracker:
         self.SC.features = self.SC.featureTranslate(initialPosition[0] - initialWidth / 2,initialPosition[1] - initialHeight / 2, self.SC.features)
         self.SC.LK.prevFeatures = self.SC.features
 
-        x_bounds = [(1, 200), (0, 20), (0, 20), (0, 250)]
+        #x_bounds = [(1, 200), (0, 20), (0, 20), (0, 250)]
 
         #res = optimize.shgo(self.costChangeParams, x_bounds, options={'disp': True ,'eps' : 5e0})
 
-        #print(res.x)
+       # print(res.x)
 
     def getTrackingError(self):
         return self.SC.trackingError
