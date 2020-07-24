@@ -163,10 +163,6 @@ class HistFilter:
 
 class MaskingFilter:
 
-
-
-
-
     def __init__(self):
         self.maskingType = dict(
             FILTER_OFF=0,
