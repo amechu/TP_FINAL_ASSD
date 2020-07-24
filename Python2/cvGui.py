@@ -26,9 +26,9 @@ COLORFILTER_A = 15.0
 COLORFILTER_B = 15.0
 
 CAMSHIFT_BIN = 64.0
-CAMSHIFT_MB = 0.0
-CAMSHIFT_SB = 0.0
-CAMSHIFT_LBPT = 230.0
+CAMSHIFT_MB = 11.0
+CAMSHIFT_SB = 4.0
+CAMSHIFT_LBPT = 200.0
 
 SHIT_MAXFEAT = 100.0
 SHIT_FEATQUAL = 0.001
@@ -134,8 +134,8 @@ class cvGui():
         self.colorFilter_b = [COLORFILTER_B]
 
         self.camShift_bins = [CAMSHIFT_BIN]
-        self.camShift_mb = [CAMSHIFT_MB]
-        self.camShift_sb = [CAMSHIFT_SB]
+        self.camShift_mb = [CAMSHIFT_MB] #Blur sobre toda la mascara
+        self.camShift_sb = [CAMSHIFT_SB] #Blur sobre la selección
         self.camShift_lbpt = [CAMSHIFT_LBPT]
     
         #Shi - Tomasi Properties
