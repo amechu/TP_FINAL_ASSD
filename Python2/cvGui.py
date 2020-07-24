@@ -1004,21 +1004,22 @@ class cvGui():
         
         if not len(self.trackers) == 0:
             #LAB COLOR FILTER
-            if self.ColorFilter[0]:
+            if self.ColorFilter[0] and self.CFPropOnOff[0]:
                 self.trackers[filterOfInteres].setFilter("FILTER_LAB")
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
-            #HIST COLOR FILTER
-            elif self.CamShiftFilter[0]:
+            #CAMSHIFT
+            elif self.CamShiftFilter[0] and self.CFCamShiftOnOff[0]:
                 self.trackers[filterOfInteres].setFilter("FILTER_CSHIFT")
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
             #CORRELATION FILTER
-            elif self.CorrFilter[0]:
+            elif self.CorrFilter[0] and (self.CFPropOnOff[0] or self.CFCamShiftOnOff[0]):
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
                     self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
                 else:
                     self.filteredFrame = None
-            elif self.Hist:
+            #HISTOGRAM
+            elif self.Hist[0] and self.CFCamShiftOnOff[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].MF.hist_filter.get_histogram_plot()
                 self.filteredFrame = self.rescale_hist(self.filteredFrame, STANDAR_WIDTH, self.sourceHEIGHT)
             else:
