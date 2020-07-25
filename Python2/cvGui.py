@@ -199,6 +199,8 @@ class cvGui():
         self.replaceRoi = False
         self.coordsRoi = []
 
+        self.ShowShit = [True]
+        self.ShowEstimate = [True]
 
     def onWork(self):
 
@@ -471,6 +473,10 @@ class cvGui():
                         cvui.printf(self.frame, 185, 682, 0.4, 0x10dcA1, "%s", "On")
                     else:
                         cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
+
+            #Show Features
+            cvui.checkbox(self.frame, WINDOW_SOU_X + 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Features", self.ShowShit)
+            cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH/2)+ 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Estiamted Pos.", self.ShowEstimate)
 
             #Filters: Correlation, Cam shift, Color, Histogram
 
@@ -978,10 +984,13 @@ class cvGui():
                 b = self.trackerColors[i] & 0xff
                 self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
                 if tracker.SC.trackingError is False:
-                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                    self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
+                    if self.ShowEstimate[0]:
+                        self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                    if self.ShowShit[0]:
+                        self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
                 else:
-                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                    if self.ShowEstimate[0]:
+                        self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
                     self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
                 i +=1
 

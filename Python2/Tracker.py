@@ -113,59 +113,59 @@ class Tracker:
             if self.SC.trackingError is False:
                 self.KM.correct(x,y)
 
-    # def changeSettings(self, parametersNew):
-    #
-    #     self.KM.dt = parametersNew[0]                 #kalman_ptm
-    #     self.KM.PROCESS_COV = parametersNew[1]        #kalman_pc
-    #     self.KM.MEAS_NOISE_COV = parametersNew[2]     #kalman_mc
-    #
-    #     self.SC.LK.lkMaxLevel = int(parametersNew[3])           #lk_mr
-    #
-    #     if  parametersNew[4] is False:              #Color Filter OnOff
-    #         self.MF.mask = self.MF.maskingType["FILTER_OFF"]
-    #
-    #     self.MF.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
-    #     self.MF.aSemiAmp = parametersNew[6]     #colorFilter_a
-    #     self.MF.bSemiAmp = parametersNew[7]     #colorFilter_b
-    #
-    #     if parametersNew[20] == True and parametersNew[19] == False :
-    #         self.SC.missAlgorithm = self.SC.missAlgorithmD["ST"]
-    #     elif parametersNew[20] == False and parametersNew[19] == True:
-    #         self.SC.missAlgorithm = self.SC.missAlgorithmD["CORR"]
-    #     if parametersNew[22] == True and parametersNew[21] == False:
-    #         self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["ST"]
-    #     elif parametersNew[22] == False and parametersNew[21] == True:
-    #         self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["CORR"]
-    #     self.SC.MASKCONDITION = parametersNew[23]
-    #
-    #     #= parametersNew[8]     #Light R OnOff
-    #     #= parametersNew[9]    #ligtRec_x)
-    #     #= parametersNew[10]   #ligtRec_maxT
-    #
-    #     #= parametersNew[11]    #Cam shift On/Off
-    #
-    #     self.SC.ST.maxcorners = int(parametersNew[13])                       #shit_MaxFeat
-    #     self.SC.ST.qLevel = parametersNew[14]                           #shit_FeatQual
-    #     self.SC.ST.minDist = parametersNew[15]                          #shit_MinFeat
-    #
-    #     #= parametersNew[16]                #ShiTomasiOn/ Off
-    #     self.SC.ST.frameRecalculationNumber = parametersNew[16]        #shit_SPix
-    #
-    #     #self.MF.mask = self.MF.maskingType[parametersNew[??]] #MENSAJE PARA TOMI: tiene que ser un string parametersNew[??] fijate en la clase
-    #
-    #     self.MF.hist_filter.set_bins(parametersNew[9])
-    #     self.MF.hist_filter.set_mask_blur(parametersNew[10])
-    #     self.MF.hist_filter.set_kernel_blur(parametersNew[11])
-    #     self.MF.hist_filter.set_low_pth(parametersNew[12])
-    #
-    #     self.MF.ksize = parametersNew[24]
-    #     if int(self.MF.ksize) %2 == 0:
-    #         self.MF.ksize = int(self.MF.ksize)+1
-    #     else:
-    #         self.MF.ksize = int(self.MF.ksize)
-    #
-    #     self.MF.updateMaskFromSettings()
-    #     self.KM.updateParams()
+    def changeSettings(self, parametersNew):
+
+        self.KM.dt = parametersNew[0]                 #kalman_ptm
+        self.KM.PROCESS_COV = parametersNew[1]        #kalman_pc
+        self.KM.MEAS_NOISE_COV = parametersNew[2]     #kalman_mc
+
+        self.SC.LK.lkMaxLevel = int(parametersNew[3])           #lk_mr
+
+        if  parametersNew[4] is False:              #Color Filter OnOff
+            self.MF.mask = self.MF.maskingType["FILTER_OFF"]
+
+        self.MF.LSemiAmp = parametersNew[5]  #colorFilter_LihtThr
+        self.MF.aSemiAmp = parametersNew[6]     #colorFilter_a
+        self.MF.bSemiAmp = parametersNew[7]     #colorFilter_b
+
+        if parametersNew[20] == True and parametersNew[19] == False :
+            self.SC.missAlgorithm = self.SC.missAlgorithmD["ST"]
+        elif parametersNew[20] == False and parametersNew[19] == True:
+            self.SC.missAlgorithm = self.SC.missAlgorithmD["CORR"]
+        if parametersNew[22] == True and parametersNew[21] == False:
+            self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["ST"]
+        elif parametersNew[22] == False and parametersNew[21] == True:
+            self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["CORR"]
+        self.SC.MASKCONDITION = parametersNew[23]
+
+        #= parametersNew[8]     #Light R OnOff
+        #= parametersNew[9]    #ligtRec_x)
+        #= parametersNew[10]   #ligtRec_maxT
+
+        #= parametersNew[11]    #Cam shift On/Off
+
+        self.SC.ST.maxcorners = int(parametersNew[13])                       #shit_MaxFeat
+        self.SC.ST.qLevel = parametersNew[14]                           #shit_FeatQual
+        self.SC.ST.minDist = parametersNew[15]                          #shit_MinFeat
+
+        #= parametersNew[16]                #ShiTomasiOn/ Off
+        self.SC.ST.frameRecalculationNumber = parametersNew[16]        #shit_SPix
+
+        #self.MF.mask = self.MF.maskingType[parametersNew[??]] #MENSAJE PARA TOMI: tiene que ser un string parametersNew[??] fijate en la clase
+
+        self.MF.hist_filter.set_bins(parametersNew[9])
+        self.MF.hist_filter.set_mask_blur(parametersNew[10])
+        self.MF.hist_filter.set_kernel_blur(parametersNew[11])
+        self.MF.hist_filter.set_low_pth(parametersNew[12])
+
+        self.MF.ksize = parametersNew[24]
+        if int(self.MF.ksize) %2 == 0:
+            self.MF.ksize = int(self.MF.ksize)+1
+        else:
+            self.MF.ksize = int(self.MF.ksize)
+
+        self.MF.updateMaskFromSettings()
+        self.KM.updateParams()
 
     def updateKalman(self, kalman_ptm, kalman_pc, kalman_mc):
         self.KM.dt = kalman_ptm
