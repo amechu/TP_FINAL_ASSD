@@ -776,8 +776,18 @@ class cvGui():
                         self.coordsRoi.append(cursorRoi.y)
 
                     if len(self.coordsRoi) == 6:
-                        del self.coordsRoi[3]
-                        del self.coordsRoi[2]
+                        if self.coordsRoi[4] <= int((self.coordsRoi[0] + self.coordsRoi[2])/2.0):
+                            self.coordsRoi[0] = self.coordsRoi[4]
+                        else:
+                            self.coordsRoi[2] = self.coordsRoi[4]
+
+                        if self.coordsRoi[5] <= int((self.coordsRoi[1] + self.coordsRoi[3])/2.0):
+                            self.coordsRoi[1] = self.coordsRoi[5]
+                        else:
+                            self.coordsRoi[3] = self.coordsRoi[5]
+
+                        del self.coordsRoi[5]
+                        del self.coordsRoi[4]
 
                     if not len(self.coordsRoi) == 0 and (self.coordsRoi[0] != 0 or self.coordsRoi[1] != 0):
                         cvui.rect(self.frame, self.coordsRoi[0]-1, self.coordsRoi[1]-1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
@@ -802,6 +812,8 @@ class cvGui():
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
                         if not(b == 0):
                             cvui.rect(self.frame, self.coordsRoi[2] - 1, b - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                            cvui.rect(self.frame, posX + wid - 1, posY - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                            cvui.rect(self.frame, posX - 1, posY + hei - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
 
                     cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y*2, "Selection Options")
                     cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y*2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
