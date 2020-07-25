@@ -229,8 +229,6 @@ class cvGui():
 
             if selectedT == -1:
                 cvui.printf(self.frame, 17, 275, 0.4, 0xdd97fb, "No Tracker Selected To Modify")        #0xd11616
-            # elif self.verifyInitialCond():
-            #     cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Settings By Default For Tracker " + str(selectedT + 1) + "!")
             else:
                 cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Changes Saved For Tracker " + str(selectedT + 1) + "!")
 
@@ -259,10 +257,22 @@ class cvGui():
                         self.usingCamera = False
                         self.usingVideo = False
 
-                elif not self.usingCamera:
-                    self.CurrentSource = "No Video Loaded"
+                # elif not self.usingCamera:
+                #     self.CurrentSource = "No Video Loaded"
 
-            if (cvui.button(self.frame, 20, 105, "Use Camera") and not self.usingCamera):
+            if (cvui.button(self.frame, 120, 70, "Reload Video") and self.usingVideo):
+                self.usingCamera = False
+                self.usingVideo = True
+                if (self.initSource()):  # Chequear si se inicia bien
+                    self.VideoLoaded = self.videoPath
+                    self.CurrentSource = "Video Loaded: " + self.videoName
+                    selectedT = -1
+                    self.pause = True
+                else:
+                    self.usingCamera = False
+                    self.usingVideo = False
+
+            if (cvui.button(self.frame, int((2*WINDOW_SET_X + WINDOW_SET_WIDTH)/2.0) - 60, 105, "Use Camera") and not self.usingCamera):
                self.trackers.clear()
                self.usingVideo = False
                self.usingCamera = True
