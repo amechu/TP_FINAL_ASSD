@@ -1,9 +1,9 @@
 
 \subsection{Primer diseño}
 
-A partir de una selección del video proporcionada por el usuario se obtienen las mejores features del objeto seleccionado utilizando el algoritmo de Shi-Tomasi. Luego, mediante el algoritmo de Lucas-Kanade de Optical Flow se obtiene la evolución de dichas features en el tiempo. A este cúmulo de puntos se le calcula el centro de masas $\mu$ y el centro de inercia $\sigma$. Se rechazan los puntos de este cúmulo que se encuentren a una distancia mayor a $k_{\sigma}\sigma$ respecto al centro de masas, para luego calcular nuevamente el centro de masas el cual es el que se introduce en el filtro de Kalman como medición de la posición.
+A partir de una selección del video proporcionada por el usuario se obtienen las mejores features del objeto deseado, utilizando el algoritmo de Shi-Tomasi. Luego, mediante el de Lucas-Kanade de Optical Flow se obtiene la evolución de dichas features en el tiempo. A este cúmulo de puntos se le calcula el centro de masas $\mu$ y el centro de inercia $\sigma$. Se rechazan los puntos de este cúmulo que se encuentren a una distancia mayor a $k_{\sigma}\sigma$ respecto al centro de masas, para luego calcular nuevamente dicho centro, el cual es el que se introduce en el filtro de Kalman como medición de la posición.
 
-La dimensión del vector de estados del filtro de Kalman es de cuatro, poseyendo la posición y la velocidad tanto horizontal como vertical. La dimensión del vector de observación es de dos dado que solamente se mide la posición horizontal y vertical del centro de masas. La matriz $A$ queda definida por las ecuaciones que caracterizan el movimiento del objeto a seguir que, por simplicidad, se consideraron las ecuaciones cinemáticas de MRU, quedando entonces
+La dimensión del vector de estados del filtro de Kalman es de cuatro, poseyendo la posición y la velocidad tanto horizontal como vertical. La dimensión del vector de observación es de dos, dado que solamente se mide la posición horizontal y vertical del centro de masas. La matriz $A$ queda definida por las ecuaciones que caracterizan el movimiento del objeto a seguir que, por simplicidad, se consideraron las ecuaciones cinemáticas de MRU, quedando entonces
 \begin{equation}
 \begin{pmatrix} x_{k-1} + dt\cdot v_{x_{k-1}} \\y_{k-1} + dt\cdot v_{y_{k-1}} \\ v_{x_{k-1}}  \\ v_{y_{k-1}} \end{pmatrix} =\begin{pmatrix}
 1 & 0 & dt  & 0\\
@@ -23,7 +23,7 @@ A =
 \end{pmatrix}
 \end{equation}
 
-Luego, se tiene que la matriz de observación o de transición de medición quedará definida por la transformación del espacio de observación al espacio real del vector de estados del filtro. Como los observables a medir forman parte del espacio real del vector de estados y son solo las posiciones, la matriz quedará definida de manera simple
+Luego, se tiene que la matriz de observación o de transición de medición queda definida por la transformación del espacio de observación al espacio real del vector de estados del filtro. Como los observables a medir forman parte del espacio real del vector de estados y son solo las posiciones, la matriz queda definida de manera simple
 \begin{equation}
 \begin{pmatrix} z_{x_{k}} \\ z_{y_{k}} \end{pmatrix}=\begin{pmatrix}
 1 & 0 & 0  & 0\\
@@ -39,7 +39,7 @@ H =
 \end{pmatrix}
 \end{equation}
 
-Mientras que la matrices de covarianza del proceso $Q$ y de medición $R$ serán cuadradas por definición, de dimensión cuatro y dos respectivamente, y además de la forma $\mathbb{I}\cdot \xi$ dado que se asume independencia de las variables aleatorias, quedando
+Las matrices de covarianza del proceso $Q$ y de medición $R$ son cuadradas por definición, de dimensión cuatro y dos respectivamente. Además, son la forma $\mathbb{I}\cdot \xi$ dado que se asume independencia de las variables aleatorias, quedando
 
 \begin{equation}
 Q = 
@@ -58,7 +58,6 @@ R =
 0 & \xi_R 
 \end{pmatrix}
 \end{equation}
-
 Siendo $\xi_Q$ y $\xi_R$ las varianzas del proceso y de medición respectivamente.
 
 Finalmente, $\hat{x}_{k|k}$ y $P_{k|k}$ tomarán la forma
