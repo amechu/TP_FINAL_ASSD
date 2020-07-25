@@ -776,10 +776,8 @@ class cvGui():
                         self.coordsRoi.append(cursorRoi.y)
 
                     if len(self.coordsRoi) == 6:
-                        self.coordsRoi[2] = self.coordsRoi[4]
-                        self.coordsRoi[3] = self.coordsRoi[5]
-                        del self.coordsRoi[5]
-                        del self.coordsRoi[4]
+                        del self.coordsRoi[3]
+                        del self.coordsRoi[2]
 
                     if not len(self.coordsRoi) == 0 and (self.coordsRoi[0] != 0 or self.coordsRoi[1] != 0):
                         cvui.rect(self.frame, self.coordsRoi[0]-1, self.coordsRoi[1]-1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
@@ -791,6 +789,7 @@ class cvGui():
                         else:
                             posX = self.coordsRoi[0]
                             wid = self.coordsRoi[2] - self.coordsRoi[0]
+
                         if self.coordsRoi[1] - self.coordsRoi[3] > 0:
                             posY = self.coordsRoi[3]
                             hei = self.coordsRoi[1] - self.coordsRoi[3]
@@ -799,6 +798,7 @@ class cvGui():
                             posY = self.coordsRoi[1]
                             hei = self.coordsRoi[3] - self.coordsRoi[1]
                             b = self.coordsRoi[3]
+
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
                         if not(b == 0):
                             cvui.rect(self.frame, self.coordsRoi[2] - 1, b - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
