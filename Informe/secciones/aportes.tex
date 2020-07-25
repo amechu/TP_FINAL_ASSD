@@ -170,11 +170,11 @@ Sin embargo, el filtro de Kalman no puede estimar la posición del objeto indefi
 Finalmente, para reforzar el algoritmo de seguimiento, se implemento además una recalculación periódica de las features con el método de Shi-Tomasi, partiendo de la media del cúmulo de features, removiendo los outliers, volviendo a calcular nuevamente la media y utilizar esta posición para aplicar el algoritmo de Shi-Tomasi, de misma manera que se realiza sobre la primera selección proporcionada por el usuario. Todo esto nos permite subsanar varios de los problemas planteados anteriormente, sin embargo, existen aún varios otros problemas:
 
 \subsection{Escenarios de fallas}
-Si bien se han minimizado las probabilidades de cometer errores de tipo I y tipo II, aún se plantean los siguientes problemas:
+Algunos casos donde puede fallar hasta ahora el Tracker son:
 \begin{itemize}
-\item El cambio de trayectoria de un objeto ocluido provocará una falla en la predicción de la trayectoria, si bien a diferencia del diseño anterior, ahora no habrá problemas en retornar al objeto correcto una vez que vuelva a aparecer en pantalla.
-\item El algoritmo se encuentra en su situación más frágil al haber un objecto idéntico o de gran similaridad tanto en color como en forma con el que se quiere seguir, debido a que ni el filtro de distribución de color ni el filtro de correlación lograrán distinguir entre ambos. En este caso la única distinción entre ambos será la retención de esquinas características al objeto correcto proporcionado por el algoritmo de Optical Flow. 
-\item La correcta elección de parámetros de los algoritmos encargados de la fase de enmascaramiento para cada situación proporcionan una gran robustez frente a cambios en la iluminación. Sin embargo, cuanto más robusto frente a cambios en la iluminación es el algoritmo, mayor será la probabilidad de cometer errores del tipo II (seguir a un objeto incorrecto) debido a que el enmascaramiento tendrá una mayor permisividad. 
+\item El cambio de trayectoria de un objeto una vez que desaparece, provocará una falla en la predicción.
+\item Interacción entre el objeto trackeado y un objeto de características similares, puede causar un error de detección
+\item Cambios bruscos de iluminación o en color del objeto.
 \end{itemize}
 
 \subsection{Último diseño}
@@ -247,13 +247,12 @@ Además se diseñó una GUI con la capacidad de trackeo multi-objeto, personaliz
 %\end{figure}
 
 \subsection{Escenarios de fallas}
-Algunos casos donde puede fallar el Tracker son:
+Si bien se han minimizado las probabilidades de cometer errores de tipo I y tipo II, aún se plantean los siguientes problemas:
 \begin{itemize}
-\item En caso de oclusión del objeto de interés $A$ y en la presencia de otro objeto de cualidades similares $B$ el algoritmo podrá dar un falso positivo.
-\item \begin{Huge}
-Aca deberian poner otros
-\end{Huge}
-\item 
+%\item En caso de oclusión del objeto de interés $A$ y en la presencia de otro objeto de cualidades similares $B$ el algoritmo podrá dar un falso positivo.
+%\item El cambio de trayectoria de un objeto ocluido provocará una falla en la predicción de la trayectoria, si bien a diferencia del diseño anterior, ahora no habrá problemas en retornar al objeto correcto una vez que vuelva a aparecer en pantalla.
+\item El algoritmo se encuentra en su situación más frágil al haber un objecto idéntico o de gran similaridad tanto en color como en forma con el que se quiere seguir, debido a que ni el filtro de distribución de color ni el filtro de correlación lograrán distinguir entre ambos. En este caso la única distinción entre ambos será la retención de esquinas características al objeto correcto proporcionado por el algoritmo de Optical Flow. 
+\item La correcta elección de parámetros de los algoritmos encargados de la fase de enmascaramiento para cada situación proporcionan una gran robustez frente a cambios en la iluminación. Sin embargo, cuanto más robusto frente a cambios en la iluminación es el algoritmo, mayor será la probabilidad de cometer errores del tipo II (seguir a un objeto incorrecto) debido a que el enmascaramiento tendrá una mayor permisividad. 
 \end{itemize}
 
 
