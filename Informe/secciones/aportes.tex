@@ -209,21 +209,16 @@ Una vez que se hace esto se utiliza el filtro de correlación y se obtiene el pu
 
 \begin{figure}[H]
 \centering
-	\begin{subfigure}{.4\textwidth}
+
+		\begin{subfigure}{.5\textwidth}
 		\centering
-		\includegraphics[width=0.9\textwidth]{Imagenes/Originalmask.png}
-		\caption{Imagen Fuente.}
-		\label{fig:original}
-	\end{subfigure}
-		\begin{subfigure}{.4\textwidth}
-		\centering
-		\includegraphics[width=0.9\textwidth]{Imagenes/corrmask.png}
-		\caption{Correlación con máscara}
+		\includegraphics[width=1\textwidth]{Imagenes/corrmask.png}
+		\caption{Correlación con máscara ante oclusión del objeto}
 		\label{fig:sqdiff}
 	\end{subfigure}
 	\begin{subfigure}{.1\textwidth}
 		\centering
-		\includegraphics[width=0.9\textwidth]{Imagenes/kernelhsv.png}
+		\includegraphics[width=1\textwidth]{Imagenes/kernelhsv.png}
 		\caption{Kernel}
 		\label{fig:kernel}
 	\end{subfigure}
@@ -255,7 +250,9 @@ Además se diseñó una GUI con la capacidad de trackeo multi-objeto, personaliz
 Algunos casos donde puede fallar el Tracker son:
 \begin{itemize}
 \item En caso de oclusión del objeto de interés $A$ y en la presencia de otro objeto de cualidades similares $B$ el algoritmo podrá dar un falso positivo.
-\item 
+\item \begin{Huge}
+Aca deberian poner otros
+\end{Huge}
 \item 
 \end{itemize}
 
