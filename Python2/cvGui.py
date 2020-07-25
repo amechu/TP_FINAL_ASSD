@@ -314,7 +314,7 @@ class cvGui():
 
                 w = int(self.kernel[i].shape[1])
                 h = int(self.kernel[i].shape[0])
-                xFrame = int((windowWidth + 2*(xTx))/2 - w/2)   #int((windowWidth + 2*(xTx-30))/2 - w/2)
+                xFrame = int((windowWidth + 2*(xTx))/2 - w/2)
                 yFrame = yTx + 150
                 self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.kernel[i]
                 status = cvui.iarea(xFrame, yFrame, w, h)
@@ -766,10 +766,14 @@ class cvGui():
                         if self.coordsRoi[1] - self.coordsRoi[3] > 0:
                             posY = self.coordsRoi[3]
                             hei = self.coordsRoi[1] - self.coordsRoi[3]
+                            b = self.coordsRoi[3]
                         else:
                             posY = self.coordsRoi[1]
                             hei = self.coordsRoi[3] - self.coordsRoi[1]
+                            b = self.coordsRoi[3]
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
+                        if not(b == 0):
+                            cvui.rect(self.frame, self.coordsRoi[2] - 1, b - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
 
                     cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y*2, "Selection Options")
                     cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y*2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
