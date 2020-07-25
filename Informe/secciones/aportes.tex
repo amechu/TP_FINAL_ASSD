@@ -175,7 +175,7 @@ Algunos casos donde hasta ahora puede fallar el Tracker son:
 \item El cambio de trayectoria de un objeto una vez que desaparece, provocará una falla en la predicción.
 \item Interacción entre el objeto trackeado y un objeto de características similares, puede causar un error de detección
 \item Cambios bruscos de iluminación o en color del objeto.
-
+\end{itemize}
 
 \subsection{Último diseño}
 
@@ -197,9 +197,6 @@ EXPLICAR LO SIGUIENTE
 \begin{itemize}
 \item Filtro de color pasó del espacio HSV a CIE-LAB, explicar que es para mas invarianza a la iluminacion
 \item Al filtro de color se le unió una alternativa, el de camshift, explicar en qué situaciones es mejor uno o el otro
-\item ahora la busqueda de objeto perdido se puede hacer con correlacion, explicar en que casos conviene uno o el otro, explicar el proceso de parcheamiento
-\item ahora el recalculo periodico se puede realizar con correlacion, explicar en que casos combiene uno o el otro
-\item mencionar la gui?
 \end{itemize}
 
 \subsection{Algoritmo correlación}
@@ -210,16 +207,37 @@ MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (
 \end{align}
 Una vez que se hace esto se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, se toma una sección al rededor de este punto proporcional a la selección inicial y se compara con el frame original, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una máscara en la sección del frame de mayor correlación, sobre este se realiza nuevamente el cálculo de máxima correlación, este proceso se realizan unas pocas veces con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).\\
 
+\begin{figure}[H]
+\centering
+
+		\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{Imagenes/corrmask.png}
+		\caption{Correlación con máscara ante oclusión del objeto}
+		\label{fig:sqdiff}
+	\end{subfigure}
+	\begin{subfigure}{.1\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{Imagenes/kernelhsv.png}
+		\caption{Kernel}
+		\label{fig:kernel}
+	\end{subfigure}
+	\caption{Aplicación del algoritmo de correlación con máscara.}
+	\label{fig:corrtest}
+\end{figure}
+
 Este algoritmo es utilizado en dos escenarios, para la búsqueda de un objeto perdido, en el caso de oclusión se  utiliza el algoritmo para encontrar nuevamente el objeto, este es efectivo siempre que no haya objetos que compartan tanto forma y color con el de interés, en el caso de que así sea y el objeto de interés se encuentre oculto es posible que el algoritmo devuelva un falso positivo, en ese caso conviene utilizar el alternativo de Shi-Tomasi y medias móviles, dado que el tener información de la posición previa para el tracking resulta fundamental para poder distinguir entre estos.
 Otro escenario es  utilizar la correlación para el recálculo periódico de features, esto es beneficioso en el caso de la interacción de dos objetos $A$ y $B$ siendo $A$ el de interés y $B$ uno similar, si $B$ pasa por delante de $A$ quitandole las features, el cálculo periódico por correlación podrá detectar que se está siguiendo a $B$ y no a $A$ por lo que corregirá este error. Una situación similar a esta no puede ser resuelta por el algoritmo de Shi-Tomasi con medias móviles.
 
 
 \subsection{Optimización del Código}
-Se realizó una optimización del código, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto y obtener una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
+Se realizó una optimización del código, quitando redundancias y utilizando únicamente librerías que son corridas en C++ con la finalidad de que el procesamiento en tiempo real sea eficiente. Se optó por un enfoque OOP, esto permitió escalar el proyecto y obtener una mayor modularidad. \\
+Además se diseñó una GUI con la capacidad de trackeo multi-objeto, personalización de algoritmos, contando con la opcion de variar algoritmos tanto de búsqueda como de recáclculo entre medias móviles y correlación, al giaul que filtrado por color o camshift, teniendo la opción de cambiar las especificaciones de los filtros en tiempo real para obtener el filtro óptimo. También se permite diversas pantallas de debug, al igual que una estimación de la posición y velocidad del objeto, finalmente cuenta con la capacidad de utilizar tanto un video en tiempo real como un video pre-existente.
 
 
 
- 
+
+
  Finalmente se presenta un diagrama en bloques del programa, donde se puede apreciar como interaccionan todos los algoritmos trabajando en armonía.
 \begin{figure}[H]
 \centering
@@ -228,7 +246,15 @@ Se realizó una optimización del código, quitando redundancias y utilizando ú
 	\label{fig:bloques}
 \end{figure}
 
-
-
+\subsection{Escenarios de fallas}
+Algunos casos donde puede fallar el Tracker son:
+\begin{itemize}
+\item En caso de oclusión del objeto de interés $A$ y en la presencia de otro objeto de cualidades similares $B$ el algoritmo podrá dar un falso positivo.
+\item \begin{Huge}
+Aca deberian poner otros
+\end{Huge}
+\item 
 \end{itemize}
+
+
 
