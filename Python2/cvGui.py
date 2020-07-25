@@ -475,8 +475,8 @@ class cvGui():
                         cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
 
             #Show Features
-            cvui.checkbox(self.frame, WINDOW_SOU_X + 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Features", self.ShowShit)
-            cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH/2)+ 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Estiamted Pos.", self.ShowEstimate)
+            cvui.checkbox(self.frame, WINDOW_SOU_X + 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Shi-Tomasi Features", self.ShowShit)
+            cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH/2)+ 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Kalman Estiamted Pos.", self.ShowEstimate)
 
             #Filters: Correlation, Cam shift, Color, Histogram
 
@@ -685,10 +685,23 @@ class cvGui():
                 cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
             if not self.replaceRoi:
-                if (cvui.button(self.frame, 50, 915, "Reset")):
+                if (cvui.button(self.frame, 60, 915, "Reset Settings")):
                     self.resetInitialCond()
-                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 100, 915, "Auto")):
-                    pass
+                # if (cvui.button(self.frame, 50, 915, "Reset")):
+                #     self.resetInitialCond()
+                # if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 100, 915, "Auto")):
+                #     pass
+
+            alreadyTex = False
+            nizu = 0
+            for i in range(len(self.trackers)):
+                if self.trackers[i].SC.trackingError:
+                    if not alreadyTex:
+                        cvui.printf(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 25, 0.4, 0xdc2710, f'Tracker Error In Tracker:')
+                        alreadyTex = True
+                    cvui.printf(self.frame, WINDOW_SOU_X + 165 + nizu * 10, WINDOW_SOU_Y + 25, 0.4, self.trackerColors[nizu], f'{nizu + 1}')
+                    nizu = nizu + 1
+
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
@@ -915,8 +928,8 @@ class cvGui():
             if todoPiola:
                 if self.usingVideo:
                     cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, X_SCREEN - 2*WINDOW_VS_X, Y_SCREEN - 2*WINDOW_VS_Y, " ")
-                    cvui.printf(self.frame, int(X_SCREEN/16), int(Y_SCREEN/4), 5, 0xe9d540, "Loading Video")
-                    cvui.printf(self.frame, int(X_SCREEN/16 + 25), int(Y_SCREEN/2), 5, 0xe9d540, "Please Wait...")
+                    cvui.printf(self.frame, int(X_SCREEN/7), int(Y_SCREEN/4), 5, 0xe9d540, "Loading Video")
+                    cvui.printf(self.frame, int(X_SCREEN/7 + 30), int(Y_SCREEN/2), 5, 0xe9d540, "Please Wait...")
                     cvui.imshow(WINDOW_NAME, self.frame)
                     cv.waitKey(1)
                     self.boolVideoLoaded = True
@@ -966,11 +979,6 @@ class cvGui():
             else:
                 self.sourceWIDTH = int(self.source.shape[1])
                 self.sourceHEIGHT = int(self.source.shape[0])
-
-            # if self.checkParametersChange():
-            #     selectedTr = self.IsTrackerSelected()
-            #     if selectedTr != -1: # and not self.trackerChanged:
-            #         self.trackers[selectedTr].changeSettings(self.parametersNew)
 
             selectedTr = self.IsTrackerSelected()
             if selectedTr != -1: # and not self.trackerChanged:

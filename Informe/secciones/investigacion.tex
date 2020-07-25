@@ -1,21 +1,21 @@
 
 \subsection{Optical Flow} 
-El campo de movimiento de una imagen es el movimiento real del objeto en el espacio proyectado sobre el plano de la imagen. El Optical Flow (flujo óptico) se define como el flujo de la intensidad en escala de grises en el plano de la imagen, a medida que evoluciona en el tiempo. También se puede interpretar el Optical Flow o flujo de la imagen como el movimiento aparente de la imagen basado en la percepción visual, y tiene dimensión de velocidad $\vec{V}= (V_x \ , \ V_y)$. Si el Optical Flow se determina de dos imagenes consecutivas, aparece un vector de desplazamiento $\vec{d}$ de las cualidades elegidas, entre el cuadro n y el n+1.
+El campo de movimiento de una imagen es el movimiento real del objeto en el espacio proyectado sobre el plano de la imagen. El Optical Flow (flujo óptico) se define como el flujo de la intensidad en escala de grises en el plano de la imagen, a medida que evoluciona en el tiempo. También se puede interpretar el flujo de la imagen como el movimiento aparente de esta basado en la percepción visual, teniendo dimensión de velocidad $\vec{V}= (V_x \ , \ V_y)$. Si el Optical Flow se determina de dos imágenes consecutivas, aparece un vector de desplazamiento $\vec{d}$ de las cualidades elegidas, entre el cuadro n y el n+1.
 \begin{figure}[H]
 		\centering
 		\includegraphics[width=0.5\textwidth]{Imagenes/opticalflowrubick.png}
 		\caption{Cubo de rubik rotando en una mesa.}
 		\label{fig:opticalflow1}
 \end{figure}
-Para la implementación del algoritmo existen varios caminos, como el basado en calculo de gradientes de la imagen total. Existe otro que utiliza solo ciertos puntos que se determinan constantes de la imagen. Nosotros utilizaremos el método piramidal de Lucas-Kanade.
+Para la implementación del algoritmo existen varios caminos, como lo es, por ejemplo, el basado en calculo de gradientes de la imagen total. Existe otro que utiliza solo ciertos puntos que se determinan constantes de la imagen. El el presente se emplea el método piramidal de Lucas-Kanade.
 
 \subsubsection{Lucas-Kanade} 
- Este consta del uso de información obtenida a partir de la intensidad del gradiente espacial para buscar la posición que mejor se acomoda a una imagen en movimiento \cite{ref:lucas-kanade} \cite{ref:lucas-kanade2}, algunas de las hipótesis que postula Lucas-Kanade son:
+Este algoritmo consta del uso de información obtenida a partir de la intensidad del gradiente espacial para buscar la posición que mejor se acomoda a una imagen en movimiento \cite{ref:lucas-kanade} \cite{ref:lucas-kanade2}. Algunas de las hipótesis que postula Lucas-Kanade son:
 \begin{itemize}
 \item Los movimientos entre cuadros consecutivos son pequeños. Tan pequeños como un pixel.
 \item La intensidad de los objeto se mantiene constante cuadro a cuadro.
 \end{itemize} 
-Este algoritmo se basa en el principio de ``divide y conquistarás'' al realizar la tarea de detectar movimiento en toda la imagen en problemas más sencillos. El algoritmo consta de dividir la pantalla en un árbol cuaternario. Esto lo hace debido a que las hipótesis de Lucas-Kanade deben cumplirse, por lo que se toma una pequeña parte de la imagen del menor tamaño posible, donde tienden a cumplirse las hipótesis del algoritmo. De allí calculando se calcula recursivamente cada partición hasta el primer nivel.
+Este algoritmo se basa en el principio de ``divide y conquistarás'' al realizar la tarea de detectar movimiento en toda la imagen en problemas más sencillos. El proceso consta de dividir la pantalla en un árbol cuaternario. Esto lo hace debido a que se requiere que las hipótesis de Lucas-Kanade deben cumplirse, se toma una pequeña parte de la imagen, del menor tamaño posible, donde tienden a cumplirse las condiciones necesarias del algoritmo. De allí se calcula recursivamente cada partición hasta el primer nivel.
 \begin{figure}[H]
 		\centering
 		\includegraphics[width=0.5\textwidth]{Imagenes/op.png}
@@ -24,7 +24,7 @@ Este algoritmo se basa en el principio de ``divide y conquistarás'' al realizar
 \end{figure}
 \subsection{Shi-Tomasi}
 
-El algoritmo de Shi-Tomasi se basa en el algoritmo de Harris para la detección de bordes. El funcionamiento del algoritmo se basa en asignarle un valor a cada pixel del bitmap recibido, y si el valor del pixel es mayor a cierto límite se determina que ese pixel corresponde a una esquina. El valor asignado al pixel se obtiene utilizando dos autovalores de una matriz Z. Uno le pasa estos autovalores a una función y esta los manipula y devuelve el valor.
+Por su parte, el algoritmo de Shi-Tomasi se basa en el algoritmo de Harris para la detección de bordes. El funcionamiento del algoritmo se basa en asignarle un valor a cada pixel del bitmap recibido, y si el valor del pixel es mayor a cierto límite se determina que este corresponde a una esquina. El valor asignado al pixel se obtiene utilizando dos autovalores de una matriz Z. Una función recibe estos autovalores, para poder manipularlos y devolver el valor.
 La diferenciación entre el algoritmo de Harris y el de Shi-Tomasi, es que mientras Harris utiliza la función mencionada previamente, Shi-Tomasi decide utilizar únicamente los autovalores \cite{ref:shi-tomasi}.
 \\ Los valores de cada pixel se determinan de la siguiente manera:
 
@@ -121,7 +121,7 @@ K_k = P_{k|k-1}H^TS_k^{-1}
 
 
 
- En la Figura (\ref{fig:kalman-comp}) se puede observar el funcionamiento del algoritmo con un vector de estados dinámicos de dimensión dos compuesto por las coordenadas $(x,y)$ sobre el plano cartesiano, realizando mediciones periódicamente. Se comparan dos curvas. Por un lado, una senoidal con un ruido gaussiano montado sobre ella, simulando una serie de mediciones con ruido, y por el otro lado, la estimación obtenida a partir del filtro desarrollado.
+ En la Figura (\ref{fig:kalman-comp}) se puede observar el funcionamiento del algoritmo con un vector de estados dinámicos de dimensión dos compuesto por las coordenadas $(x,y)$ sobre el plano cartesiano. Realizando mediciones periódicamente, se comparan dos curvas. Por un lado, una senoidal con un ruido gaussiano montado sobre ella, simulando una serie de mediciones con ruido, y por el otro lado, la estimación obtenida a partir del filtro desarrollado.
 
 \begin{figure}[H]
 \centering
@@ -132,7 +132,7 @@ K_k = P_{k|k-1}H^TS_k^{-1}
 
 \subsection{Filtros de Correlación:}
 \label{sec:corr}
-El filtro de correlación o también conocido como ``Matched Filter''  \cite{ref:Corr}  en inglés, se obtiene al calcular la correlación de una señal conocida, o ``kernel'', con una señal desconocida con el propósito de detectar este kernel en la última señal. Esto último es equivalente a convolucionar la señal desconocida con la inversión temporal del conjugado del kernel. Este filtro es el filtro óptimo lineal que maximiza la relación señal a ruido (SNR) en presencia de ruido aditivo.
+El filtro de correlación o también conocido como ``Matched Filter'' \cite{ref:Corr} en inglés, se obtiene al calcular la correlación de una señal conocida, o ``kernel'', con una señal desconocida con el propósito de detectar este kernel en la última señal. Esto último es equivalente a convolucionar la señal desconocida con la inversión temporal del conjugado de la conocida. Este filtro es el óptimo lineal que maximiza la relación señal a ruido (SNR) en presencia de ruido aditivo.
 
 Existen diversas maneras de calcular esta correlación, los dos métodos propuestos fueron:
 \begin{itemize}
@@ -150,8 +150,6 @@ R(x,y) = \frac{\Sigma_{x',y'} \left( T(x',y') \cdot I(x+x',y+y') \right)}{\sqrt{
 Donde R es la función de resultado, I la señal desconocida, y T el template o kernel.
 
 A continuación se muestra una imagen y el resultado del cálculo de correlación utilizando la correlación por cuadrados mínimos y por correlación.
-
-
 
 \begin{figure}[H]
 \centering
@@ -182,4 +180,4 @@ A continuación se muestra una imagen y el resultado del cálculo de correlació
 	\caption{Aplicación del algoritmo de correlación.}
 	\label{fig:corrtest}
 \end{figure}
-Se puede apreciar como el punto más oscuro de la pantalla indica el punto de mayor correlación entre la imagen fuente y el kernel seleccionado para el algorítmo de cuadrados mínimos mientras que el mas claro indica la mayor correlación para el otro. 
+Se puede apreciar como el punto más oscuro de la pantalla indica el punto de mayor correlación entre la imagen fuente y el kernel seleccionado para el algoritmo de cuadrados mínimos mientras que el mas claro indica la mayor correlación para el otro. 
