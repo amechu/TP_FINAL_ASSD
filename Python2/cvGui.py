@@ -92,7 +92,6 @@ class cvGui():
         #Source names    
         self.VideoLoaded = "None"
         self.CurrentSource = "None"
-        self.DebugModeString = "Off"
         self.videoName = ""                 
         self.videoPath = ""                  
         self.videoExtension = ""
@@ -201,6 +200,7 @@ class cvGui():
 
         self.ShowShit = [True]
         self.ShowEstimate = [True]
+        self.ShowTrajectory = [True]
 
     def onWork(self):
 
@@ -485,8 +485,13 @@ class cvGui():
                         cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
 
             #Show Features
-            cvui.checkbox(self.frame, WINDOW_SOU_X + 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Shi-Tomasi Features", self.ShowShit)
-            cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH/2)+ 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Kalman Estiamted Pos.", self.ShowEstimate)
+            beforeShowBox = [self.ShowShit[0], self.ShowEstimate[0], self.ShowTrajectory[0]]
+            cvui.checkbox(self.frame, WINDOW_SOU_X + 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Features", self.ShowShit)
+            cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH/3), WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Estiamted Pos.", self.ShowEstimate)
+            cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH) - 130, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Trajectory", self.ShowTrajectory)
+            afterShowBox = [self.ShowShit[0], self.ShowEstimate[0], self.ShowTrajectory[0]]
+            if not beforeShowBox == afterShowBox:
+                self.changeInTrackers = True
 
             #Filters: Correlation, Cam shift, Color, Histogram
 
@@ -709,8 +714,8 @@ class cvGui():
                     if not alreadyTex:
                         cvui.printf(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 25, 0.4, 0xdc2710, f'Tracker Error In Tracker:')
                         alreadyTex = True
-                    cvui.printf(self.frame, WINDOW_SOU_X + 165 + nizu * 10, WINDOW_SOU_Y + 25, 0.4, self.trackerColors[nizu], f'{nizu + 1}')
-                    nizu = nizu + 1
+                    cvui.printf(self.frame, WINDOW_SOU_X + 165 + nizu * 10, WINDOW_SOU_Y + 25, 0.4, self.trackerColors[i], f'{i + 1}')
+                    nizu += 1
 
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
@@ -999,24 +1004,31 @@ class cvGui():
 
             self.updateFilterFrame()
 
-            i = 0
-            for tracker in self.trackers:
-                r = (self.trackerColors[i] >> 16) & 0xff
-                g = (self.trackerColors[i] >> 8) & 0xff
-                b = self.trackerColors[i] & 0xff
-                self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
-                if tracker.SC.trackingError is False:
-                    if self.ShowEstimate[0]:
-                        self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                    if self.ShowShit[0]:
-                        self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
-                else:
-                    if self.ShowEstimate[0]:
-                        self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                    self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
-                i +=1
+            self.updateArtist()
 
         return todoPiola
+
+    def updateArtist(self):
+        i = 0
+        for tracker in self.trackers:
+            r = (self.trackerColors[i] >> 16) & 0xff
+            g = (self.trackerColors[i] >> 8) & 0xff
+            b = self.trackerColors[i] & 0xff
+            if self.ShowTrajectory[0]:
+                self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
+            if tracker.SC.trackingError is False:
+                if self.ShowEstimate[0]:
+                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(),
+                                                         tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                if self.ShowShit[0]:
+                    self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
+            else:
+                if self.ShowEstimate[0]:
+                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(),
+                                                         tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(),
+                                                       tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
+            i += 1
 
     def callFilterPause(self):
         if self.boolVideoLoaded:
@@ -1024,11 +1036,6 @@ class cvGui():
         else:
             self.source = self.lastFrame.copy()
 
-        # if self.checkParametersChange():
-        #     for tracker in self.trackers:
-        #         if len(self.parametersNew) == 26:
-        #             del self.parametersNew[25]
-        #         tracker.changeSettings(self.parametersNew)
         self.checkParametersChange()
 
         for tracker in self.trackers:
@@ -1039,21 +1046,7 @@ class cvGui():
             self.lastFilterFrame = self.trackers[filterOfInteres].MF.filterFrame(self.source)
             self.updateFilterFrame()
 
-        i = 0
-        for tracker in self.trackers:
-            # [b,g,r] = tracker.MF.bgrmask
-            r = (self.trackerColors[i] >> 16) & 0xff
-            g = (self.trackerColors[i] >> 8) & 0xff
-            b = self.trackerColors[i] & 0xff
-            self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
-            if tracker.SC.trackingError is False:
-                self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(),
-                                                     tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
-            else:
-                self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(),
-                                                       tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
-            i += 1
+        self.updateArtist()
 
         return True
 
