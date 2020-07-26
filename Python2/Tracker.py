@@ -274,7 +274,7 @@ class Tracker:
         return countOutside - countInside
 
     def calculate_optimal_params(self):
-        for i in range(5):
+        for i in range(3):
             self.optimize()
         params = {"bins":self.MF.hist_filter.bins_opti,
                   "mask_blur":self.MF.hist_filter.mask_blur_size_opti,
