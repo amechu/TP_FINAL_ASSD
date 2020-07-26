@@ -200,15 +200,15 @@ EXPLICAR LO SIGUIENTE
 \begin{figure*}
 \centering
 	\includegraphics[width=0.5\textwidth]{Imagenes/camshift_mask1.png}
-	\caption{Primer ejemplo del algoritmo de enmascaramiento basado en camshift.}
+	\caption{Primer ejemplo del algoritmo de enmascaramiento basado en camshift. En este ejemplo se puede notar la eficiencia conseguida en la máscara, debido a que por más que se encuentren varios objetos en escena de un color muy similar al objeto de interés, estos son exluídos por la máscara. Además, y de mayor importancia, se puede notar como el algoritmo de enmascaramiento no excluye la zona del libro bajo sombra. Esto muestra la gran robustez frente a cambios en la iluminación del algoritmo.}
 	\label{fig:c_mask1}
 \end{figure*}
-\begin{figure*}
+\begin{figure}[H]
 \centering
 	\includegraphics[width=0.5\textwidth]{Imagenes/camshift_mask2.png}
-	\caption{Segundo ejemplo del algoritmo de enmascaramiento basado en camshift.}
+	\caption{Segundo ejemplo del algoritmo de enmascaramiento basado en camshift. Se observa como el enmascaramiento se realiza a partir de la distribución de colores y no de los colores por separado, dado que por más que los carretes de hilo azules y amarillos posean colores dentro de la selección original (el libro), estos son excluídos por el algoritmo de enmascaramiento. Se editó a posteriori el histograma de colores de la selección sobre la imagen ya filtrada.}
 	\label{fig:c_mask2}
-\end{figure*}
+\end{figure}
 \subsection{Máscara por CIE-LAB}
 
 
