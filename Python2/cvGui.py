@@ -179,7 +179,7 @@ class cvGui():
         self.parametersNew = []
         self.boolForTrackers = []
         self.kernel = []
-        self.trackSelectionBGR = []
+        self.trackSelectionBGR = [[], [], [], [], []]
         self.lastTracker = -1
         self.configSelected = []
 
@@ -330,7 +330,7 @@ class cvGui():
                 status = cvui.iarea(xFrame, yFrame, w, h)
                 if status == cvui.CLICK:
                     cursor = cvui.mouse(WINDOW_NAME)
-                    self.trackSelectionBGR = self.frame[cursor.y, cursor.x]
+                    self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
 
                 if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
                     self.changeInTrackers = True
@@ -340,6 +340,7 @@ class cvGui():
                     del self.trackers[i]
                     del self.kernel[i]
                     self.trackerColors.append(self.trackerColors[i])
+                    self.trackSelectionBGR[i] = []
                     del self.trackerColors[i]
                     selectedT = self.IsTrackerSelected()
 
@@ -908,7 +909,9 @@ class cvGui():
         self.recAlgCorr[0] = [True]
         self.recAlgST[0] = [False]
 
-        self.trackSelectionBGR = []
+        sT = self.IsTrackerSelected()
+        if sT != 1:
+            self.trackSelectionBGR[sT] = []
 
         self.maskCondition[0] = MASK_COND
 
@@ -1144,7 +1147,8 @@ class cvGui():
 
         self.maskCondition[0] = self.configSelected[selected][23]
 
-        self.trackSelectionBGR = self.configSelected[selected][25]
+        if len(self.configSelected[selected]) == 26:
+            self.trackSelectionBGR[selected] = self.configSelected[selected][25]
 
     def updateParameters(self):
         self.parameters.clear()
@@ -1186,8 +1190,8 @@ class cvGui():
         self.parameters.append(self.maskBlur_lab[0])        #24
 
         selected = self.IsTrackerSelected()
-        #if not len(self.trackSelectionBGR) == 0:
-        self.parameters.append(self.trackSelectionBGR)        #25
+        if selected != -1 and (not len(self.trackSelectionBGR[selected]) == 0):
+            self.parameters.append(self.trackSelectionBGR[selected])        #25
 
     def IsTrackerSelected(self):
         filterOfInteres = -1
@@ -1242,7 +1246,18 @@ class cvGui():
             self.parametersNew.append(self.maskBlur_lab[0])  # 24
 
             sT = self.IsTrackerSelected()
-            self.parametersNew.append(self.trackSelectionBGR)
+            if sT != -1 and (not len(self.trackSelectionBGR[sT]) == 0):
+                self.parametersNew.append(self.trackSelectionBGR[sT])
+                if len(self.parametersNew) == 26:
+                    if len(self.parameters) == 26:
+                        if not (self.parametersNew[25][0] == self.parameters[25][0] and self.parametersNew[25][1] == self.parameters[25][1] and self.parametersNew[25][2] == self.parameters[25][2]):
+                            changes = True  # Tracker BGR
+                            self.trackers[sT].colorKernelChange(self.parametersNew[25])
+                            self.trackers[sT].updateBGR(self.parametersNew[25])
+                    else:
+                        changes = True  # Tracker BGR
+                        self.trackers[sT].colorKernelChange(self.parametersNew[25])
+                        self.trackers[sT].updateBGR(self.parametersNew[25])
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
@@ -1284,13 +1299,6 @@ class cvGui():
             if not(self.parametersNew[23] == self.parameters[23]):
                 changes = True      #Mask condition
                 self.trackers[sT].updateMaskCond(self.parametersNew[23])
-
-            if (len(self.parametersNew[25]) == len(self.parameters[25])) and not len(self.parametersNew[25]) == 0:
-                if not(self.parametersNew[25][0] == self.parameters[25][0] and self.parametersNew[25][1] == self.parameters[25][1] and self.parametersNew[25][2] == self.parameters[25][2]):
-                    changes = True  # Tracker BGR
-                    self.trackers[sT].colorKernelChange(self.parametersNew[25])
-                    self.trackers[sT].updateBGR(self.parametersNew[25])
-
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
