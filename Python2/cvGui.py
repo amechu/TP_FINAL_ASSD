@@ -92,7 +92,6 @@ class cvGui():
         #Source names    
         self.VideoLoaded = "None"
         self.CurrentSource = "None"
-        self.DebugModeString = "Off"
         self.videoName = ""                 
         self.videoPath = ""                  
         self.videoExtension = ""
@@ -180,7 +179,7 @@ class cvGui():
         self.parametersNew = []
         self.boolForTrackers = []
         self.kernel = []
-        self.trackSelectionBGR = []
+        self.trackSelectionBGR = [[], [], [], [], []]
         self.lastTracker = -1
         self.configSelected = []
 
@@ -199,6 +198,9 @@ class cvGui():
         self.replaceRoi = False
         self.coordsRoi = []
 
+        self.ShowShit = [True]
+        self.ShowEstimate = [True]
+        self.ShowTrajectory = [True]
 
     def onWork(self):
 
@@ -207,6 +209,8 @@ class cvGui():
         originalParam = self.parameters.copy()
 
         while True:
+
+            # print(f'LAB: {self.CFCamShiftOnOff}           CamOnOF:{self.CFPropOnOff}')
 
             self.updateParameters()
             selectedT = self.IsTrackerSelected()
@@ -227,8 +231,6 @@ class cvGui():
 
             if selectedT == -1:
                 cvui.printf(self.frame, 17, 275, 0.4, 0xdd97fb, "No Tracker Selected To Modify")        #0xd11616
-            # elif self.verifyInitialCond():
-            #     cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Settings By Default For Tracker " + str(selectedT + 1) + "!")
             else:
                 cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Changes Saved For Tracker " + str(selectedT + 1) + "!")
 
@@ -257,10 +259,22 @@ class cvGui():
                         self.usingCamera = False
                         self.usingVideo = False
 
-                elif not self.usingCamera:
-                    self.CurrentSource = "No Video Loaded"
+                # elif not self.usingCamera:
+                #     self.CurrentSource = "No Video Loaded"
 
-            if (cvui.button(self.frame, 20, 105, "Use Camera") and not self.usingCamera):
+            if (cvui.button(self.frame, 120, 70, "Reload Video") and self.usingVideo):
+                self.usingCamera = False
+                self.usingVideo = True
+                if (self.initSource()):  # Chequear si se inicia bien
+                    self.VideoLoaded = self.videoPath
+                    self.CurrentSource = "Video Loaded: " + self.videoName
+                    selectedT = -1
+                    self.pause = True
+                else:
+                    self.usingCamera = False
+                    self.usingVideo = False
+
+            if (cvui.button(self.frame, int((2*WINDOW_SET_X + WINDOW_SET_WIDTH)/2.0) - 60, 105, "Use Camera") and not self.usingCamera):
                self.trackers.clear()
                self.usingVideo = False
                self.usingCamera = True
@@ -312,16 +326,13 @@ class cvGui():
 
                 w = int(self.kernel[i].shape[1])
                 h = int(self.kernel[i].shape[0])
-                xFrame = int((windowWidth + 2*(xTx))/2 - w/2)   #int((windowWidth + 2*(xTx-30))/2 - w/2)
+                xFrame = int((windowWidth + 2*(xTx))/2 - w/2)
                 yFrame = yTx + 150
                 self.frame[yFrame:yFrame + h, xFrame:xFrame + w] = self.kernel[i]
                 status = cvui.iarea(xFrame, yFrame, w, h)
                 if status == cvui.CLICK:
                     cursor = cvui.mouse(WINDOW_NAME)
-                    if i < len(self.trackSelectionBGR):
-                        self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
-                    else:
-                        self.trackSelectionBGR.append(self.frame[cursor.y, cursor.x])
+                    self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
 
                 if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
                     self.changeInTrackers = True
@@ -331,10 +342,10 @@ class cvGui():
                     del self.trackers[i]
                     del self.kernel[i]
                     self.trackerColors.append(self.trackerColors[i])
+                    self.trackSelectionBGR[i] = []
                     del self.trackerColors[i]
                     selectedT = self.IsTrackerSelected()
-                    if i < len(self.trackSelectionBGR):
-                        del self.trackSelectionBGR[i]
+
                     if len(self.trackers) == 0:
                         self.filteredFrame = None
                         self.resetInitialCond()
@@ -466,10 +477,20 @@ class cvGui():
 
                     if (cvui.checkbox(self.frame, 20, 680, "Feature Recalculation", self.ShiTPropOnOff)):
                         cvui.printf(self.frame, 20, 710, 0.4, 0xdd97fb, "Recalculation Number")
-                        cvui.trackbar(self.frame, 20, 725, 210, self.shit_Rec, 1.0, 100.0)
+                        cvui.trackbar(self.frame, 20, 725, 210, self.shit_Rec, 1.0, 100.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                        self.shit_Rec[0] = int(self.shit_Rec[0])
                         cvui.printf(self.frame, 185, 682, 0.4, 0x10dcA1, "%s", "On")
                     else:
                         cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
+
+            #Show Features
+            beforeShowBox = [self.ShowShit[0], self.ShowEstimate[0], self.ShowTrajectory[0]]
+            cvui.checkbox(self.frame, WINDOW_SOU_X + 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Features", self.ShowShit)
+            cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH/3), WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Estiamted Pos.", self.ShowEstimate)
+            cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH) - 130, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Trajectory", self.ShowTrajectory)
+            afterShowBox = [self.ShowShit[0], self.ShowEstimate[0], self.ShowTrajectory[0]]
+            if not beforeShowBox == afterShowBox:
+                self.changeInTrackers = True
 
             #Filters: Correlation, Cam shift, Color, Histogram
 
@@ -651,37 +672,52 @@ class cvGui():
                         y0 = int(WINDOW_FILS_Y + 125) + WINDOW_FILS_WIDTH
                         self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
-            cvui.printf(self.frame, 20, 775, 0.4, 0xdd97fb, "Missing Algorithm")
-            if cvui.checkbox(self.frame, 20, 790, "Correlation", self.missAlgCorr):
-                self.missAlgST[0] = False
-            else:
-                self.missAlgST[0] = True
+            if not selectedT == -1:
+                cvui.printf(self.frame, 20, 775, 0.4, 0xdd97fb, "Missing Algorithm")
+                if cvui.checkbox(self.frame, 20, 790, "Correlation", self.missAlgCorr):
+                    self.missAlgST[0] = False
+                else:
+                    self.missAlgST[0] = True
 
-            if cvui.checkbox(self.frame, 150, 790, "ST", self.missAlgST):
-                self.missAlgCorr[0] = False
-            else:
-                self.missAlgCorr[0] = True
+                if cvui.checkbox(self.frame, 150, 790, "ST", self.missAlgST):
+                    self.missAlgCorr[0] = False
+                else:
+                    self.missAlgCorr[0] = True
 
-            cvui.printf(self.frame, 20, 810, 0.4, 0xdd97fb, "Recalculation Algorithm")
-            if cvui.checkbox(self.frame, 20, 825, "Correlation", self.recAlgCorr):
-                self.recAlgST[0] = False
-            else:
-                self.recAlgST[0] = True
+                cvui.printf(self.frame, 20, 810, 0.4, 0xdd97fb, "Recalculation Algorithm")
+                if cvui.checkbox(self.frame, 20, 825, "Correlation", self.recAlgCorr):
+                    self.recAlgST[0] = False
+                else:
+                    self.recAlgST[0] = True
 
-            if cvui.checkbox(self.frame, 150, 825, "ST", self.recAlgST):
-                self.recAlgCorr[0] = False
-            else:
-                self.recAlgCorr[0] = True
+                if cvui.checkbox(self.frame, 150, 825, "ST", self.recAlgST):
+                    self.recAlgCorr[0] = False
+                else:
+                    self.recAlgCorr[0] = True
+
             
-            if (self.missAlgCorr[0] or self.recAlgCorr[0]) and not self.replaceRoi:
-                cvui.printf(self.frame, 20, 850, 0.4, 0xdd97fb, "Mask Correlation")
-                cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                if (self.missAlgCorr[0] or self.recAlgCorr[0]) and not self.replaceRoi:
+                    cvui.printf(self.frame, 20, 850, 0.4, 0xdd97fb, "Mask Correlation")
+                    cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
             if not self.replaceRoi:
-                if (cvui.button(self.frame, 50, 915, "Reset")):
+                # if (cvui.button(self.frame, 60, 915, "Reset Settings")):
+                #     self.resetInitialCond()
+                if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
-                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 100, 915, "Auto")):
+                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
                     pass
+
+            alreadyTex = False
+            nizu = 0
+            for i in range(len(self.trackers)):
+                if self.trackers[i].SC.trackingError:
+                    if not alreadyTex:
+                        cvui.printf(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 25, 0.4, 0xdc2710, f'Tracker Error In Tracker:')
+                        alreadyTex = True
+                    cvui.printf(self.frame, WINDOW_SOU_X + 165 + nizu * 10, WINDOW_SOU_Y + 25, 0.4, self.trackerColors[i], f'{i + 1}')
+                    nizu += 1
+
 
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
@@ -718,11 +754,34 @@ class cvGui():
                     y0 = int(((WINDOW_SOU_Y + 37) + (WINDOW_SOU_Y + 37 + WINDOW_SOU_HEIGHT - 75))/2 - self.filterHEIGHT/2)
                     self.frame[y0:y0 + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
 
-            # #Help Frame
-            # cvui.rect(self.frame, 200, 182, 20, 20, 0x494949, 0x545454)
-            # cvui.text(self.frame, 205, 185, "?", 0.6)
-            # if not cvui.iarea(200, 182, 20, 20) == cvui.OUT:
-            #     cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 500, "Help")
+            #Help Frame
+            cvui.rect(self.frame, 210, 182, 20, 20, 0x494949, 0x545454)
+            cvui.text(self.frame, 215, 185, "?", 0.6)
+            if not cvui.iarea(210, 182, 20, 20) == cvui.OUT:
+                cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 260, "Help")
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 33, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 30, "Begin loading a video or turning on the camera. Videos will start paused", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 50, "by default.", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 73, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 70, "Add up to 5 different trackers. Tracker Settings will be only available", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 90, "when selecting a tracker.", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 113, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 110, "The Filter Selection will be available after selecting a tracker and", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 130, "turning on a filter option in Mask FIlter (LAB or Cam Shift).", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 153, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 150, "For the Color Filter you can re-select the mean color of the first", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 170, "selection by clicking the kernel that corresponds.", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 193, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 190, "You can configure each tracker with different conditions.", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 213, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 210, "Reset Settings will set settings for the tracker select by default, while", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 230, "Auto will stablish the best conditions for the selection.", 0.4, 0xdd97fb)
+
 
             if ((cvui.button(self.frame, 20, 180, "Add Tracker") and ( (self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
 
@@ -741,8 +800,16 @@ class cvGui():
                         self.coordsRoi.append(cursorRoi.y)
 
                     if len(self.coordsRoi) == 6:
-                        self.coordsRoi[2] = self.coordsRoi[4]
-                        self.coordsRoi[3] = self.coordsRoi[5]
+                        if self.coordsRoi[4] <= int((self.coordsRoi[0] + self.coordsRoi[2])/2.0):
+                            self.coordsRoi[0] = self.coordsRoi[4]
+                        else:
+                            self.coordsRoi[2] = self.coordsRoi[4]
+
+                        if self.coordsRoi[5] <= int((self.coordsRoi[1] + self.coordsRoi[3])/2.0):
+                            self.coordsRoi[1] = self.coordsRoi[5]
+                        else:
+                            self.coordsRoi[3] = self.coordsRoi[5]
+
                         del self.coordsRoi[5]
                         del self.coordsRoi[4]
 
@@ -756,13 +823,21 @@ class cvGui():
                         else:
                             posX = self.coordsRoi[0]
                             wid = self.coordsRoi[2] - self.coordsRoi[0]
+
                         if self.coordsRoi[1] - self.coordsRoi[3] > 0:
                             posY = self.coordsRoi[3]
                             hei = self.coordsRoi[1] - self.coordsRoi[3]
+                            b = self.coordsRoi[3]
                         else:
                             posY = self.coordsRoi[1]
                             hei = self.coordsRoi[3] - self.coordsRoi[1]
+                            b = self.coordsRoi[3]
+
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
+                        if not(b == 0):
+                            cvui.rect(self.frame, self.coordsRoi[2] - 1, b - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                            cvui.rect(self.frame, posX + wid - 1, posY - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                            cvui.rect(self.frame, posX - 1, posY + hei - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
 
                     cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y*2, "Selection Options")
                     cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y*2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
@@ -861,19 +936,24 @@ class cvGui():
         self.recAlgCorr[0] = [True]
         self.recAlgST[0] = [False]
 
+        sT = self.IsTrackerSelected()
+        if sT != 1:
+            self.trackSelectionBGR[sT] = []
+
         self.maskCondition[0] = MASK_COND
 
     def initSource(self):
         self.resetInitialCond()
         self.trackers.clear()
-        self.trackSelectionBGR.clear()
         self.kernel.clear()
 
         self.replaceRoi = False
         self.coordsRoi.clear()
 
         self.source = []
-        # self.source[:] = (49, 52, 49)
+
+        self.boolForTrackers.clear()
+        self.trackerAdded = False
 
         self.arrayVideoLoaded.clear()
         self.boolVideoLoaded = False
@@ -904,8 +984,8 @@ class cvGui():
             if todoPiola:
                 if self.usingVideo:
                     cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, X_SCREEN - 2*WINDOW_VS_X, Y_SCREEN - 2*WINDOW_VS_Y, " ")
-                    cvui.printf(self.frame, int(X_SCREEN/16), int(Y_SCREEN/4), 5, 0xe9d540, "Loading Video")
-                    cvui.printf(self.frame, int(X_SCREEN/16 + 25), int(Y_SCREEN/2), 5, 0xe9d540, "Please Wait...")
+                    cvui.printf(self.frame, int(X_SCREEN/7), int(Y_SCREEN/4), 5, 0xe9d540, "Loading Video")
+                    cvui.printf(self.frame, int(X_SCREEN/7 + 30), int(Y_SCREEN/2), 5, 0xe9d540, "Please Wait...")
                     cvui.imshow(WINDOW_NAME, self.frame)
                     cv.waitKey(1)
                     self.boolVideoLoaded = True
@@ -956,31 +1036,40 @@ class cvGui():
                 self.sourceWIDTH = int(self.source.shape[1])
                 self.sourceHEIGHT = int(self.source.shape[0])
 
-            if self.checkParametersChange():
-                selectedTr = self.IsTrackerSelected()
-                if selectedTr != -1: # and not self.trackerChanged:
-                    self.trackers[selectedTr].changeSettings(self.parametersNew)
+            selectedTr = self.IsTrackerSelected()
+            if selectedTr != -1: # and not self.trackerChanged:
+                self.checkParametersChange()
 
             for tracker in self.trackers:
                 tracker.update(self.source)
 
             self.updateFilterFrame()
 
-            i = 0
-            for tracker in self.trackers:
-                r = (self.trackerColors[i] >> 16) & 0xff
-                g = (self.trackerColors[i] >> 8) & 0xff
-                b = self.trackerColors[i] & 0xff
-                self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
-                if tracker.SC.trackingError is False:
-                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                    self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
-                else:
-                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(), tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                    self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(), tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
-                i +=1
+            self.updateArtist()
 
         return todoPiola
+
+    def updateArtist(self):
+        i = 0
+        for tracker in self.trackers:
+            r = (self.trackerColors[i] >> 16) & 0xff
+            g = (self.trackerColors[i] >> 8) & 0xff
+            b = self.trackerColors[i] & 0xff
+            if self.ShowTrajectory[0]:
+                self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
+            if tracker.SC.trackingError is False:
+                if self.ShowEstimate[0]:
+                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(),
+                                                         tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                if self.ShowShit[0]:
+                    self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
+            else:
+                if self.ShowEstimate[0]:
+                    self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(),
+                                                         tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
+                self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(),
+                                                       tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
+            i += 1
 
     def callFilterPause(self):
         if self.boolVideoLoaded:
@@ -988,11 +1077,7 @@ class cvGui():
         else:
             self.source = self.lastFrame.copy()
 
-        if self.checkParametersChange():
-            for tracker in self.trackers:
-                if len(self.parametersNew) == 26:
-                    del self.parametersNew[25]
-                tracker.changeSettings(self.parametersNew)
+        self.checkParametersChange()
 
         for tracker in self.trackers:
             tracker.MF.updateMaskFromSettings()
@@ -1002,21 +1087,7 @@ class cvGui():
             self.lastFilterFrame = self.trackers[filterOfInteres].MF.filterFrame(self.source)
             self.updateFilterFrame()
 
-        i = 0
-        for tracker in self.trackers:
-            # [b,g,r] = tracker.MF.bgrmask
-            r = (self.trackerColors[i] >> 16) & 0xff
-            g = (self.trackerColors[i] >> 8) & 0xff
-            b = self.trackerColors[i] & 0xff
-            self.source = Artist.Artist.trajectory(self.source, tracker.getTrajectory(), (b, g, r))
-            if tracker.SC.trackingError is False:
-                self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(),
-                                                     tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                self.source = Artist.Artist.features(self.source, tracker.SC.features, (b, g, r))
-            else:
-                self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(),
-                                                       tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
-            i += 1
+        self.updateArtist()
 
         return True
 
@@ -1081,7 +1152,7 @@ class cvGui():
         self.colorFilter_LihtThr[0] = self.configSelected[selected][5]
         self.colorFilter_a[0] = self.configSelected[selected][6]
         self.colorFilter_b[0] = self.configSelected[selected][7]
-        #self.maskBlur_lab[0] = self.configSelected[selected][]
+        self.maskBlur_lab[0] = self.configSelected[selected][24]
 
         self.CFCamShiftOnOff[0] = self.configSelected[selected][8]
         self.camShift_bins[0] = self.configSelected[selected][9]
@@ -1105,7 +1176,7 @@ class cvGui():
 
         self.maskCondition[0] = self.configSelected[selected][23]
 
-        if not len(self.configSelected[selected]) == 25:
+        if len(self.configSelected[selected]) == 26:
             self.trackSelectionBGR[selected] = self.configSelected[selected][25]
 
     def updateParameters(self):
@@ -1121,7 +1192,6 @@ class cvGui():
         self.parameters.append(self.colorFilter_LihtThr[0])    #5X
         self.parameters.append(self.colorFilter_a[0])          #6X
         self.parameters.append(self.colorFilter_b[0])          #7X
-
 
         self.parameters.append(self.CFCamShiftOnOff[0])        #8 (???????)
         self.parameters.append(self.camShift_bins[0])          #9x
@@ -1147,11 +1217,9 @@ class cvGui():
 
         self.parameters.append(self.maskBlur_lab[0])        #24
 
-        sT = self.IsTrackerSelected()
-        # if not len(self.trackSelectionBGR) == 0:
-        if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
-            self.parameters.append(self.trackSelectionBGR[sT])    #25
-
+        selected = self.IsTrackerSelected()
+        if selected != -1 and (not len(self.trackSelectionBGR[selected]) == 0):
+            self.parameters.append(self.trackSelectionBGR[selected])        #25
 
     def IsTrackerSelected(self):
         filterOfInteres = -1
@@ -1180,7 +1248,6 @@ class cvGui():
             self.parametersNew.append(self.colorFilter_LihtThr[0])           #5
             self.parametersNew.append(self.colorFilter_a[0])           #6
             self.parametersNew.append(self.colorFilter_b[0])           #7
-            # self.parametersNew.append(self.maskBlur_lab[0])
 
             self.parametersNew.append(self.CFCamShiftOnOff[0])           #8          #
             self.parametersNew.append(self.camShift_bins[0])           #9
@@ -1204,67 +1271,62 @@ class cvGui():
 
             self.parametersNew.append(self.maskCondition[0])       # 23
 
-            self.parametersNew.append(self.maskBlur_lab[0])     # 24
+            self.parametersNew.append(self.maskBlur_lab[0])  # 24
 
             sT = self.IsTrackerSelected()
-            # if not len(self.trackSelectionBGR[sT]) == 0:
-            if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
-                self.parametersNew.append(self.trackSelectionBGR[sT])  # 25
-
-
+            if sT != -1 and (not len(self.trackSelectionBGR[sT]) == 0):
+                self.parametersNew.append(self.trackSelectionBGR[sT])
+                if len(self.parametersNew) == 26:
+                    if len(self.parameters) == 26:
+                        if not (self.parametersNew[25][0] == self.parameters[25][0] and self.parametersNew[25][1] == self.parameters[25][1] and self.parametersNew[25][2] == self.parameters[25][2]):
+                            changes = True  # Tracker BGR
+                            self.trackers[sT].colorKernelChange(self.parametersNew[25])
+                            self.trackers[sT].updateBGR(self.parametersNew[25])
+                    else:
+                        changes = True  # Tracker BGR
+                        self.trackers[sT].colorKernelChange(self.parametersNew[25])
+                        self.trackers[sT].updateBGR(self.parametersNew[25])
 
             if not(self.parametersNew[0] == self.parameters[0] and self.parametersNew[1] == self.parameters[1] and self.parametersNew[2] == self.parameters[2]) :
                 changes = True         #Chequeo Kalman
-                #self.trackers[sT].updateKalman(self.parametersNew[0], self.parametersNew[1], self.parametersNew[2])
+                self.trackers[sT].updateKalman(self.parametersNew[0], self.parametersNew[1], self.parametersNew[2])
 
             if not(self.parametersNew[3] == self.parameters[3]):
                 changes = True         #Chequeo Lucas-Kanade
-                # self.trackers[sT].updateLK(self.parametersNew[3])
+                self.trackers[sT].updateLK(self.parametersNew[3])
 
             if not(self.parametersNew[4] == self.parameters[4]):
                 changes = True        #Color Filter On/Off
-                # self.trackers[sT].updateColorFilter(self.parametersNew[4], self.parametersNew[5], self.parametersNew[6], self.parametersNew[7], self.parametersNew[24])
+                self.trackers[sT].updateColorFilter(self.parametersNew[4], self.parametersNew[5], self.parametersNew[6], self.parametersNew[7], self.parametersNew[24])
             elif not ((self.parametersNew[5] == self.parameters[5]) and (self.parametersNew[6] == self.parameters[6]) and (self.parametersNew[7] == self.parameters[7]) and (self.parametersNew[24] == self.parameters[24])):
                 changes = True      #Chequeo Params de CF
-                # self.trackers[sT].updateColorFilter(self.parametersNew[4], self.parametersNew[5], self.parametersNew[6], self.parametersNew[7], self.parametersNew[24])
+                self.trackers[sT].updateColorFilter(self.parametersNew[4], self.parametersNew[5], self.parametersNew[6], self.parametersNew[7], self.parametersNew[24])
 
             if not(self.parametersNew[8] == self.parameters[8]):
                 changes = True        #Cam Shift On/Off
-                # self.trackers[sT].updateCamShift(self.parametersNew[8], self.parametersNew[9], self.parametersNew[10], self.parametersNew[11], self.parametersNew[12])
+                self.trackers[sT].updateCamShift(self.parametersNew[8], self.parametersNew[9], self.parametersNew[10], self.parametersNew[11], self.parametersNew[12])
             elif not(self.parametersNew[9] == self.parameters[9] and self.parametersNew[10] == self.parameters[10] and self.parametersNew[11] == self.parameters[11] and self.parametersNew[12] == self.parameters[12]):       #BINS
                 changes = True
-                # self.trackers[sT].updateCamShift(self.parametersNew[8], self.parametersNew[9], self.parametersNew[10], self.parametersNew[11], self.parametersNew[12])
+                self.trackers[sT].updateCamShift(self.parametersNew[8], self.parametersNew[9], self.parametersNew[10], self.parametersNew[11], self.parametersNew[12])
 
             if not(self.parametersNew[13] == self.parameters[13] and self.parametersNew[14] == self.parameters[14] and self.parametersNew[15] == self.parameters[15] and self.parametersNew[16] == self.parameters[16]):
                 changes = True         #Chequeo Shi-Tomasi
-                # self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
+                self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
 
             if not(self.parametersNew[17] == self.parameters[17]):
                 changes = True        #Shi-Tomasi On/Off
-                # self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
+                self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
             elif not(self.parametersNew[18] == self.parameters[18]):
                 changes = True   #Chequeo Params Shi
-                # self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
+                self.trackers[sT].updateShiT(self.parametersNew[13], self.parametersNew[14], self.parametersNew[15], self.parametersNew[16], self.parametersNew[17], self.parametersNew[18])
 
             if not(self.parametersNew[19] == self.parameters[19] and self.parametersNew[20] == self.parameters[20] and  self.parametersNew[21] == self.parameters[21] and  self.parametersNew[22] == self.parameters[22]):
                 changes = True      #Missing and Search algorithm
-                # self.trackers[sT].updateMissinSearch(self.parametersNew[19], self.parametersNew[80], self.parametersNew[21], self.parametersNew[21], self.parametersNew[22])
+                self.trackers[sT].updateMissinSearch(self.parametersNew[19], self.parametersNew[20], self.parametersNew[21], self.parametersNew[22])
 
             if not(self.parametersNew[23] == self.parameters[23]):
                 changes = True      #Mask condition
-                # self.trackers[sT].updateMaskCond(self.parametersNew[23])
-
-            #if not len(self.trackSelectionBGR[sT]) == 0:
-            if sT is not -1 and sT < len(self.trackSelectionBGR) and len(self.trackSelectionBGR[sT]) is not 0:
-                if len(self.parametersNew) == len(self.parameters):
-                    if not(self.parametersNew[25][0] == self.parameters[25][0] and self.parametersNew[25][1] == self.parameters[25][1] and self.parametersNew[25][2] == self.parameters[25][2]):
-                        changes = True  # Tracker BGR
-                        self.trackers[sT].colorKernelChange(self.parametersNew[25])
-                        # self.trackers[sT].updateBGR(self.parametersNew[25])
-                else:
-                    changes = True
-                    self.trackers[sT].colorKernelChange(self.parametersNew[25])
-                    self.trackers[sT].updateBGR(self.parametersNew[25])
+                self.trackers[sT].updateMaskCond(self.parametersNew[23])
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()

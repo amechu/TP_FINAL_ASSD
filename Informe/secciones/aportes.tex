@@ -1,9 +1,9 @@
 
 \subsection{Primer diseño}
 
-A partir de una selección del video proporcionada por el usuario se obtienen las mejores features del objeto seleccionado utilizando el algoritmo de Shi-Tomasi. Luego, mediante el algoritmo de Lucas-Kanade de Optical Flow se obtiene la evolución de dichas features en el tiempo. A este cúmulo de puntos se le calcula el centro de masas $\mu$ y el centro de inercia $\sigma$. Se rechazan los puntos de este cúmulo que se encuentren a una distancia mayor a $k_{\sigma}\sigma$ respecto al centro de masas, para luego calcular nuevamente el centro de masas el cual es el que se introduce en el filtro de Kalman como medición de la posición.
+A partir de una selección del video proporcionada por el usuario se obtienen las mejores features del objeto deseado, utilizando el algoritmo de Shi-Tomasi. Luego, mediante el de Lucas-Kanade de Optical Flow se obtiene la evolución de dichas features en el tiempo. A este cúmulo de puntos se le calcula el centro de masas $\mu$ y el centro de inercia $\sigma$. Se rechazan los puntos de este cúmulo que se encuentren a una distancia mayor a $k_{\sigma}\sigma$ respecto al centro de masas, para luego calcular nuevamente dicho centro, el cual es el que se introduce en el filtro de Kalman como medición de la posición.
 
-La dimensión del vector de estados del filtro de Kalman es de cuatro, poseyendo la posición y la velocidad tanto horizontal como vertical. La dimensión del vector de observación es de dos dado que solamente se mide la posición horizontal y vertical del centro de masas. La matriz $A$ queda definida por las ecuaciones que caracterizan el movimiento del objeto a seguir que, por simplicidad, se consideraron las ecuaciones cinemáticas de MRU, quedando entonces
+La dimensión del vector de estados del filtro de Kalman es de cuatro, poseyendo la posición y la velocidad tanto horizontal como vertical. La dimensión del vector de observación es de dos, dado que solamente se mide la posición horizontal y vertical del centro de masas. La matriz $A$ queda definida por las ecuaciones que caracterizan el movimiento del objeto a seguir que, por simplicidad, se consideraron las ecuaciones cinemáticas de MRU, quedando entonces
 \begin{equation}
 \begin{pmatrix} x_{k-1} + dt\cdot v_{x_{k-1}} \\y_{k-1} + dt\cdot v_{y_{k-1}} \\ v_{x_{k-1}}  \\ v_{y_{k-1}} \end{pmatrix} =\begin{pmatrix}
 1 & 0 & dt  & 0\\
@@ -23,11 +23,11 @@ A =
 \end{pmatrix}
 \end{equation}
 
-Luego, se tiene que la matriz de observación o de transición de medición quedará definida por la transformación del espacio de observación al espacio real del vector de estados del filtro. Como los observables a medir forman parte del espacio real del vector de estados y son solo las posiciones, la matriz quedará definida de manera simple
+Luego, se tiene que la matriz de observación o de transición de medición queda definida por la transformación del espacio de observación al espacio real del vector de estados del filtro. Como los observables a medir forman parte del espacio real del vector de estados y son solo las posiciones, la matriz queda definida de manera simple
 \begin{equation}
 \begin{pmatrix} z_{x_{k}} \\ z_{y_{k}} \end{pmatrix}=\begin{pmatrix}
 1 & 0 & 0  & 0\\
-%0 & 1  & 0 & 0  \end{pmatrix} \cdot  \begin{pmatrix} x_k \\ y_k \\ v_{x_{k}} \\ v_{y_{k}} \ver
+0 & 1  & 0 & 0  \end{pmatrix} \cdot  \begin{pmatrix} x_k \\ y_k \\ v_{x_{k}} \\ v_{y_{k}}
 \end{pmatrix}
 \end{equation}
 Siendo,
@@ -39,7 +39,7 @@ H =
 \end{pmatrix}
 \end{equation}
 
-Mientras que la matrices de covarianza del proceso $Q$ y de medición $R$ serán cuadradas por definición, de dimensión cuatro y dos respectivamente, y además de la forma $\mathbb{I}\cdot \xi$ dado que se asume independencia de las variables aleatorias, quedando
+Las matrices de covarianza del proceso $Q$ y de medición $R$ son cuadradas por definición, de dimensión cuatro y dos respectivamente. Además, son la forma $\mathbb{I}\cdot \xi$ dado que se asume independencia de las variables aleatorias, quedando
 
 \begin{equation}
 Q = 
@@ -58,10 +58,9 @@ R =
 0 & \xi_R 
 \end{pmatrix}
 \end{equation}
-
 Siendo $\xi_Q$ y $\xi_R$ las varianzas del proceso y de medición respectivamente.
 
-Finalmente, $\hat{x}_{k|k}$ y $P_{k|k}$ tomarán la forma
+Finalmente, $\hat{x}_{k|k}$ y $P_{k|k}$ toman la forma
 
 \begin{equation}
 \hat{x}_{k|k} = 
@@ -82,15 +81,14 @@ P_{k|k} =
 0 & 0  & 0  & \gamma_{v_y} 
 \end{pmatrix}
 \end{equation}
-
 Siendo $\gamma_{i}$ la varianza de cada variable de estado. Cabe notar que el modelo utilizado asume independencia entre las variables aleatorias por simplicidad.
 
-Este algoritmo, hasta ahora explicado, cuenta con grandes problemas. Dados dos objetos $A$ y $B$, donde $A$ es el objeto a seguir:
+Este algoritmo explicado, cuenta con grandes problemas. Dados dos objetos $A$ y $B$, donde $A$ es el objeto a seguir:
 
 \begin{itemize}
-\item Como el algoritmo de Shi-Tomasi tiende a colocar features en bordes bien definidos, y estos suelen ser los bordes externos de un objeto, si el objeto a seguir $A$ pasa por delante de un objeto $B$ con bordes bien definidos, las features del algoritmo de Optical Flow tenderán a adosarse a los bordes del objeto $B$ por más que este esté quieto.
-\item Si el objeto $A$ pasase por detrás del objeto $B$ inmóvil, todas las features sobre el objeto a seguir quedarían adosadas al objeto $B$. Esto plantea un problema mucho más grande que el anterior, dado que no se podrá utilizar la estimación del filtro de Kalman de manera confiable, debido a que cuando los features se queden quietos adosados en $B$, se seguirá midiendo de todas formas y se seguirán entregando esas mediciones al filtro de Kalman, por lo que la estimación de este se adosará también al objeto $B$.
-\item Profundizando en el item anterior, existe una ambigüedad entre que $A$ pase de un movimiento MRU a que se quede completamente quieto y que $A$ pase por detras de $B$, dado que en ambas situaciones las features quedarán quietas en el lugar donde $A$ se haya quedado quieto o el lugar de la intersección entre $A$ y $B$
+\item Como el algoritmo de Shi-Tomasi tiende a colocar features en bordes bien definidos, y estos suelen ser los bordes externos de un objeto, si el objeto a seguir $A$ pasa por delante de un objeto $B$ con bordes bien definidos, las features del algoritmo de Optical Flow tienden a adosarse a los bordes del objeto $B$ por más que este esté quieto.
+\item Si el objeto $A$ pasase por detrás del objeto $B$ inmóvil, todas las features sobre el objeto a seguir quedan adosadas al objeto $B$. Esto plantea un problema mucho más grande que el anterior, dado que no se puede utilizar la estimación del filtro de Kalman de manera confiable, debido a que cuando los features se queden quietos adosados en $B$, se sigue midiendo de todas formas y se sigue entregando esas mediciones al filtro de Kalman, por lo que la estimación de este se adosa también al objeto $B$.
+\item Profundizando en el item anterior, existe una ambigüedad entre que $A$ pase de un movimiento MRU a que se quede completamente quieto y que $A$ pase por detrás de $B$, dado que en ambas situaciones las features quedan quietas en el lugar donde $A$ se haya quedado quieto o el lugar de la intersección entre $A$ y $B$
 \end{itemize}
 
 \subsection{Segundo diseño}
@@ -137,13 +135,13 @@ donde $\Lambda$ es el límite para cada propiedad $u$, siendo estas Hue, Saturat
 	\label{fig:color_comp}
 \end{figure}
 
-Este filtrado de color no solo posee una gran sinergia con el método de obtención de features de Shi-Tomasi, dado que este frame tendrá bordes de mucha mejor calidad, sino que también posee una gran sinergia con el método de Optical Flow, debido a que como se verán menos bordes en la imagen modificada, aumenta notablemente la probabilidad de que los features queden contenidos todos dentro, o sobre los bordes del objeto a seguir.
+Este filtrado de color no solo posee una gran sinergia con el método de obtención de features de Shi-Tomasi, dado que este frame tiene bordes de mucha mejor calidad, sino que también posee una gran sinergia con el método de Optical Flow, debido a que como se ven menos bordes en la imagen modificada, aumenta notablemente la probabilidad de que los features queden contenidos todos dentro, o sobre los bordes del objeto a seguir.
 
 Volviendo al caso de los objetos $A$ y $B$:
 
 \begin{itemize}
-\item Si $A$ y $B$ son de colores distintos, con el filtro de color, el algoritmo nunca detectará que existe un objeto $B$ por lo que seguirlo será imposible, y por consecuencia seguirá únicamente a $A$ y no se tendrá el problema de $A$ pasando por frente de $B$.
-\item Si $A$ y $B$ son de colores distintos, y $A$, el objeto a seguir, pasa por detrás de $B$, ahora no se adosarán las features al objeto $B$, sino que el algoritmo verá que el área de $A$ se achica a medida que este queda oculto por $B$. Como los features no tendrán bordes para seguir, estos desaparecerán, por lo que se dejará de entregar mediciones al filtro de Kalman y este estimará correctamente la posición de $A$ mientras que este no haya sufrido aceleración alguna mientras estaba oculto. 
+\item Si $A$ y $B$ son de colores distintos, con el filtro de color, el algoritmo nunca detecta que existe un objeto $B$ por lo que seguirlo es imposible. Por consecuencia, se sigue únicamente a $A$ y no se t el problema de $A$ pasando por frente de $B$.
+\item Si $A$ y $B$ son de colores distintos, y $A$, el objeto a seguir, pasa por detrás de $B$, ahora no se adosan las features al objeto $B$, sino que el algoritmo ve que el área de $A$ se achica a medida que este queda oculto por $B$. Como los features no tienen bordes para seguir, estos desaparecen, por lo que se deja de entregar mediciones al filtro de Kalman y este estima correctamente la posición de $A$ mientras que este no haya sufrido aceleración alguna mientras estaba oculto. 
 \end{itemize}
 
 \begin{figure}[H]
@@ -164,18 +162,17 @@ Volviendo al caso de los objetos $A$ y $B$:
 	\label{fig:optical12}
 \end{figure}
 
-Sin embargo, el filtro de Kalman no puede estimar la posición del objeto indefinidamente. Es por esto que cuando el objeto se pierde, es decir, no se logran detectar más features, se entra en otra fase del programa. En esta fase, se realiza una búsqueda del objeto en cada frame del video a partir de la estimación del filtro de Kalman y el tamaño original del área seleccionada. La altura y el ancho del área de búsqueda se incrementará por un factor constante por cada frame en la que la búsqueda falle. Esta búsqueda se basa en aplicar el algoritmo de Shi-Tomasi sobre el área mencionada.
+Sin embargo, el filtro de Kalman no puede estimar la posición del objeto indefinidamente. Es por esto que cuando el objeto se pierde, es decir, no se logran detectar más features, se entra en otra fase del programa. En esta fase, se realiza una búsqueda del objeto en cada frame del video a partir de la estimación del filtro de Kalman y el tamaño original del área seleccionada. La altura y el ancho del área de búsqueda se incrementa por un factor constante por cada frame en la que la búsqueda falle. Esta búsqueda se basa en aplicar el algoritmo de Shi-Tomasi sobre el área mencionada.
 
-
-Finalmente, para reforzar el algoritmo de seguimiento, se implemento además una recalculación periódica de las features con el método de Shi-Tomasi, partiendo de la media del cúmulo de features, removiendo los outliers, volviendo a calcular nuevamente la media y utilizar esta posición para aplicar el algoritmo de Shi-Tomasi, de misma manera que se realiza sobre la primera selección proporcionada por el usuario. Todo esto nos permite subsanar varios de los problemas planteados anteriormente, sin embargo, existen aún varios otros problemas:
+Finalmente, para reforzar el algoritmo de seguimiento, se implemento además una recalculación periódica de las features con el método de Shi-Tomasi. Se parte de la media del cúmulo de features, removiendo los outliers, volviendo a calcular nuevamente la media y utilizar esta posición para aplicar el algoritmo de Shi-Tomasi, de la misma manera que se realiza sobre la primera selección proporcionada por el usuario. Todo esto permite subsanar varios de los problemas planteados anteriormente, sin embargo, existen aún otros problemas.
 
 \subsection{Escenarios de fallas}
-Algunos casos donde hasta ahora puede fallar el Tracker son:
+Algunos casos donde puede fallar hasta ahora el Tracker son:
 \begin{itemize}
-\item El cambio de trayectoria de un objeto una vez que desaparece, provocará una falla en la predicción.
-\item Interacción entre el objeto trackeado y un objeto de características similares, puede causar un error de detección
+\item El cambio de trayectoria de un objeto una vez que desaparece, provocando una falla en la predicción.
+\item Interacción entre el objeto trackeado y un objeto de características similares, causando un error de detección
 \item Cambios bruscos de iluminación o en color del objeto.
-
+\end{itemize}
 
 \subsection{Último diseño}
 
@@ -186,100 +183,78 @@ Algunos casos donde hasta ahora puede fallar el Tracker son:
 	\label{fig:Flowchart}
 \end{figure*}
 
+
+\begin{figure}
+\centering
+	\includegraphics[width=0.5\textwidth]{Imagenes/classd.png}
+	\caption{Diagrama de Clases del programa utilizado para presentar la funcionalidad del algoritmo desarollado.}
+	\label{fig:class}
+\end{figure}
 EXPLICAR LO SIGUIENTE
 \begin{itemize}
 \item Filtro de color pasó del espacio HSV a CIE-LAB, explicar que es para mas invarianza a la iluminacion
 \item Al filtro de color se le unió una alternativa, el de camshift, explicar en qué situaciones es mejor uno o el otro
-\item ahora la busqueda de objeto perdido se puede hacer con correlacion, explicar en que casos conviene uno o el otro, explicar el proceso de parcheamiento
-\item ahora el recalculo periodico se puede realizar con correlacion, explicar en que casos combiene uno o el otro
-\item mencionar la gui?
 \end{itemize}
+\subsection{Máscara por camshift}
+\subsection{Optimización de la selección}
+\subsection{Máscara por CIE-LAB}
 
 \subsection{Algoritmo correlación}
-Para el algoritmo de correlación no solo se utiliza el filtro explicado en la sección \ref{sec:corr}, sino que ademas se trata tanto al frame como al kernel, aplicando una transformación al espacio \textbf{HSV} y allí un filtrado bajo las siguientes especificaciones: 
+Para el algoritmo de correlación no solo se utiliza el filtro explicado en la Sección \ref{sec:corr}, sino que ademas se trata tanto al frame como al kernel, aplicando una transformación al espacio \textbf{HSV} y allí un filtrado bajo las siguientes especificaciones: 
             
 \begin{align}
 MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (32,255)
 \end{align}
-Una vez que se hace esto se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor, se toma una sección al rededor de este punto proporcional a la selección inicial y se compara con el frame original, si no comparte las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una máscara en la sección del frame de mayor correlación, sobre este se realiza nuevamente el cálculo de máxima correlación, este proceso se realizan unas pocas veces con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).\\
+Una vez que se hace esto, se utiliza el filtro de correlación y se obtiene el punto donde esta es mayor. Se toma una sección al rededor de este punto proporcional a la selección inicial y se compara con el frame original. Si no comparten las características de color que son calculadas por el filtrado de color, este punto de correlación es desechado. Esto se logra aplicando una máscara en la sección del frame de mayor correlación, realizando sobre este nuevamente el cálculo de máxima correlación. Este proceso se realiza unas pocas veces con el propósito de no comprometer la velocidad de procesamiento entre frames. En caso de no encontrar al objeto se considera que hubo un error de trackeo (Oclusión del objeto).\\
 
-Este algoritmo es utilizado en dos escenarios, para la búsqueda de un objeto perdido, en el caso de oclusión se  utiliza el algoritmo para encontrar nuevamente el objeto, este es efectivo siemrpe que no haya objetos que compartan tanto forma y color con el de interés, en el caso de que así sea y el objeto de interés se encuentre oculto es posible que el algoritmo devuelva un falso positivo, en ese caso conviene utilizar el alternativo de Shi-Tomasi y medias móviles, dado que el tener información de la posición previa para el tracking resulta fundamental para poder distinguir entre estos.
-Otro escenario es  utilizar la correlación para el recálculo periódico de features, esto es beneficioso en el caso de la interacción de dos objetos $A$ y $B$ siendo $A$ el de interés y $B$ uno similar, si $B$ pasa por delante de $A$ quitandole las features, el cálculo periódico por correlación podrá detectar que se está siguiendo a $B$ y no a $A$ por lo que corregirá este error. Una situación similar a esta no puede ser resuelta por el algoritmo de Shi-Tomasi con medias moviles.
+\begin{figure}[H]
+\centering
+
+		\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{Imagenes/corrmask.png}
+		\caption{Correlación con máscara ante oclusión del objeto}
+		\label{fig:sqdiff}
+	\end{subfigure}
+	\begin{subfigure}{.1\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{Imagenes/kernelhsv.png}
+		\caption{Kernel}
+		\label{fig:kernel}
+	\end{subfigure}
+	\caption{Aplicación del algoritmo de correlación con máscara.}
+	\label{fig:corrtest}
+\end{figure}
+
+Este algoritmo es utilizado en dos escenarios. En el primero se utiliza para la búsqueda de un objeto perdido. En caso de oclusión se utiliza el algoritmo para encontrar nuevamente el objeto, siendo efectivo siempre que no haya objetos que compartan tanto forma y color con el de interés. Por otro lado, en caso de que así sea y el objeto de interés se encuentre oculto, es posible que el algoritmo devuelva un falso positivo, siendo conviene utilizar el alternativo de Shi-Tomasi y medias móviles, dado que el tener información de la posición previa para el tracking resulta fundamental para poder distinguir entre estos.
+
+El otro escenario es utilizar la correlación para el recálculo periódico de features, esto es beneficioso cuando se da la interacción de dos objetos $A$ y $B$ siendo $A$ el de interés y $B$ uno similar. Si $B$ pasa por delante de $A$ quitandole las features, el cálculo periódico por correlación puede detectar que se está siguiendo a $B$ y no a $A$, por lo que corrige este error. Una situación similar a esta no puede ser resuelta por el algoritmo de Shi-Tomasi con medias móviles.
 
 
 \subsection{Optimización del Código}
-Se realizó una optimización del codigo, quitando redundancias y utilizando únicamente librerías que son corridas en C++, se optó por un enfoque OOP. Esto permitió escalar el proyecto y obtener una mayor modularidad. Contando con una GUI y la posibilidad de un trackeo multi-objeto, adicionalmente se puede interactivamente cambiar especificaciones de los trackers, al igual que diseñar el filtro de color para obtener el mejor resultado posible.
-
-
-\subsection{KTN}
-
-Se decidió implementar código en \textbf{Python}, apoyándose en la librería \href{https://opencv.org/}{OpenCV}.
-El pseudocódigo que corresponde es:
-
-
-\definecolor{keywords}{RGB}{255,0,90}
-\definecolor{comments}{RGB}{0,0,113}
-\definecolor{red}{RGB}{160,0,0}
-\definecolor{green}{RGB}{0,150,0}
- 
-\lstset{language=Python, 
-        basicstyle=\ttfamily\small, 
-        keywordstyle=\color{keywords},
-        commentstyle=\color{comments},
-        stringstyle=\color{red},
-        showstringspaces=false,
-        identifierstyle=\color{green},
-        procnamekeys={def,class}}
-\begin{figure}[H]
-
-\begin{lstlisting}
-kalman = KalmanFilter()
-
-cap = VideoCapture()
-
-lower_thr, upper_thr = [],[]
-
-prev = captureROI(cap)
-
-prev = space_translate(x, y, prev)
-
-frame = cap.read()
-
-while(cap.isOpened()):
-
-    frame_num++
-    frame_real = cap.read()
-
-
-    hsv = cvtColor(frame, COLOR_BGR2HSV)
-    mask = inRange(hsv, lower_thr, upper_thr)
-    frame = bitwise_and(frame, mask)
-
-    if(recalc and not error):
-        frame_num = 0
-        prev, x, y = recalculateFeatures()
-
-    if error:
-        prev=  searchObject(kalman)
-        dyn_h, dyn_w = new_dyn_h, new_dyn_w
-
-
-    good_new, good_old,prev= measureFeatures()
-
-    drawEstimate(good_new, kalman, frame)
-
-\end{lstlisting}
-\end{figure} 
- 
- Finalmente se presenta un diagrama en bloques del programa, donde se puede apreciar como interaccionan todos los algoritmos trabajando en armonía.
-\begin{figure}[H]
-\centering
-	\includegraphics[width=0.5\textwidth]{Imagenes/diagram.png}
-	\caption{Diagrama en bloques del programa.}
-	\label{fig:bloques}
-\end{figure}
+Se realizó una optimización del código, quitando redundancias y utilizando únicamente librerías que son corridas en C++ con la finalidad de que el procesamiento en tiempo real sea eficiente. Se optó por un enfoque OOP, esto permitió escalar el proyecto y obtener una mayor modularidad. \\
+Además se diseñó una GUI con la capacidad de trackeo multi-objeto, personalización de algoritmos, contando con la opción de variar algoritmos tanto de búsqueda como de recálculo entre medias móviles y correlación, al igual que filtrado por color o camshift. Existen la opción de cambiar las especificaciones de los filtros en tiempo real para obtener el filtro óptimo o que un algoritmo de optimización las calcule automaticamente. También se permiten diversas pantallas de debug, es decir, observar los ditintos filtros a la vez, al igual que una estimación de la posición y velocidad del objeto. Finalmente cuenta con la capacidad de utilizar tanto un video en tiempo real como un video pre-existente.
 
 
 
+
+
+% Finalmente se presenta un diagrama en bloques del programa, donde se puede apreciar como interaccionan todos %los algoritmos trabajando en armonía.
+%\begin{figure}[H]
+%\centering
+%	\includegraphics[width=0.5\textwidth]{Imagenes/diagram.png}
+%	\caption{Diagrama en bloques del programa.}
+%	\label{fig:bloques}
+%\end{figure}
+
+\subsection{Escenarios de fallas}
+Si bien se han minimizado las probabilidades de cometer errores de tipo I y tipo II, aún se plantean los siguientes problemas:
+\begin{itemize}
+%\item En caso de oclusión del objeto de interés $A$ y en la presencia de otro objeto de cualidades similares $B$ el algoritmo podrá dar un falso positivo.
+%\item El cambio de trayectoria de un objeto ocluido provocará una falla en la predicción de la trayectoria, si bien a diferencia del diseño anterior, ahora no habrá problemas en retornar al objeto correcto una vez que vuelva a aparecer en pantalla.
+\item El algoritmo se encuentra en su situación más frágil al haber un objecto idéntico o de gran similaridad tanto en color como en forma con el que se quiere seguir, debido a que ni el filtro de distribución de color ni el filtro de correlación lograrán distinguir entre ambos. En este caso la única distinción entre ambos será la retención de esquinas características al objeto correcto proporcionado por el algoritmo de Optical Flow. 
+\item La correcta elección de parámetros de los algoritmos encargados de la fase de enmascaramiento para cada situación proporcionan una gran robustez frente a cambios en la iluminación. Sin embargo, cuanto más robusto frente a cambios en la iluminación es el algoritmo, mayor será la probabilidad de cometer errores del tipo II (seguir a un objeto incorrecto) debido a que el enmascaramiento tendrá una mayor permisividad. 
 \end{itemize}
+
+
 

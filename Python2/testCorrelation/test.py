@@ -73,6 +73,7 @@ if __name__ == '__main__':
         ret, frame = cap.read()
     cv.namedWindow('tracking')
     cv.namedWindow('kernel')
+    cv.namedWindow('kernel2')
     cv.namedWindow('CORR')
     cv.namedWindow('SQ DIFF')
 
@@ -88,7 +89,9 @@ if __name__ == '__main__':
     anchor = [-1,1]
     delta=0
     ddepht=-1
-    cv.imshow('kernel',kernelRGB)
+    cv.imshow('kernel',kernel)
+    cv.imshow('kernel2', kernelRGB)
+
     color = (255, 0, 0)
     color2 = (255, 255, 0)
 

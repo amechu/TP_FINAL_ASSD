@@ -129,9 +129,6 @@ class Tracker:
             if self.SC.trackingError is False:
                 self.KM.correct(x,y)
 
-
-
-
     def changeSettings(self, parametersNew):
 
         self.KM.dt = parametersNew[0]                 #kalman_ptm
@@ -185,6 +182,62 @@ class Tracker:
 
         self.MF.updateMaskFromSettings()
         self.KM.updateParams()
+
+    def updateKalman(self, kalman_ptm, kalman_pc, kalman_mc):
+        self.KM.dt = kalman_ptm
+        self.KM.PROCESS_COV = kalman_pc
+        self.KM.MEAS_NOISE_COV = kalman_mc
+        self.KM.updateParams()
+
+    def updateLK(self, lk_mr):
+        self.SC.LK.lkMaxLevel = lk_mr
+
+    def updateColorFilter(self, CFPropOnOff, LihtThr, a, b, maskBlur_lab):
+        if CFPropOnOff is False:                                # Color Filter OnOff
+            self.MF.mask = self.MF.maskingType["FILTER_OFF"]
+
+        self.MF.LSemiAmp = LihtThr
+        self.MF.aSemiAmp = a
+        self.MF.bSemiAmp = b
+
+        self.MF.ksize = maskBlur_lab
+        if int(self.MF.ksize) % 2 == 0:
+            self.MF.ksize = int(self.MF.ksize) + 1
+        else:
+            self.MF.ksize = int(self.MF.ksize)
+
+        self.MF.updateMaskFromSettings()
+
+    def updateCamShift(self, CFCamShiftOnOff, bins, mb, sb, lbpt):
+        self.MF.hist_filter.set_bins(bins)
+        self.MF.hist_filter.set_mask_blur(mb)
+        self.MF.hist_filter.set_kernel_blur(sb)
+        self.MF.hist_filter.set_low_pth(lbpt)
+
+        self.MF.updateMaskFromSettings()
+
+    def updateShiT(self, MaxFeat, FeatQual, MinFeat, Rec, ShiTPropOnOff, SPix):
+        self.SC.ST.maxcorners = int(MaxFeat)
+        self.SC.ST.qLevel = FeatQual
+        self.SC.ST.minDist = MinFeat
+        self.SC.ST.frameRecalculationNumber = Rec
+
+    def updateMissinSearch(self, missCorr, missST,  recCor, recST):
+        if missST == True and missCorr == False:
+            self.SC.missAlgorithm = self.SC.missAlgorithmD["ST"]
+        elif missST == False and missCorr == True:
+            self.SC.missAlgorithm = self.SC.missAlgorithmD["CORR"]
+        if recST == True and recCor == False:
+            self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["ST"]
+        elif recST == False and recCor == True:
+            self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["CORR"]
+
+    def updateMaskCond(self, maskCondition):
+        self.SC.MASKCONDITION = maskCondition
+
+    def updateBGR(self,color):
+        self.MF.calculateNewMask(None,None,True,color)
+        self.MF.updateMaskFromSettings()
 
     def getFilteredFrame(self):
         return self.MF.filteredFrame
