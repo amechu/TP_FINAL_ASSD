@@ -411,8 +411,9 @@ class cvGui():
                 self.ShiTProp[0] = False
 
                 if not selectedT == -1:
-                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")#TOMI HACE ESTO DISCRETO
-                    cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0)
+                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")    #TOMI HACE ESTO DISCRETO
+                    cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                    self.lk_mr[0] = int(self.lk_mr[0])
 
             if cvui.checkbox(self.frame, 20, 340, "Mask Filter", self.CFProp):
                 self.KalmanProp[0] = False
