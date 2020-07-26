@@ -46,10 +46,18 @@ class Searcher:
     def searchMissing(self,estX,estY,frame,filteredframe):
 
         if self.missAlgorithm== self.missAlgorithmD["ST"]:
+      #      print("IM USING SHI TOMASI for search missing")
             candidate=[None,None]
-            frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)  #REVISAR
-            self.features, self.trackingError = self.ST.recalculateFeatures(frameGray[int(estY - self.searchHeight / 2): int(estY + self.searchHeight / 2),int(estX - self.searchWidth / 2): int(estX + self.searchWidth / 2)])
+            frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+            y1=np.clip(int(estY - self.searchHeight / 2),1,frame.shape[0])
+            y2=np.clip(int(estY + self.searchHeight / 2),1,frame.shape[0])
+            x1=np.clip(int(estX - self.searchWidth / 2),1,frame.shape[1])
+            x2=np.clip(int(estX + self.searchWidth / 2),1,frame.shape[1] )
+            searchin=frameGray[y1: y2,x1: x2 ]
+            self.features, self.trackingError = self.ST.recalculateFeatures(searchin)
             self.features = self.featureTranslate(estX- self.searchWidth / 2,estY - self.searchHeight / 2,self.features)
+      #      print(f'Search Height : {self.searchHeight }')
+      #      print(f'Search Width : {self.searchWidth }')
             if self.trackingError is True:
                 self.searchWidth += self.ST.searchEnlargementThreshold
                 self.searchHeight += self.ST.searchEnlargementThreshold
@@ -61,6 +69,7 @@ class Searcher:
 
 
         elif self.missAlgorithm == self.missAlgorithmD["CORR"]:
+          #  print("CORRELATION PAPI")
             frameGray = cv.cvtColor(filteredframe, cv.COLOR_BGR2GRAY)   
             frame_hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
             mask = cv.inRange(frame_hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
@@ -130,6 +139,7 @@ class Searcher:
                 if frameCounter != 0 and frameCounter % self.ST.frameRecalculationNumber == 0:
                     # yes
                     if(self.recalcAlgorithm == self.recalcAlgorithmD["ST"]):
+                    #    print("Shi tomasi daddy recalc")
                         medx, medy = np.median(self.features[:, 0, 0]), np.median(self.features[:, 0, 1])
                         std = np.sqrt((np.std(self.features[:, 0, 0])) ** 2 + (np.std(self.features[:, 0, 1])) ** 2)
                         # calculate mean and std of features
@@ -143,6 +153,7 @@ class Searcher:
                         self.LK.prevFeatures = self.features
                     elif(self.recalcAlgorithm == self.recalcAlgorithmD["CORR"]):
                         a= self.missAlgorithm
+                     #   print("correlation for recalc")
                         self.missAlgorithm = self.missAlgorithmD["CORR"]
                         medx,medy=self.searchMissing(0,0,frame,filteredFrame)
                         self.missAlgorithm = a
