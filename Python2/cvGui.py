@@ -210,6 +210,8 @@ class cvGui():
 
         while True:
 
+            # print(f'LAB: {self.CFCamShiftOnOff}           CamOnOF:{self.CFPropOnOff}')
+
             self.updateParameters()
             selectedT = self.IsTrackerSelected()
 
@@ -670,31 +672,33 @@ class cvGui():
                         y0 = int(WINDOW_FILS_Y + 125) + WINDOW_FILS_WIDTH
                         self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
-            cvui.printf(self.frame, 20, 775, 0.4, 0xdd97fb, "Missing Algorithm")
-            if cvui.checkbox(self.frame, 20, 790, "Correlation", self.missAlgCorr):
-                self.missAlgST[0] = False
-            else:
-                self.missAlgST[0] = True
+            if not selectedT == -1:
+                cvui.printf(self.frame, 20, 775, 0.4, 0xdd97fb, "Missing Algorithm")
+                if cvui.checkbox(self.frame, 20, 790, "Correlation", self.missAlgCorr):
+                    self.missAlgST[0] = False
+                else:
+                    self.missAlgST[0] = True
 
-            if cvui.checkbox(self.frame, 150, 790, "ST", self.missAlgST):
-                self.missAlgCorr[0] = False
-            else:
-                self.missAlgCorr[0] = True
+                if cvui.checkbox(self.frame, 150, 790, "ST", self.missAlgST):
+                    self.missAlgCorr[0] = False
+                else:
+                    self.missAlgCorr[0] = True
 
-            cvui.printf(self.frame, 20, 810, 0.4, 0xdd97fb, "Recalculation Algorithm")
-            if cvui.checkbox(self.frame, 20, 825, "Correlation", self.recAlgCorr):
-                self.recAlgST[0] = False
-            else:
-                self.recAlgST[0] = True
+                cvui.printf(self.frame, 20, 810, 0.4, 0xdd97fb, "Recalculation Algorithm")
+                if cvui.checkbox(self.frame, 20, 825, "Correlation", self.recAlgCorr):
+                    self.recAlgST[0] = False
+                else:
+                    self.recAlgST[0] = True
 
-            if cvui.checkbox(self.frame, 150, 825, "ST", self.recAlgST):
-                self.recAlgCorr[0] = False
-            else:
-                self.recAlgCorr[0] = True
+                if cvui.checkbox(self.frame, 150, 825, "ST", self.recAlgST):
+                    self.recAlgCorr[0] = False
+                else:
+                    self.recAlgCorr[0] = True
+
             
-            if (self.missAlgCorr[0] or self.recAlgCorr[0]) and not self.replaceRoi:
-                cvui.printf(self.frame, 20, 850, 0.4, 0xdd97fb, "Mask Correlation")
-                cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                if (self.missAlgCorr[0] or self.recAlgCorr[0]) and not self.replaceRoi:
+                    cvui.printf(self.frame, 20, 850, 0.4, 0xdd97fb, "Mask Correlation")
+                    cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
             if not self.replaceRoi:
                 if (cvui.button(self.frame, 60, 915, "Reset Settings")):
@@ -1165,7 +1169,6 @@ class cvGui():
         self.parameters.append(self.colorFilter_LihtThr[0])    #5X
         self.parameters.append(self.colorFilter_a[0])          #6X
         self.parameters.append(self.colorFilter_b[0])          #7X
-
 
         self.parameters.append(self.CFCamShiftOnOff[0])        #8 (???????)
         self.parameters.append(self.camShift_bins[0])          #9x
