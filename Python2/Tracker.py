@@ -61,8 +61,7 @@ class Tracker:
         # for i in range(epochs):
         #     print([self.bins_var.numpy(), self.kernel_blur_var.numpy(),self.mask_blur_var.numpy(),self.low_pth_var.numpy(), self.target().numpy()])
         #     opt = gradient_descent.GradientDescentOptimizer(0.01).minimize(self.target)
-        for i in range(5):
-            self.optimize()
+
         #print(res.x)
 
     def getTrackingError(self):
@@ -274,13 +273,22 @@ class Tracker:
         print(countOutside-countInside)
         return countOutside - countInside
 
+    def calculate_optimal_params(self):
+        for i in range(5):
+            self.optimize()
+        params = {"bins":self.MF.hist_filter.bins_opti,
+                  "mask_blur":self.MF.hist_filter.mask_blur_size_opti,
+                  "kernel_blur":self.MF.hist_filter.kernel_blur_size_opti,
+                  "low_pth":self.MF.hist_filter.low_pth_opti}
+        return params
+
     def calculate_cost(self):
         test_frame = self.MF.filterFrame(self.initFrame)
 
         count_total = np.count_nonzero(test_frame)
         count_inside = np.count_nonzero(test_frame[int(self.initPos[1] - self.selectionHeight / 2): int(self.initPos[1] + self.selectionHeight / 2),int(self.initPos[0] - self.selectionWidth / 2): int(self.initPos[0] + self.selectionWidth / 2)])
         count_outside = count_total - count_inside
-        return count_outside - count_inside #PREFERIMOS QUE ESTE VACIO AFUERA
+        return count_outside - count_inside
         # return count_outside**4 - count_inside**3 #PREFERIMOS QUE ESTE VACIO AFUERA
 
     def optimize(self):
@@ -320,7 +328,6 @@ class Tracker:
         self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
         self.MF.updateMaskFromSettings()
 
-
         # best_low_pth = [1]
         # best_cost = np.inf
         #
@@ -335,6 +342,12 @@ class Tracker:
         self.MF.hist_filter.set_bins(best_bin[-1])
         self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
         self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
+
+        self.MF.hist_filter.bins_opti = best_bin[-1]
+        self.MF.hist_filter.mask_blur_size_opti = best_mask_blur[-1]
+        self.MF.hist_filter.kernel_blur_size_opti = best_kernel_blur[-1]
+        self.MF.hist_filter.low_pth_opti = self.MF.hist_filter.low_pth
+
         # self.MF.hist_filter.set_low_pth(best_low_pth[-1])
         self.MF.updateMaskFromSettings()
         print("-------------------------------")
@@ -345,25 +358,6 @@ class Tracker:
         print(f"Costo : {self.calculate_cost()}")
         print("-------------------------------")
 
-        # print(f"blur kernel optimo {best_kernel_blur[-1]}")
-        # print(f"th p {best_low_pth[-1]}")
-        return
-        #
-        #
-        #
-        # if 0 <= self.bins_var < 200:
-        #     self.MF.hist_filter.set_bins(self.bins_var)
-        # if 0 <= self.kernel_blur_var < 20:
-        #     self.MF.hist_filter.set_kernel_blur(self.kernel_blur_var)
-        # if 0 <= self.mask_blur_var < 20:
-        #     self.MF.hist_filter.set_mask_blur(self.mask_blur_var)
-        # if 0 <= self.low_pth_var < 250:
-        #     self.MF.hist_filter.set_low_pth(self.low_pth_var)
-
-
-        # count_outside = count_total - count_inside
-        # print(count_outside-count_inside)
-        # return count_outside - count_inside
 
     def colorKernelChange(self, bgr):
         b = bgr[0]
