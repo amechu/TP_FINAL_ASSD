@@ -181,6 +181,7 @@ class cvGui():
         self.kernel = []
         self.trackSelectionBGR = [[], [], [], [], []]
         self.lastTracker = -1
+        self.deletedTracker = -1
         self.configSelected = []
 
         self.changeInTrackers = False
@@ -194,6 +195,7 @@ class cvGui():
 
         self.lastFrame = []
         self.lastFilterFrame = []
+        self.lastEditedFrame = []
 
         self.replaceRoi = False
         self.coordsRoi = []
@@ -205,6 +207,7 @@ class cvGui():
     def onWork(self):
 
         selectedT = -1
+        autoCS = False
         self.updateParameters()
         originalParam = self.parameters.copy()
 
@@ -344,11 +347,22 @@ class cvGui():
                     self.trackerColors.append(self.trackerColors[i])
                     self.trackSelectionBGR[i] = []
                     del self.trackerColors[i]
+                    self.deletedTracker = i
                     selectedT = self.IsTrackerSelected()
 
                     if len(self.trackers) == 0:
+                        self.filterConditions.clear()
+
                         self.filteredFrame = None
                         self.resetInitialCond()
+
+                        self.ColorFilter[0] = False
+                        self.CorrFilter[0] = False
+                        self.CamShiftFilter[0] = False
+                        self.Hist[0] = False
+                        self.CFPropOnOff[0] = False
+                        self.CFCamShiftOnOff[0] = False
+
                         self.ShiTProp[0] = False
                         self.LKProp[0] = False
                         self.KalmanProp[0] = False
@@ -358,7 +372,6 @@ class cvGui():
             self.trackerChanged = not(selectedT == self.IsTrackerSelected())
             # if self.trackerChanged:
             #     selectedT = self.IsTrackerSelected()
-
 
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No Trackers Added. Try Selecting A New Area!")
@@ -372,7 +385,7 @@ class cvGui():
             elif a == 4:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdcce10, "Using 4 Tracker Of 5!")
             else:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 Trackers Of 5! No More Trackers Can Be Added. Try Deleting One.")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 Trackers Of 5! No More Trackers Can Be Added.")
 
             if (cvui.button(self.frame, 20, 215, "Pause Source") and not self.replaceRoi):
                 self.pause = not self.pause
@@ -399,8 +412,9 @@ class cvGui():
                 self.ShiTProp[0] = False
 
                 if not selectedT == -1:
-                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")#TOMI HACE ESTO DISCRETO
-                    cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0)
+                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")    #TOMI HACE ESTO DISCRETO
+                    cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
+                    self.lk_mr[0] = int(self.lk_mr[0])
 
             if cvui.checkbox(self.frame, 20, 340, "Mask Filter", self.CFProp):
                 self.KalmanProp[0] = False
@@ -496,7 +510,7 @@ class cvGui():
 
             selectedT = self.IsTrackerSelected()
             if self.lastTracker != selectedT:
-                if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (len(self.boolForTrackers) < self.lastTracker)):
+                if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (self.deletedTracker == self.lastTracker)):
                     self.lastTracker = -1
                 else:
                     if not (selectedT == -1):
@@ -572,7 +586,7 @@ class cvGui():
 
                     if not len(self.trackers) == 0:
                         # HISTOGRAM
-                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "HUE Histogram")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
                         miniFilter = self.rescale_hist(miniFilter, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
@@ -603,7 +617,7 @@ class cvGui():
                             y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2) + WINDOW_FILS_WIDTH
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
-                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Histogram", self.Hist):
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "HUE Histogram", self.Hist):
                     self.ColorFilter[0] = False
                     self.CorrFilter[0] = False
                     self.CamShiftFilter[0] = False
@@ -662,7 +676,7 @@ class cvGui():
                         self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
                         # HISTOGRAM
-                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "HUE Histogram")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter2 = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
                         miniFilter2 = self.rescale_hist(miniFilter2, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
@@ -705,18 +719,14 @@ class cvGui():
                     self.resetInitialCond()
                 if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 90, 915, "Auto CS")):
                     if not selectedT == -1 and self.CFCamShiftOnOff[0]:
-                        params = self.trackers[selectedT].calculate_optimal_params()
-                        self.camShift_bins[0] = params["bins"]
-                        self.camShift_mb[0] = params["mask_blur"]
-                        self.camShift_sb[0] = params["kernel_blur"]
-                        self.camShift_lbpt[0] = params["low_pth"]
+                        autoCS = True
 
             alreadyTex = False
             nizu = 0
             for i in range(len(self.trackers)):
                 if self.trackers[i].SC.trackingError:
                     if not alreadyTex:
-                        cvui.printf(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 25, 0.4, 0xdc2710, f'Tracker Error In Tracker:')
+                        cvui.printf(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 25, 0.4, 0xdc1076, 'Tracker Error In Tracker:')        #0xdc2710
                         alreadyTex = True
                     cvui.printf(self.frame, WINDOW_SOU_X + 165 + nizu * 10, WINDOW_SOU_Y + 25, 0.4, self.trackerColors[i], f'{i + 1}')
                     nizu += 1
@@ -728,7 +738,7 @@ class cvGui():
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastEditedFrame #self.lastFrame
                         #Hubo algún tipo de error al cargar la camara o me quedé sin video
                         #Muestro el último frame que cargué
 
@@ -742,7 +752,7 @@ class cvGui():
                         self.changeInTrackers = False
                         self.callFilterPause()
                     if self.usingVideo and len(self.arrayVideoLoaded) == 0:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastEditedFrame #self.lastFrame
                     else:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
@@ -881,8 +891,24 @@ class cvGui():
             else:
                 self.trackerAdded = False
 
+            if autoCS:
+                cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto CS")
+                cvui.printf(self.frame, WINDOW_SET_X + 10, 875, 0.4, 0xdd97fb, "Calcualting optimum Cam Shift")
+                cvui.printf(self.frame, WINDOW_SET_X + 10, 895, 0.4, 0xdd97fb, f'parameters for tracker {selectedT + 1}. Hold')
+                cvui.printf(self.frame, WINDOW_SET_X + 10, 915, 0.4, 0xdd97fb, 'on This could take a while...')
+
+
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
+
+            if autoCS:
+                cv.waitKey(1)
+                autoCS = False
+                params = self.trackers[selectedT].calculate_optimal_params()
+                self.camShift_bins[0] = params["bins"]
+                self.camShift_mb[0] = params["mask_blur"]
+                self.camShift_sb[0] = params["kernel_blur"]
+                self.camShift_lbpt[0] = params["low_pth"]
 
             #Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
@@ -963,8 +989,11 @@ class cvGui():
         self.arrayVideoLoaded.clear()
         self.boolVideoLoaded = False
         self.lastFrame = []
+        self.lastEditedFrame = []
         self.lastFilterFrame = []
         self.filteredFrame = None
+
+        self.deletedTracker = -1
 
         self.KalmanProp[0] = False
         self.LKProp[0] = False
@@ -1051,6 +1080,8 @@ class cvGui():
             self.updateFilterFrame()
 
             self.updateArtist()
+
+            self.lastEditedFrame = self.source.copy()
 
         return todoPiola
 
