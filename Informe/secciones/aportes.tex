@@ -195,6 +195,9 @@ EXPLICAR LO SIGUIENTE
 \item Filtro de color pasó del espacio HSV a CIE-LAB, explicar que es para mas invarianza a la iluminacion
 \item Al filtro de color se le unió una alternativa, el de camshift, explicar en qué situaciones es mejor uno o el otro
 \end{itemize}
+\subsection{Máscara por camshift}
+\subsection{Optimización de la selección}
+\subsection{Máscara por CIE-LAB}
 
 \subsection{Algoritmo correlación}
 Para el algoritmo de correlación no solo se utiliza el filtro explicado en la Sección \ref{sec:corr}, sino que ademas se trata tanto al frame como al kernel, aplicando una transformación al espacio \textbf{HSV} y allí un filtrado bajo las siguientes especificaciones: 
@@ -230,7 +233,7 @@ El otro escenario es utilizar la correlación para el recálculo periódico de f
 
 \subsection{Optimización del Código}
 Se realizó una optimización del código, quitando redundancias y utilizando únicamente librerías que son corridas en C++ con la finalidad de que el procesamiento en tiempo real sea eficiente. Se optó por un enfoque OOP, esto permitió escalar el proyecto y obtener una mayor modularidad. \\
-Además se diseñó una GUI con la capacidad de trackeo multi-objeto, personalización de algoritmos, contando con la opción de variar algoritmos tanto de búsqueda como de recálculo entre medias móviles y correlación, al igual que filtrado por color o camshift. Existen la opción de cambiar las especificaciones de los filtros en tiempo real para obtener el filtro óptimo. También se permiten diversas pantallas de debug, es decir, observar los ditintos filtros a la vez, al igual que una estimación de la posición y velocidad del objeto. Finalmente cuenta con la capacidad de utilizar tanto un video en tiempo real como un video pre-existente.
+Además se diseñó una GUI con la capacidad de trackeo multi-objeto, personalización de algoritmos, contando con la opción de variar algoritmos tanto de búsqueda como de recálculo entre medias móviles y correlación, al igual que filtrado por color o camshift. Existen la opción de cambiar las especificaciones de los filtros en tiempo real para obtener el filtro óptimo o que un algoritmo de optimización las calcule automaticamente. También se permiten diversas pantallas de debug, es decir, observar los ditintos filtros a la vez, al igual que una estimación de la posición y velocidad del objeto. Finalmente cuenta con la capacidad de utilizar tanto un video en tiempo real como un video pre-existente.
 
 
 
