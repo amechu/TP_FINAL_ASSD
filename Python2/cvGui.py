@@ -181,6 +181,7 @@ class cvGui():
         self.kernel = []
         self.trackSelectionBGR = [[], [], [], [], []]
         self.lastTracker = -1
+        self.deletedTracker = -1
         self.configSelected = []
 
         self.changeInTrackers = False
@@ -344,11 +345,22 @@ class cvGui():
                     self.trackerColors.append(self.trackerColors[i])
                     self.trackSelectionBGR[i] = []
                     del self.trackerColors[i]
+                    self.deletedTracker = i
                     selectedT = self.IsTrackerSelected()
 
                     if len(self.trackers) == 0:
+                        self.filterConditions.clear()
+
                         self.filteredFrame = None
                         self.resetInitialCond()
+
+                        self.ColorFilter[0] = False
+                        self.CorrFilter[0] = False
+                        self.CamShiftFilter[0] = False
+                        self.Hist[0] = False
+                        self.CFPropOnOff[0] = False
+                        self.CFCamShiftOnOff[0] = False
+
                         self.ShiTProp[0] = False
                         self.LKProp[0] = False
                         self.KalmanProp[0] = False
@@ -358,7 +370,6 @@ class cvGui():
             self.trackerChanged = not(selectedT == self.IsTrackerSelected())
             # if self.trackerChanged:
             #     selectedT = self.IsTrackerSelected()
-
 
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No Trackers Added. Try Selecting A New Area!")
@@ -372,7 +383,7 @@ class cvGui():
             elif a == 4:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdcce10, "Using 4 Tracker Of 5!")
             else:
-                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 Trackers Of 5! No More Trackers Can Be Added. Try Deleting One.")
+                cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0xdc2710, "Using 5 Trackers Of 5! No More Trackers Can Be Added.")
 
             if (cvui.button(self.frame, 20, 215, "Pause Source") and not self.replaceRoi):
                 self.pause = not self.pause
@@ -496,7 +507,7 @@ class cvGui():
 
             selectedT = self.IsTrackerSelected()
             if self.lastTracker != selectedT:
-                if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (len(self.boolForTrackers) < self.lastTracker)):
+                if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (self.deletedTracker == self.lastTracker)):
                     self.lastTracker = -1
                 else:
                     if not (selectedT == -1):
@@ -716,7 +727,7 @@ class cvGui():
             for i in range(len(self.trackers)):
                 if self.trackers[i].SC.trackingError:
                     if not alreadyTex:
-                        cvui.printf(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 25, 0.4, 0xdc2710, f'Tracker Error In Tracker:')
+                        cvui.printf(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 25, 0.4, 0xdc1076, 'Tracker Error In Tracker:')        #0xdc2710
                         alreadyTex = True
                     cvui.printf(self.frame, WINDOW_SOU_X + 165 + nizu * 10, WINDOW_SOU_Y + 25, 0.4, self.trackerColors[i], f'{i + 1}')
                     nizu += 1
@@ -965,6 +976,8 @@ class cvGui():
         self.lastFrame = []
         self.lastFilterFrame = []
         self.filteredFrame = None
+
+        self.deletedTracker = -1
 
         self.KalmanProp[0] = False
         self.LKProp[0] = False
