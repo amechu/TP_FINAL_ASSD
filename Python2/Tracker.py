@@ -350,13 +350,13 @@ class Tracker:
 
         # self.MF.hist_filter.set_low_pth(best_low_pth[-1])
         self.MF.updateMaskFromSettings()
-        print("-------------------------------")
-        print(f"numero de bines optimo {best_bin[-1]}")
-        print(f"blur mascara optimo {best_mask_blur[-1]}")
-        print(f"blur kernel optimo {best_kernel_blur[-1]}")
-
-        print(f"Costo : {self.calculate_cost()}")
-        print("-------------------------------")
+        # print("-------------------------------")
+        # print(f"numero de bines optimo {best_bin[-1]}")
+        # print(f"blur mascara optimo {best_mask_blur[-1]}")
+        # print(f"blur kernel optimo {best_kernel_blur[-1]}")
+        #
+        # print(f"Costo : {self.calculate_cost()}")
+        # print("-------------------------------")
 
 
     def colorKernelChange(self, bgr):
