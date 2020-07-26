@@ -207,6 +207,7 @@ class cvGui():
     def onWork(self):
 
         selectedT = -1
+        autoCS = False
         self.updateParameters()
         originalParam = self.parameters.copy()
 
@@ -585,7 +586,7 @@ class cvGui():
 
                     if not len(self.trackers) == 0:
                         # HISTOGRAM
-                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "HUE Histogram")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
                         miniFilter = self.rescale_hist(miniFilter, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
@@ -616,7 +617,7 @@ class cvGui():
                             y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2) + WINDOW_FILS_WIDTH
                             self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
 
-                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Histogram", self.Hist):
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "HUE Histogram", self.Hist):
                     self.ColorFilter[0] = False
                     self.CorrFilter[0] = False
                     self.CamShiftFilter[0] = False
@@ -675,7 +676,7 @@ class cvGui():
                         self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
 
                         # HISTOGRAM
-                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Histogram")
+                        cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "HUE Histogram")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter2 = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
                         miniFilter2 = self.rescale_hist(miniFilter2, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
@@ -718,11 +719,7 @@ class cvGui():
                     self.resetInitialCond()
                 if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 90, 915, "Auto CS")):
                     if not selectedT == -1 and self.CFCamShiftOnOff[0]:
-                        params = self.trackers[selectedT].calculate_optimal_params()
-                        self.camShift_bins[0] = params["bins"]
-                        self.camShift_mb[0] = params["mask_blur"]
-                        self.camShift_sb[0] = params["kernel_blur"]
-                        self.camShift_lbpt[0] = params["low_pth"]
+                        autoCS = True
 
             alreadyTex = False
             nizu = 0
@@ -894,8 +891,24 @@ class cvGui():
             else:
                 self.trackerAdded = False
 
+            if autoCS:
+                cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto CS")
+                cvui.printf(self.frame, WINDOW_SET_X + 10, 875, 0.4, 0xdd97fb, "Calcualting optimum Cam Shift")
+                cvui.printf(self.frame, WINDOW_SET_X + 10, 895, 0.4, 0xdd97fb, f'parameters for tracker {selectedT + 1}. Hold')
+                cvui.printf(self.frame, WINDOW_SET_X + 10, 915, 0.4, 0xdd97fb, 'on This could take a while...')
+
+
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
+
+            if autoCS:
+                cv.waitKey(1)
+                autoCS = False
+                params = self.trackers[selectedT].calculate_optimal_params()
+                self.camShift_bins[0] = params["bins"]
+                self.camShift_mb[0] = params["mask_blur"]
+                self.camShift_sb[0] = params["kernel_blur"]
+                self.camShift_lbpt[0] = params["low_pth"]
 
             #Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
