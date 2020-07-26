@@ -701,12 +701,12 @@ class cvGui():
                     cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
             if not self.replaceRoi:
-                if (cvui.button(self.frame, 60, 915, "Reset Settings")):
-                    self.resetInitialCond()
-                # if (cvui.button(self.frame, 50, 915, "Reset")):
+                # if (cvui.button(self.frame, 60, 915, "Reset Settings")):
                 #     self.resetInitialCond()
-                # if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 100, 915, "Auto")):
-                #     pass
+                if (cvui.button(self.frame, 20, 915, "Reset Settings")):
+                    self.resetInitialCond()
+                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
+                    pass
 
             alreadyTex = False
             nizu = 0
@@ -754,11 +754,34 @@ class cvGui():
                     y0 = int(((WINDOW_SOU_Y + 37) + (WINDOW_SOU_Y + 37 + WINDOW_SOU_HEIGHT - 75))/2 - self.filterHEIGHT/2)
                     self.frame[y0:y0 + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
 
-            # #Help Frame
-            # cvui.rect(self.frame, 200, 182, 20, 20, 0x494949, 0x545454)
-            # cvui.text(self.frame, 205, 185, "?", 0.6)
-            # if not cvui.iarea(200, 182, 20, 20) == cvui.OUT:
-            #     cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 500, "Help")
+            #Help Frame
+            cvui.rect(self.frame, 210, 182, 20, 20, 0x494949, 0x545454)
+            cvui.text(self.frame, 215, 185, "?", 0.6)
+            if not cvui.iarea(210, 182, 20, 20) == cvui.OUT:
+                cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 260, "Help")
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 33, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 30, "Begin loading a video or turning on the camera. Videos will start paused", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 50, "by default.", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 73, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 70, "Add up to 5 different trackers. Tracker Settings will be only available", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 90, "when selecting a tracker.", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 113, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 110, "The Filter Selection will be available after selecting a tracker and", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 130, "turning on a filter option in Mask FIlter (LAB or Cam Shift).", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 153, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 150, "For the Color Filter you can re-select the mean color of the first", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 170, "selection by clicking the kernel that corresponds.", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 193, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 190, "You can configure each tracker with different conditions.", 0.4, 0xdd97fb)
+
+                cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 213, 3, 3, 0xdd97fb, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 210, "Reset Settings will set settings for the tracker select by default, while", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 230, "Auto will stablish the best conditions for the selection.", 0.4, 0xdd97fb)
+
 
             if ((cvui.button(self.frame, 20, 180, "Add Tracker") and ( (self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
 
