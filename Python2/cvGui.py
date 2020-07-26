@@ -895,7 +895,7 @@ class cvGui():
                 cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto CS")
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 875, 0.4, 0xdd97fb, "Calcualting optimum Cam Shift")
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 895, 0.4, 0xdd97fb, f'parameters for tracker {selectedT + 1}. Hold')
-                cvui.printf(self.frame, WINDOW_SET_X + 10, 915, 0.4, 0xdd97fb, 'on This could take a while...')
+                cvui.printf(self.frame, WINDOW_SET_X + 10, 915, 0.4, 0xdd97fb, 'on, this could take a while...')
 
 
             #Show everything on the screen
