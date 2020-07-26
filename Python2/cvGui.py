@@ -195,6 +195,7 @@ class cvGui():
 
         self.lastFrame = []
         self.lastFilterFrame = []
+        self.lastEditedFrame = []
 
         self.replaceRoi = False
         self.coordsRoi = []
@@ -739,7 +740,7 @@ class cvGui():
                     if self.callSource():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
                     else:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastEditedFrame #self.lastFrame
                         #Hubo algún tipo de error al cargar la camara o me quedé sin video
                         #Muestro el último frame que cargué
 
@@ -753,7 +754,7 @@ class cvGui():
                         self.changeInTrackers = False
                         self.callFilterPause()
                     if self.usingVideo and len(self.arrayVideoLoaded) == 0:
-                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastFrame
+                        self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.lastEditedFrame #self.lastFrame
                     else:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
@@ -974,6 +975,7 @@ class cvGui():
         self.arrayVideoLoaded.clear()
         self.boolVideoLoaded = False
         self.lastFrame = []
+        self.lastEditedFrame = []
         self.lastFilterFrame = []
         self.filteredFrame = None
 
@@ -1064,6 +1066,8 @@ class cvGui():
             self.updateFilterFrame()
 
             self.updateArtist()
+
+            self.lastEditedFrame = self.source.copy()
 
         return todoPiola
 
