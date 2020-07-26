@@ -13,6 +13,12 @@ class HistFilter:
         self.mask_blur_size = 11 # Applies blur to the whole mask. LPF
         self.kernel_blur_size = 5 # Applies blur to the selection to spread the color. LPF
         self.low_pth = 230
+
+        self.bins_opti = 0
+        self.mask_blur_size_opti  = 0
+        self.kernel_blur_size_opti = 0
+        self.low_pth_opti = 0
+
         self.selection = None
 
     def compute_hist(self, src, bins=64):
