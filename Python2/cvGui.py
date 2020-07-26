@@ -701,13 +701,15 @@ class cvGui():
                     cvui.trackbar(self.frame, 20, 865, 210, self.maskCondition, 0.0, 1.0, 1, "%0.2Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
             if not self.replaceRoi:
-                # if (cvui.button(self.frame, 60, 915, "Reset Settings")):
-                #     self.resetInitialCond()
                 if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
                 if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 90, 915, "Auto CS")):
                     if not selectedT == -1 and self.CFCamShiftOnOff[0]:
-                        pass
+                        params = self.trackers[selectedT].calculate_optimal_params()
+                        self.camShift_bins[0] = params["bins"]
+                        self.camShift_mb[0] = params["mask_blur"]
+                        self.camShift_sb[0] = params["kernel_blur"]
+                        self.camShift_lbpt[0] = params["low_pth"]
 
             alreadyTex = False
             nizu = 0
