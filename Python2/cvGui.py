@@ -924,7 +924,9 @@ class cvGui():
         self.coordsRoi.clear()
 
         self.source = []
-        # self.source[:] = (49, 52, 49)
+
+        self.boolForTrackers.clear()
+        self.trackerAdded = False
 
         self.arrayVideoLoaded.clear()
         self.boolVideoLoaded = False
