@@ -1,4 +1,3 @@
-
 \subsection{Optical Flow} 
 El campo de movimiento de una imagen es el movimiento real del objeto en el espacio proyectado sobre el plano de la imagen. El Optical Flow (flujo óptico) se define como el flujo de la intensidad en escala de grises en el plano de la imagen, a medida que evoluciona en el tiempo. También se puede interpretar el flujo de la imagen como el movimiento aparente de esta basado en la percepción visual, teniendo dimensión de velocidad $\vec{V}= (V_x \ , \ V_y)$. Si el Optical Flow se determina de dos imágenes consecutivas, aparece un vector de desplazamiento $\vec{d}$ de las cualidades elegidas, entre el cuadro n y el n+1.
 \begin{figure}[H]
@@ -121,6 +120,7 @@ K_k = P_{k|k-1}H^TS_k^{-1}
 
 
 
+
  En la Figura (\ref{fig:kalman-comp}) se puede observar el funcionamiento del algoritmo con un vector de estados dinámicos de dimensión dos compuesto por las coordenadas $(x,y)$ sobre el plano cartesiano. Realizando mediciones periódicamente, se comparan dos curvas. Por un lado, una senoidal con un ruido gaussiano montado sobre ella, simulando una serie de mediciones con ruido, y por el otro lado, la estimación obtenida a partir del filtro desarrollado.
 
 \begin{figure}[H]
@@ -162,19 +162,19 @@ A continuación se muestra una imagen y el resultado del cálculo de correlació
 	\begin{subfigure}{.4\textwidth}
 		\centering
 		\includegraphics[width=0.9\textwidth]{Imagenes/Correlation.png}
-		\caption{Correlación utilizando definición}
+		\caption{Correlación utilizando definición.}
 		\label{fig:corr}
 	\end{subfigure}
 		\begin{subfigure}{.4\textwidth}
 		\centering
 		\includegraphics[width=0.9\textwidth]{Imagenes/SQDIFF.png}
-		\caption{Correlación utilizando cuadrados mínimos}
+		\caption{Correlación utilizando cuadrados mínimos.}
 		\label{fig:sqdiff}
 	\end{subfigure}
 	\begin{subfigure}{.1\textwidth}
 		\centering
 		\includegraphics[width=0.9\textwidth]{Imagenes/kernel.png}
-		\caption{Kernel}
+		\caption{Kernel.}
 		\label{fig:kernel}
 	\end{subfigure}
 	\caption{Aplicación del algoritmo de correlación.}
@@ -196,11 +196,11 @@ El espacio de color HSV, o hue-saturation-value logra representar a un color med
 \end{figure}
 
 Este espacio se puede representar como un cilindro, como se demuestra en la Figura (\ref{hsv}). Si bien la componente de value representa la oscuridad/luminosidad de un color, este modelo es incorrecto debido a que presenta uniformidades. Es por esto, que para obtener una verdadera representación de luminosidad se utiliza el espacio Lab.
-El espacio de color L*a*b* de la comisión internacional en iluminación o CIE por sus siglas en francés es un espacio de color perceptualmente uniforme que representa a un color mediante tres parámetros: lightness, a y b, siendo lightness un modelo correctamente calculado e uniforme de la luminosidad de un color, y a y b las componentes de rojo/verde y amarillo/azul del color respectivamente. 
+El espacio de color L*a*b* de la comisión internacional en iluminación o CIE por sus siglas en francés es un espacio de color perceptualmente uniforme que representa a un color mediante tres parámetros: lightness, a y b, siendo lightness un modelo correctamente calculado e uniforme de la luminosidad de un color, y a y b las componentes de rojo/verde y amarillo/azul del color respectivamente\footnote{Imagen atribuida en \href{https://opentextbc.ca/graphicdesign/chapter/colour-science/}{https:\slash \slash opentextbc.ca\slash graphicdesign\slash chapter\slash colour-science\slash}}.
 \begin{figure}[H]
 		\centering
 		\includegraphics[width=0.5\textwidth]{Imagenes/lab.png}
-		\caption{Espacio de colores CIE-Lab en el espacio cartesiano\footnote{Imagen atribuida a https://opentextbc.ca/graphicdesign/chapter/colour-science/}.}
+		\caption{Espacio de colores CIE-Lab en el espacio cartesiano.}
 		\label{fig:lab}
 \end{figure}
 
