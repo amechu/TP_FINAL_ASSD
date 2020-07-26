@@ -47,15 +47,16 @@ class Searcher:
 
         if self.missAlgorithm== self.missAlgorithmD["ST"]:
       #      print("IM USING SHI TOMASI for search missing")
-            candidate=[None,None]
+            candidate = [None, None]
             frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-            y1=np.clip(int(estY - self.searchHeight / 2),1,frame.shape[0])
-            y2=np.clip(int(estY + self.searchHeight / 2),1,frame.shape[0])
-            x1=np.clip(int(estX - self.searchWidth / 2),1,frame.shape[1])
-            x2=np.clip(int(estX + self.searchWidth / 2),1,frame.shape[1] )
-            searchin=frameGray[y1: y2,x1: x2 ]
+            y1 = np.clip(int(estY - self.searchHeight / 2), 1, frame.shape[0])
+            y2 = np.clip(int(estY + self.searchHeight / 2), 1, frame.shape[0])
+            x1 = np.clip(int(estX - self.searchWidth / 2), 1, frame.shape[1])
+            x2 = np.clip(int(estX + self.searchWidth / 2), 1, frame.shape[1])
+            searchin = frameGray[y1: y2, x1:x2]
             self.features, self.trackingError = self.ST.recalculateFeatures(searchin)
-            self.features = self.featureTranslate(estX- self.searchWidth / 2,estY - self.searchHeight / 2,self.features)
+            self.features = self.featureTranslate(estX - self.searchWidth / 2, estY - self.searchHeight / 2, self.features)
+
       #      print(f'Search Height : {self.searchHeight }')
       #      print(f'Search Width : {self.searchWidth }')
             if self.trackingError is True:

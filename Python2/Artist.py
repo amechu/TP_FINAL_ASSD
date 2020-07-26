@@ -17,16 +17,20 @@ class Artist:
         return frame
 
     @staticmethod
-    def trajectory(frame, pointArray, color):
+    def trajectory(frame, pointArray, color,persistance=True):
+        overlay = frame.copy()
         pointArray = pointArray[-80:] #descomentar esto para que la linea dure como maximo 99 frames
         for i in range(np.shape(pointArray)[0]): #[[x y],[x y],[x y]]
-            if i is 0:
-                cv.circle(frame, pointArray[i], 4, color, -1)
+            if not color:
+                cv.line(overlay, pointArray[i-1], pointArray[i], (0,0,255), 2)
             else:
-                color = (int(np.clip(color[0] - 3*i, 0, 255)), int(np.clip(color[1] - 3*i, 0, 255)),  int(np.clip(color[2] - 3*i, 0, 255)))
-                cv.line(frame, pointArray[i-1], pointArray[i], color, 1)
-            #cv.circle(frame, pointArray[i], 3, color, -1)
-        return frame
+                cv.line(overlay, pointArray[i-1], pointArray[i], color, 2)
+            if persistance:
+                #cv.circle(frame, pointArray[i], 3, color, -1)
+                alpha = i/len(pointArray)  # Transparency factor.
+                # Following line overlays transparent rectangle over the image
+                overlay = cv.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+        return overlay
 
     @staticmethod
     def searchArea(frame, x, y, width, height, color):
