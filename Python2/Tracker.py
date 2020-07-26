@@ -284,7 +284,6 @@ class Tracker:
 
     def calculate_cost(self):
         test_frame = self.MF.filterFrame(self.initFrame)
-
         count_total = np.count_nonzero(test_frame)
         count_inside = np.count_nonzero(test_frame[int(self.initPos[1] - self.selectionHeight / 2): int(self.initPos[1] + self.selectionHeight / 2),int(self.initPos[0] - self.selectionWidth / 2): int(self.initPos[0] + self.selectionWidth / 2)])
         count_outside = count_total - count_inside
