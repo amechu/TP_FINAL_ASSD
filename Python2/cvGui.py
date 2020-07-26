@@ -496,7 +496,7 @@ class cvGui():
 
             selectedT = self.IsTrackerSelected()
             if self.lastTracker != selectedT:
-                if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (not self.boolForTrackers[self.lastTracker][0])):
+                if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (len(self.boolForTrackers) < self.lastTracker)):
                     self.lastTracker = -1
                 else:
                     if not (selectedT == -1):
