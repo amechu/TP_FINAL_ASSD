@@ -5,10 +5,11 @@ from MaskingFilter import MaskingFilter
 from ShiTomasi import ShiTomasi
 from OpticalFlow import OpticalFlow
 from Searcher import Searcher
-from scipy import optimize
-from scipy.optimize import Bounds
+# from scipy import optimize
+# from scipy.optimize import Bounds
 
-
+# import tensorflow as tf
+# from tensorflow.python.training import gradient_descent
 class Tracker:
     LIG_THR_EVERY_FRAMES = 15
 
@@ -43,10 +44,25 @@ class Tracker:
         self.SC.features = self.SC.featureTranslate(initialPosition[0] - initialWidth / 2,initialPosition[1] - initialHeight / 2, self.SC.features)
         self.SC.LK.prevFeatures = self.SC.features
 
+        #OPTIMIZACIÓN
+        self.bins_var = 1
+        self.kernel_blur_var = 1
+        self.mask_blur_var = 1
+        self.low_pth_var = 200
+        # self.bins_var = tf.Variable(64, trainable=True)
+        # self.kernel_blur_var = tf.Variable(0, trainable=True)
+        # self.mask_blur_var = tf.Variable(11, trainable=True)
+        # self.low_pth_var = tf.Variable(200, trainable=True)
+
         #x_bounds = [(1, 200), (0, 20), (0, 20), (0, 250)]
 
         #res = optimize.shgo(self.costChangeParams, x_bounds, options={'disp': True ,'eps' : 5e0})
-
+        # epochs = 200
+        # for i in range(epochs):
+        #     print([self.bins_var.numpy(), self.kernel_blur_var.numpy(),self.mask_blur_var.numpy(),self.low_pth_var.numpy(), self.target().numpy()])
+        #     opt = gradient_descent.GradientDescentOptimizer(0.01).minimize(self.target)
+        for i in range(5):
+            self.optimize()
         #print(res.x)
 
     def getTrackingError(self):
@@ -107,9 +123,9 @@ class Tracker:
             elif self.SC.missAlgorithm == self.SC.missAlgorithmD["CORR"]:
                 x, y = self.SC.searchMissing(self.KM.statePost[0][0], self.KM.statePost[1][0], realframe,frame)
             if self.SC.trackingError is False:
-                self.KM.correct(x,y)
+                self.KM.correct(x, y)
         else:
-            x,y = self.SC.search(self.frameCounter,realframe,frame)
+            x,y = self.SC.search(self.frameCounter, realframe, frame)
             if self.SC.trackingError is False:
                 self.KM.correct(x,y)
 
@@ -204,6 +220,97 @@ class Tracker:
         countOutside = countTotal - countInside
         print(countOutside-countInside)
         return countOutside - countInside
+
+    def calculate_cost(self):
+        test_frame = self.MF.filterFrame(self.initFrame)
+
+        count_total = np.count_nonzero(test_frame)
+        count_inside = np.count_nonzero(test_frame[int(self.initPos[1] - self.selectionHeight / 2): int(self.initPos[1] + self.selectionHeight / 2),int(self.initPos[0] - self.selectionWidth / 2): int(self.initPos[0] + self.selectionWidth / 2)])
+        count_outside = count_total - count_inside
+        return count_outside - count_inside #PREFERIMOS QUE ESTE VACIO AFUERA
+        # return count_outside**4 - count_inside**3 #PREFERIMOS QUE ESTE VACIO AFUERA
+
+    def optimize(self):
+
+        best_bin = [self.MF.hist_filter.bins]
+        best_cost = self.calculate_cost()
+
+        for i in range(1, 200):
+            self.MF.hist_filter.set_bins(i)
+            self.MF.updateMaskFromSettings()
+            cost = self.calculate_cost()
+            if cost < best_cost:
+                best_bin.append(i)
+                best_cost = cost
+
+        self.MF.hist_filter.set_bins(best_bin[-1])
+        self.MF.updateMaskFromSettings()
+
+        best_mask_blur = [self.MF.hist_filter.mask_blur_size]
+        # best_cost = 0
+        for i in range(1, 20):
+            self.MF.hist_filter.set_mask_blur(i)
+            cost = self.calculate_cost()
+            if cost < best_cost:
+                best_mask_blur.append(i)
+                best_cost = cost
+        self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
+
+        best_kernel_blur = [self.MF.hist_filter.kernel_blur_size]
+        for i in range(1, 20):
+            self.MF.hist_filter.set_kernel_blur(i)
+            self.MF.updateMaskFromSettings()
+            cost = self.calculate_cost()
+            if cost < best_cost:
+                best_kernel_blur.append(i)
+                best_cost = cost
+        self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
+        self.MF.updateMaskFromSettings()
+
+
+        # best_low_pth = [1]
+        # best_cost = np.inf
+        #
+        # for i in range(1, 254):
+        #     self.MF.hist_filter.set_mask_blur(i)
+        #     self.MF.updateMaskFromSettings()
+        #     cost = self.calculate_cost()
+        #     if cost < best_cost:
+        #         best_low_pth.append(i)
+        #         best_cost = cost
+
+        self.MF.hist_filter.set_bins(best_bin[-1])
+        self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
+        self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
+        # self.MF.hist_filter.set_low_pth(best_low_pth[-1])
+        self.MF.updateMaskFromSettings()
+        print("-------------------------------")
+        print(f"numero de bines optimo {best_bin[-1]}")
+        print(f"blur mascara optimo {best_mask_blur[-1]}")
+        print(f"blur kernel optimo {best_kernel_blur[-1]}")
+
+        print(f"Costo : {self.calculate_cost()}")
+        print("-------------------------------")
+
+        # print(f"blur kernel optimo {best_kernel_blur[-1]}")
+        # print(f"th p {best_low_pth[-1]}")
+        return
+        #
+        #
+        #
+        # if 0 <= self.bins_var < 200:
+        #     self.MF.hist_filter.set_bins(self.bins_var)
+        # if 0 <= self.kernel_blur_var < 20:
+        #     self.MF.hist_filter.set_kernel_blur(self.kernel_blur_var)
+        # if 0 <= self.mask_blur_var < 20:
+        #     self.MF.hist_filter.set_mask_blur(self.mask_blur_var)
+        # if 0 <= self.low_pth_var < 250:
+        #     self.MF.hist_filter.set_low_pth(self.low_pth_var)
+
+
+        # count_outside = count_total - count_inside
+        # print(count_outside-count_inside)
+        # return count_outside - count_inside
 
     def colorKernelChange(self, bgr):
         b = bgr[0]
