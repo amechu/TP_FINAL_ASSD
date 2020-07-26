@@ -424,7 +424,7 @@ class cvGui():
                         cvui.trackbar(self.frame, 20, 675, 210, self.maskBlur_lab, 0.0, 20.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
                         self.maskBlur_lab[0] = int(self.maskBlur_lab[0])
 
-                    if cvui.checkbox(self.frame, 20, 420, "Camshift Filter", self.CFCamShiftOnOff):
+                    if cvui.checkbox(self.frame, 20, 420, "Cam Shift Filter", self.CFCamShiftOnOff):
                         self.CFPropOnOff[0] = False
 
                         cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Number Of Bins")
@@ -705,8 +705,9 @@ class cvGui():
                 #     self.resetInitialCond()
                 if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
-                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
-                    pass
+                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 90, 915, "Auto CS")):
+                    if not selectedT == -1 and self.CFCamShiftOnOff[0]:
+                        pass
 
             alreadyTex = False
             nizu = 0
@@ -758,7 +759,7 @@ class cvGui():
             cvui.rect(self.frame, 210, 182, 20, 20, 0x494949, 0x545454)
             cvui.text(self.frame, 215, 185, "?", 0.6)
             if not cvui.iarea(210, 182, 20, 20) == cvui.OUT:
-                cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 260, "Help")
+                cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SET_Y, 500, 300, "Help")
                 cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 33, 3, 3, 0xdd97fb, 0xdd97fb)
                 cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 30, "Begin loading a video or turning on the camera. Videos will start paused", 0.4, 0xdd97fb)
                 cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 50, "by default.", 0.4, 0xdd97fb)
@@ -780,7 +781,9 @@ class cvGui():
 
                 cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 213, 3, 3, 0xdd97fb, 0xdd97fb)
                 cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 210, "Reset Settings will set settings for the tracker select by default, while", 0.4, 0xdd97fb)
-                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 230, "Auto will stablish the best conditions for the selection.", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 230, "Auto will stablish the best Cam Shift conditions for the selection.", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 250, "Remeber this option is only available when a tracker is selected and", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 270, "Cam Shift option is on.", 0.4, 0xdd97fb)
 
 
             if ((cvui.button(self.frame, 20, 180, "Add Tracker") and ( (self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
