@@ -1286,16 +1286,12 @@ class cvGui():
                 changes = True      #Mask condition
                 self.trackers[sT].updateMaskCond(self.parametersNew[23])
 
-            if len(self.parametersNew[25]) == len(self.parameters[25]):
-                if not len(self.parametersNew[25]) == 0:
-                    if not(self.parametersNew[25][0] == self.parameters[25][0] and self.parametersNew[25][1] == self.parameters[25][1] and self.parametersNew[25][2] == self.parameters[25][2]):
-                        changes = True  # Tracker BGR
-                        self.trackers[sT].colorKernelChange(self.parametersNew[25])
-                        self.trackers[sT].updateBGR(self.parametersNew[25])
-            else:
-                changes = True  # Tracker BGR
-                self.trackers[sT].colorKernelChange(self.parametersNew[25])
-                self.trackers[sT].updateBGR(self.parametersNew[25])
+            if (len(self.parametersNew[25]) == len(self.parameters[25])) and not len(self.parametersNew[25]) == 0:
+                if not(self.parametersNew[25][0] == self.parameters[25][0] and self.parametersNew[25][1] == self.parameters[25][1] and self.parametersNew[25][2] == self.parameters[25][2]):
+                    changes = True  # Tracker BGR
+                    self.trackers[sT].colorKernelChange(self.parametersNew[25])
+                    self.trackers[sT].updateBGR(self.parametersNew[25])
+
 
         if changes:
             self.configSelected[filterOfInteres] = self.parametersNew.copy()
