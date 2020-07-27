@@ -327,13 +327,13 @@ class Tracker:
         self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
         self.MF.updateMaskFromSettings()
 
-        # best_low_pth = [1]
-        # best_cost = np.inf
-        #
+        best_low_pth = [self.MF.hist_filter.low_pth]
+
         # for i in range(1, 254):
-        #     self.MF.hist_filter.set_mask_blur(i)
+        #     self.MF.hist_filter.set_low_pth(i)
         #     self.MF.updateMaskFromSettings()
         #     cost = self.calculate_cost()
+        #     print(f"low_pth{i} cost:{cost}")
         #     if cost < best_cost:
         #         best_low_pth.append(i)
         #         best_cost = cost
@@ -341,21 +341,15 @@ class Tracker:
         self.MF.hist_filter.set_bins(best_bin[-1])
         self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
         self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
+        self.MF.hist_filter.set_low_pth(best_low_pth[-1])
 
         self.MF.hist_filter.bins_opti = best_bin[-1]
         self.MF.hist_filter.mask_blur_size_opti = best_mask_blur[-1]
         self.MF.hist_filter.kernel_blur_size_opti = best_kernel_blur[-1]
-        self.MF.hist_filter.low_pth_opti = self.MF.hist_filter.low_pth
+        self.MF.hist_filter.low_pth_opti = best_low_pth[-1]
 
         # self.MF.hist_filter.set_low_pth(best_low_pth[-1])
         self.MF.updateMaskFromSettings()
-        # print("-------------------------------")
-        # print(f"numero de bines optimo {best_bin[-1]}")
-        # print(f"blur mascara optimo {best_mask_blur[-1]}")
-        # print(f"blur kernel optimo {best_kernel_blur[-1]}")
-        #
-        # print(f"Costo : {self.calculate_cost()}")
-        # print("-------------------------------")
 
 
     def colorKernelChange(self, bgr):

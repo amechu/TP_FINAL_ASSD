@@ -181,10 +181,18 @@ A continuación se muestra una imagen y el resultado del cálculo de correlació
 	\label{fig:corrtest}
 \end{figure}
 Se puede apreciar como el punto más oscuro de la pantalla indica el punto de mayor correlación entre la imagen fuente y el kernel seleccionado para el algoritmo de cuadrados mínimos mientras que el mas claro indica la mayor correlación para el otro. 
-\subsection{Filtros de Camshift:}
-\begin{Huge}
-INTRODUCCIÓN TEORICA DE CAMSHIFT
-\end{Huge}
+\subsection{Filtros basados en distribución de probabilidad de Hue:}
+Los filtros de color tradicionales usualmente se basan en la detección de un color especifico con la adición de una cierta tolerancia para poder incluir una gama de colores más amplia. Sin embargo dicha elección resulta ser demasiado restrictiva cuando aparecen sombras o cambios de iluminación. Es por eso que una alternativa más permisiva es la de utilizar mascaras que permitan el paso de ciertos colores según una función de masa de probabilidad dada. Dicha distribución se computa usando como semilla el objeto que deseamos seguir.
+\begin{figure}[H]
+\centering
+	\begin{subfigure}{.1\textwidth}
+		\centering
+		\includegraphics[width=1.2\textwidth]{Imagenes/camshift_kernel.png}
+		\caption{Kernel}
+		\label{fig:kernelHistFilter}
+	\end{subfigure}
+\end{figure}
+
 \subsection{Espacios de Color HSV y CIE-L*a*b*:}
 El espacio de color HSV, o hue-saturation-value logra representar a un color mediante tres ejes distintos. A diferencia del espacio de colores usual, RGB, que describe un color mediante sus componentes de rojo, verde y azul, en el espacio HSV se describe mediante la oscuridad/luminosidad del color, al cual se le asigna la componente value; la cantidad de pigmentación o pureza del color, al cual se le asigna la componente de saturación; y finalmente la componente de hue, que describe el \textit{chroma} según la teoría de colores, es decir la posición en la rueda de colores.
 

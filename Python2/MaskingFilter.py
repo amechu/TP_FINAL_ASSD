@@ -37,12 +37,12 @@ class HistFilter:
         """
 
         bins = bins
-        hist_size = max(bins, 2)
+        hist_size = max(bins, 1)
         hsv = src
         if self.kernel_blur_size != 0:
             hsv = cv.medianBlur(hsv, int(self.kernel_blur_size))
         hsv = cv.cvtColor(hsv, cv.COLOR_BGR2HSV)
-        self.mask = cv.inRange(hsv, np.array((0., 60., 0.)), np.array((180., 255., 255.)))  #((0., 60., 32.))
+        self.mask = cv.inRange(hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))  #((0., 60., 32.))
         # self.mask = cv.medianBlur(self.mask,15)
         self.hist = cv.calcHist([hsv], [0], self.mask, [hist_size], self.ranges)
         cv.normalize(self.hist, self.hist, 0, 255, cv.NORM_MINMAX)
