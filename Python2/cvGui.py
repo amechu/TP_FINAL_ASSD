@@ -669,7 +669,7 @@ class cvGui():
                 if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
                 if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
-                    if not selectedT == -1 and self.CFCamShiftOnOff[0]:
+                    if not selectedT == -1 and (self.CFCamShiftOnOff[0] or self.CFPropOnOff[0]):
                         autoCS = True
 
             # Tracking Error
@@ -845,9 +845,9 @@ class cvGui():
             # Auto CS "Load Screen"
             if autoCS:
                 cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto")
-                if self.CFCamShiftOnOff:
+                if self.CFCamShiftOnOff[0]:
                     mask = "Cam Shift"
-                elif self.CFPropOnOff:
+                elif self.CFPropOnOff[0]:
                     mask = "LAB"
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 875, 0.4, 0xdd97fb, f'Calcualting optimum {mask}')
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 895, 0.4, 0xdd97fb, f'parameters for tracker {selectedT + 1}. Hold')
@@ -861,7 +861,7 @@ class cvGui():
                 cv.waitKey(1)
                 autoCS = False
                 params = self.trackers[selectedT].calculate_optimal_params()
-                if self.CFCamShiftOnOff:
+                if self.CFCamShiftOnOff[0]:
                     self.camShift_bins[0] = params["bins"]
                     self.camShift_mb[0] = params["mask_blur"]
                     self.camShift_sb[0] = params["kernel_blur"]
@@ -870,7 +870,7 @@ class cvGui():
                     self.configSelected[selectedT][10] = params["mask_blur"]
                     self.configSelected[selectedT][11] = params["kernel_blur"]
                     self.configSelected[selectedT][12] = params["low_pth"]
-                elif self.CFPropOnOff:
+                elif self.CFPropOnOff[0]:
                     self.colorFilter_LihtThr[0] = params["l"]
                     self.colorFilter_a[0] = params["a"]
                     self.colorFilter_b[0] = params["b"]
