@@ -269,10 +269,10 @@ mediante el uso de \textit{Matched Filters}. Además, se logró obtener una gran
 	\label{fig:c_mask1}
 \end{figure*}
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=0.45\textwidth]{Imagenes/classd.png}
-	\caption{Diagrama de Clases del programa utilizado para presentar la funcionalidad del algoritmo desarollado. \LARGE{siento que esta foto no aporta mucho (alan)}}
+	\includegraphics[width=0.45\textwidth]{Imagenes/Classes.jpg}
+	\caption{Diagrama de Clases del programa utilizado para presentar la funcionalidad del algoritmo desarollado.}
 	\label{fig:class}
 \end{figure}
 
@@ -301,9 +301,12 @@ El diseño anterior poseía un algoritmo de enmascaramiento basado en el espacio
 
 La generación de la máscara se realiza de la misma forma que en el diseño anterior, con el único agregado de un suavizamiento de la máscara computada previo a la utilización de esta para el filtrado de la imagen. Esto se utiliza debido a que generalmente los bordes de un objeto poseen mayor o menor iluminación dependiendo de dónde este la fuente de luz más cercana. Estas diferencias en la iluminación pueden ocasionar que un objeto de similar color al de interés sea vez correctamente excluído de la imagen a excepción de sus bordes, lo cual genera problemas al pasar por delante o por detrás del objeto a seguir por causas detalladas anteriormente.
 
-\begin{Large}
-aca poner fotino de un caso con median blur 0 y despues con median blur y ver como se arregla. optimizacion a lo tincho con optimize.shgo? ver si funciona en el codigo y escribir o no
-\end{Large}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.45\textwidth]{Imagenes/medianblur.png}
+	\caption{Ejemplo del uso del suavizado de la máscara de color. La segunda foto es la máscara previo al suavizado y la tercer foto es posterior al suavizado.}
+	\label{fig:medianblur}
+\end{figure}
 
 Sin embargo, si bien la utilización del espacio de color CIE-Lab subsanó varios problemas, el enmascaramiento de la imagen tomando en cuenta solamente uno de los varios colores del objeto a seguir falla cuando se encuentra en pantalla un objeto del mismo color que el utilizado para la máscara. Para lidiar con este problema, se decidió desarrollar un método de enmascaramiento que tenga en cuenta todos los colores del objeto a seguir.
 
