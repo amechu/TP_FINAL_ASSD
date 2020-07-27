@@ -29,7 +29,7 @@ CAMSHIFT_LBPT = 200.0
 
 INITIAL_ST_ONOFF = True
 SHIT_MAXFEAT = 100.0
-SHIT_FEATQUAL = 0.001
+SHIT_FEATQUAL = 0.01
 SHIT_MINFEAT = 0.01
 SHIT_REC = 20.0
 SHIT_SPIX = 4.0
@@ -475,7 +475,7 @@ class cvGui():
                     self.shit_MaxFeat[0] = int(self.shit_MaxFeat[0])
 
                     cvui.printf(self.frame, 20, 470, 0.4, 0xdd97fb, "Feature Quality Level")
-                    cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.0, 1)
+                    cvui.trackbar(self.frame, 20, 485, 210, self.shit_FeatQual, 0.01, 1.0, 1, "%0.3Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
 
                     cvui.printf(self.frame, 20, 540, 0.4, 0xdd97fb, "Minimum Feature Distance")
                     cvui.trackbar(self.frame, 20, 555, 210, self.shit_MinFeat, 0.0, 1.0)
