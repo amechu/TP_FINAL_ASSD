@@ -273,7 +273,7 @@ class Tracker:
 
         countOutside = countTotal - countInside
         print(countOutside-countInside)
-        return countOutside - countInside
+        return countOutside*(1/5) - countInside*(4/5)
 
     def calculate_optimal_params(self):
         if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
