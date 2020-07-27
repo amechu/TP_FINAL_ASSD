@@ -437,8 +437,8 @@ class cvGui():
 
                         cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Number Of Bins")
                         cvui.trackbar(self.frame, 20, 465, 210, self.camShift_bins, 1.0, 200.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
-                        if self.camShift_bins[0] < 1:
-                            self.camShift_bins[0] = 1
+                        # if self.camShift_bins[0] < 2:
+                        #     self.camShift_bins[0] = 2
                         self.camShift_bins[0] = int(self.camShift_bins[0])
 
                         cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "Mask Blur")
