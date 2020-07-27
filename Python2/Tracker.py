@@ -5,7 +5,7 @@ from MaskingFilter import MaskingFilter
 from ShiTomasi import ShiTomasi
 from OpticalFlow import OpticalFlow
 from Searcher import Searcher
-# from scipy import optimize
+from scipy import optimize
 # from scipy.optimize import Bounds
 
 # import tensorflow as tf
@@ -20,6 +20,8 @@ class Tracker:
         #########################################
         self.initFrame = frame
         self.initPos = initialPosition
+        self.initW = initialWidth
+        self.initH = initialHeight
         self.KM = KalmanFilter()
         self.MF= MaskingFilter()
         self.KM.setStatePost(np.array([initialPosition[0], initialPosition[1], 0., 0.]).reshape(4, 1))
@@ -224,8 +226,12 @@ class Tracker:
     def updateMissinSearch(self, missCorr, missST,  recCor, recST):
         if missST == True and missCorr == False:
             self.SC.missAlgorithm = self.SC.missAlgorithmD["ST"]
+            self.SC.searchHeight = self.initH
+            self.SC.searchWidth = self.initW
         elif missST == False and missCorr == True:
             self.SC.missAlgorithm = self.SC.missAlgorithmD["CORR"]
+            self.SC.searchHeight = self.initH
+            self.SC.searchWidth = self.initW
         if recST == True and recCor == False:
             self.SC.recalcAlgorithm = self.SC.recalcAlgorithmD["ST"]
         elif recST == False and recCor == True:
@@ -253,16 +259,12 @@ class Tracker:
     def getTrajectory(self):
         return self.KM.trajectory
 
-    def costChangeParams(self, x): # x = [parametersNew[9], parametersNew[11], parametersNew[12]]
 
-        x[0] = int(x[0])
-        x[1] = int(x[1]/25)
-        x[2] = int(x[2]/25)
-        x[3] = int(x[3])
-        self.MF.hist_filter.set_bins(x[0])
-        self.MF.hist_filter.set_kernel_blur(x[2])
-        self.MF.hist_filter.set_mask_blur(x[1])
-        self.MF.hist_filter.set_low_pth(x[3])
+    def costChangeParamsLAB(self, x):
+
+        self.MF.LSemiAmp = x[0]
+        self.MF.aSemiAmp = x[1]
+        self.MF.bSemiAmp = x[2]
         self.MF.updateMaskFromSettings()
         testFrame = self.MF.filterFrame(self.initFrame)
 
@@ -274,13 +276,20 @@ class Tracker:
         return countOutside - countInside
 
     def calculate_optimal_params(self):
-        for i in range(3):
+        if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
             self.optimize()
-        params = {"bins":self.MF.hist_filter.bins_opti,
-                  "mask_blur":self.MF.hist_filter.mask_blur_size_opti,
-                  "kernel_blur":self.MF.hist_filter.kernel_blur_size_opti,
-                  "low_pth":self.MF.hist_filter.low_pth_opti}
-        return params
+            params = {"l":self.MF.LSemiAmp,
+                      "a":self.MF.aSemiAmp,
+                      "b":self.MF.bSemiAmp}
+            return params
+        elif self.MF.mask is self.MF.maskingType["FILTER_CSHIFT"]:
+            for i in range(3):
+                self.optimize()
+            params = {"bins":self.MF.hist_filter.bins_opti,
+                      "mask_blur":self.MF.hist_filter.mask_blur_size_opti,
+                      "kernel_blur":self.MF.hist_filter.kernel_blur_size_opti,
+                      "low_pth":self.MF.hist_filter.low_pth_opti}
+            return params
 
     def calculate_cost(self):
         test_frame = self.MF.filterFrame(self.initFrame)
@@ -292,64 +301,73 @@ class Tracker:
 
     def optimize(self):
 
-        best_bin = [self.MF.hist_filter.bins]
-        best_cost = self.calculate_cost()
+        if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
+            x_bounds = [(0, 150), (0, 150), (0, 150)]
+            res = optimize.shgo(self.costChangeParamsLAB, x_bounds)
+            print(res.x)
+            self.MF.LSemiAmp = res.x[0]
+            self.MF.aSemiAmp = res.x[1]
+            self.MF.bSemiAmp = res.x[2]
 
-        for i in range(1, 200):
-            self.MF.hist_filter.set_bins(i)
+        else:
+            best_bin = [self.MF.hist_filter.bins]
+            best_cost = self.calculate_cost()
+
+            for i in range(1, 200):
+                self.MF.hist_filter.set_bins(i)
+                self.MF.updateMaskFromSettings()
+                cost = self.calculate_cost()
+                if cost < best_cost:
+                    best_bin.append(i)
+                    best_cost = cost
+
+            self.MF.hist_filter.set_bins(best_bin[-1])
             self.MF.updateMaskFromSettings()
-            cost = self.calculate_cost()
-            if cost < best_cost:
-                best_bin.append(i)
-                best_cost = cost
 
-        self.MF.hist_filter.set_bins(best_bin[-1])
-        self.MF.updateMaskFromSettings()
+            best_mask_blur = [self.MF.hist_filter.mask_blur_size]
+            # best_cost = 0
+            for i in range(1, 20):
+                self.MF.hist_filter.set_mask_blur(i)
+                cost = self.calculate_cost()
+                if cost < best_cost:
+                    best_mask_blur.append(i)
+                    best_cost = cost
+            self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
 
-        best_mask_blur = [self.MF.hist_filter.mask_blur_size]
-        # best_cost = 0
-        for i in range(1, 20):
-            self.MF.hist_filter.set_mask_blur(i)
-            cost = self.calculate_cost()
-            if cost < best_cost:
-                best_mask_blur.append(i)
-                best_cost = cost
-        self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
-
-        best_kernel_blur = [self.MF.hist_filter.kernel_blur_size]
-        for i in range(1, 20):
-            self.MF.hist_filter.set_kernel_blur(i)
+            best_kernel_blur = [self.MF.hist_filter.kernel_blur_size]
+            for i in range(1, 20):
+                self.MF.hist_filter.set_kernel_blur(i)
+                self.MF.updateMaskFromSettings()
+                cost = self.calculate_cost()
+                if cost < best_cost:
+                    best_kernel_blur.append(i)
+                    best_cost = cost
+            self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
             self.MF.updateMaskFromSettings()
-            cost = self.calculate_cost()
-            if cost < best_cost:
-                best_kernel_blur.append(i)
-                best_cost = cost
-        self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
-        self.MF.updateMaskFromSettings()
 
-        best_low_pth = [self.MF.hist_filter.low_pth]
+            best_low_pth = [self.MF.hist_filter.low_pth]
 
-        # for i in range(1, 254):
-        #     self.MF.hist_filter.set_low_pth(i)
-        #     self.MF.updateMaskFromSettings()
-        #     cost = self.calculate_cost()
-        #     print(f"low_pth{i} cost:{cost}")
-        #     if cost < best_cost:
-        #         best_low_pth.append(i)
-        #         best_cost = cost
+            # for i in range(1, 254):
+            #     self.MF.hist_filter.set_low_pth(i)
+            #     self.MF.updateMaskFromSettings()
+            #     cost = self.calculate_cost()
+            #     print(f"low_pth{i} cost:{cost}")
+            #     if cost < best_cost:
+            #         best_low_pth.append(i)
+            #         best_cost = cost
 
-        self.MF.hist_filter.set_bins(best_bin[-1])
-        self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
-        self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
-        self.MF.hist_filter.set_low_pth(best_low_pth[-1])
+            self.MF.hist_filter.set_bins(best_bin[-1])
+            self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
+            self.MF.hist_filter.set_kernel_blur(best_kernel_blur[-1])
+            self.MF.hist_filter.set_low_pth(best_low_pth[-1])
 
-        self.MF.hist_filter.bins_opti = best_bin[-1]
-        self.MF.hist_filter.mask_blur_size_opti = best_mask_blur[-1]
-        self.MF.hist_filter.kernel_blur_size_opti = best_kernel_blur[-1]
-        self.MF.hist_filter.low_pth_opti = best_low_pth[-1]
+            self.MF.hist_filter.bins_opti = best_bin[-1]
+            self.MF.hist_filter.mask_blur_size_opti = best_mask_blur[-1]
+            self.MF.hist_filter.kernel_blur_size_opti = best_kernel_blur[-1]
+            self.MF.hist_filter.low_pth_opti = best_low_pth[-1]
 
-        # self.MF.hist_filter.set_low_pth(best_low_pth[-1])
-        self.MF.updateMaskFromSettings()
+            # self.MF.hist_filter.set_low_pth(best_low_pth[-1])
+            self.MF.updateMaskFromSettings()
 
 
     def colorKernelChange(self, bgr):
