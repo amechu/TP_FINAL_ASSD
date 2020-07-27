@@ -27,7 +27,7 @@ CAMSHIFT_MB = 11.0
 CAMSHIFT_SB = 4.0
 CAMSHIFT_LBPT = 200.0
 
-INITIAL_ST_ONOFF = False
+INITIAL_ST_ONOFF = True
 SHIT_MAXFEAT = 100.0
 SHIT_FEATQUAL = 0.001
 SHIT_MINFEAT = 0.01
@@ -213,14 +213,12 @@ class cvGui():
 
         while True:
 
-            # print(f'LAB: {self.CFCamShiftOnOff}           CamOnOF:{self.CFPropOnOff}')
-
             self.updateParameters()
             selectedT = self.IsTrackerSelected()
 
             self.frame[:] = (49, 52, 49)
 
-            # FRAMES
+            # Drawing Some Frames
             cvui.window(self.frame, WINDOW_VS_X, WINDOW_VS_Y, WINDOW_VS_WIDTH, WINDOW_VS_HEIGHT, "Load Source:")  # Video Source Frame
             cvui.window(self.frame, WINDOW_SET_X, WINDOW_SET_Y, WINDOW_SET_WIDTH, WINDOW_SET_HEIGHT, "Tracker Settings:")  # Settings Frame
             cvui.window(self.frame, WINDOW_SOU_X, WINDOW_SOU_Y, WINDOW_SOU_WIDTH, WINDOW_SOU_HEIGHT, "Source:")
@@ -228,16 +226,16 @@ class cvGui():
             cvui.window(self.frame, WINDOW_FILS_X, WINDOW_FILS_Y, WINDOW_FILS_WIDTH, WINDOW_FILS_HEIGHT, "Filter Selection:")
             cvui.window(self.frame, WINDOW_TRK_X, WINDOW_TRK_Y, WINDOW_TRK_WIDTH, WINDOW_TRK_HEIGHT, "Trackers:")
 
-            #Text
+            # Text
             cvui.printf(self.frame, 17, 35, 0.4, 0xdd97fb, "Current Source:")                #Video Source
-            cvui.printf(self.frame, 17, 50, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
+            cvui.printf(self.frame, 17, 52, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
 
             if selectedT == -1:
                 cvui.printf(self.frame, 17, 275, 0.4, 0xdd97fb, "No Tracker Selected To Modify")        #0xd11616
             else:
                 cvui.printf(self.frame, 17, 275, 0.4, self.trackerColors[selectedT], "Changes Saved For Tracker " + str(selectedT + 1) + "!")
 
-            if self.pause:# and not self.replaceRoi:
+            if self.pause:
                 if (self.usingVideo or self.usingCamera):
                     cvui.printf(self.frame, 17, 255, 0.4, 0xdc1076, "Source Paused!")
                 else:
@@ -255,20 +253,17 @@ class cvGui():
                     self.usingVideo = True
                     if(self.initSource()):                                                                #Chequear si se inicia bien
                         self.VideoLoaded = self.videoPath
-                        self.CurrentSource = "Video Loaded: " + self.videoName
+                        self.CurrentSource = "Video: " + self.videoName
                         selectedT = -1
                         self.pause = True
                     else:
                         self.usingCamera = False
                         self.usingVideo = False
 
-                # elif not self.usingCamera:
-                #     self.CurrentSource = "No Video Loaded"
-
             if (cvui.button(self.frame, 120, 70, "Reload Video") and self.usingVideo):
                 self.usingCamera = False
                 self.usingVideo = True
-                if (self.initSource()):  # Chequear si se inicia bien
+                if (self.initSource()):                                                                  #Chequear si se inicia bien
                     self.VideoLoaded = self.videoPath
                     self.CurrentSource = "Video Loaded: " + self.videoName
                     selectedT = -1
@@ -281,16 +276,15 @@ class cvGui():
                self.trackers.clear()
                self.usingVideo = False
                self.usingCamera = True
-               if (self.initSource()):                  #Chequear si se inicia bien
-                   self.CurrentSource = "Camera On"
+               if (self.initSource()):                                                  #Chequear si se inicia bien
+                   self.CurrentSource = "Camera"
                    selectedT = -1
                else:
                    self.usingVideo = False
                    self.usingCamera = False
 
-            #Settings Buttons
+            # Trackers added and kernel
             a = len(self.trackers)
-
             for i in range(a):
                 if self.trackerAdded:
                     self.boolForTrackers.append([False])
@@ -300,7 +294,7 @@ class cvGui():
 
                 xTx = WINDOW_TRK_X + int((WINDOW_TRK_WIDTH - 10) * (i) / MAX_TRACKERS) + 20
                 yTx = WINDOW_TRK_Y + 60
-                xB = xTx + int(windowWidth/MAX_TRACKERS) #WINDOW_TRK_X - 170 + int(WINDOW_TRK_WIDTH * (i + 1) / MAX_TRACKERS)
+                xB = xTx + int(windowWidth/MAX_TRACKERS)
                 yB = WINDOW_TRK_Y + 80
 
                 windowHeight = int(Y_SCREEN - 2*WINDOW_SOU_Y - yTx + 10)
@@ -337,16 +331,18 @@ class cvGui():
                     cursor = cvui.mouse(WINDOW_NAME)
                     self.trackSelectionBGR[i] = self.frame[cursor.y, cursor.x]
 
-                if (cvui.button(self.frame, xB+5, yB-5, "Delete Tracker")):
+                if cvui.button(self.frame, xB+5, yB-5, "Delete Tracker"):
                     self.changeInTrackers = True
                     del self.configSelected[i]
                     del self.boolForTrackers[i]
                     del self.filterConditions[i]
                     del self.trackers[i]
                     del self.kernel[i]
+
                     self.trackerColors.append(self.trackerColors[i])
-                    self.trackSelectionBGR[i] = []
                     del self.trackerColors[i]
+
+                    self.trackSelectionBGR[i] = []
                     self.deletedTracker = i
                     selectedT = self.IsTrackerSelected()
 
@@ -370,8 +366,6 @@ class cvGui():
                     break
 
             self.trackerChanged = not(selectedT == self.IsTrackerSelected())
-            # if self.trackerChanged:
-            #     selectedT = self.IsTrackerSelected()
 
             if a == 0:
                 cvui.printf(self.frame, WINDOW_TRK_X + 5, WINDOW_TRK_Y + 30, 0.4, 0x5ed805, "No Trackers Added. Try Selecting A New Area!")
@@ -390,7 +384,7 @@ class cvGui():
             if (cvui.button(self.frame, 20, 215, "Pause Source") and not self.replaceRoi):
                 self.pause = not self.pause
 
-            #Settings Poperties
+            # Settings Poperties
             if cvui.checkbox(self.frame, 20, 300, "Kalman", self.KalmanProp):
                 self.LKProp[0] = False
                 self.CFProp[0] = False
@@ -412,7 +406,7 @@ class cvGui():
                 self.ShiTProp[0] = False
 
                 if not selectedT == -1:
-                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")    #TOMI HACE ESTO DISCRETO
+                    cvui.printf(self.frame, 20, 400, 0.4, 0xdd97fb, "Maximum Recursion")
                     cvui.trackbar(self.frame, 20, 415, 210, self.lk_mr, 0.0, 10.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
                     self.lk_mr[0] = int(self.lk_mr[0])
 
@@ -443,8 +437,8 @@ class cvGui():
 
                         cvui.printf(self.frame, 20, 450, 0.4, 0xdd97fb, "Number Of Bins")
                         cvui.trackbar(self.frame, 20, 465, 210, self.camShift_bins, 1.0, 200.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
-                        if self.camShift_bins[0] < 1:
-                            self.camShift_bins[0] = 1
+                        # if self.camShift_bins[0] < 2:
+                        #     self.camShift_bins[0] = 2
                         self.camShift_bins[0] = int(self.camShift_bins[0])
 
                         cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "Mask Blur")
@@ -459,7 +453,7 @@ class cvGui():
                         cvui.trackbar(self.frame, 20, 675, 210, self.camShift_lbpt, 0.0, 254.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
                         self.camShift_lbpt[0] = int(self.camShift_lbpt[0])
 
-                    #Printeo ONS/OFFS
+                    #Print ON/OFF
                     if (self.CFPropOnOff[0]):
                         cvui.printf(self.frame, 145, 402, 0.4, 0x10dcA1, "On")
                         cvui.printf(self.frame, 145, 422, 0.4, 0xdc1076, "Off")
@@ -497,7 +491,7 @@ class cvGui():
                     else:
                         cvui.printf(self.frame, 185, 682, 0.4, 0xdc1076, "%s", "Off")
 
-            #Show Features
+            # Show Features, Position and Trajectory
             beforeShowBox = [self.ShowShit[0], self.ShowEstimate[0], self.ShowTrajectory[0]]
             cvui.checkbox(self.frame, WINDOW_SOU_X + 10, WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Features", self.ShowShit)
             cvui.checkbox(self.frame, WINDOW_SOU_X + int(WINDOW_SOU_WIDTH/3), WINDOW_SOU_Y + WINDOW_SOU_WIDTH - 27, "Show Estiamted Pos.", self.ShowEstimate)
@@ -506,8 +500,7 @@ class cvGui():
             if not beforeShowBox == afterShowBox:
                 self.changeInTrackers = True
 
-            #Filters: Correlation, Cam shift, Color, Histogram
-
+            # Filters Options: Correlation, Cam shift, Color, Histogram
             selectedT = self.IsTrackerSelected()
             if self.lastTracker != selectedT:
                 if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (self.deletedTracker == self.lastTracker)):
@@ -531,6 +524,7 @@ class cvGui():
                 self.filterConditions[selectedT][4] = self.CFPropOnOff[0]
                 self.filterConditions[selectedT][5] = self.CFCamShiftOnOff[0]
 
+            # Mini filters
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if self.CFPropOnOff[0] and not len(self.filterConditions) == 0:
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Color Filter", self.ColorFilter):
@@ -544,21 +538,13 @@ class cvGui():
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter = self.trackers[selectedT].getCorrFrame()
                         if miniFilter is not None:
-                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
+                            miniFilter = self.rescale_mini_filter(miniFilter)
                             miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
-                            x0 = WINDOW_FILS_X + 14
-                            w = WINDOW_FILS_WIDTH - 27
-                            h = np.asarray(miniFilter).shape[0]
-                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
-                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                            self.drawMiniFilter(miniFilter, False)
                         else:
                             miniFilter = self.lastFrame.copy()
-                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
-                            x0 = WINDOW_FILS_X + 14
-                            w = WINDOW_FILS_WIDTH - 27
-                            h = np.asarray(miniFilter).shape[0]
-                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
-                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                            miniFilter = self.rescale_mini_filter(miniFilter)
+                            self.drawMiniFilter(miniFilter, False)
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Correlation Filter",self.CorrFilter):
                     self.CamShiftFilter[0] = False
@@ -571,12 +557,8 @@ class cvGui():
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         self.trackers[selectedT].setFilter("FILTER_LAB")
                         miniFilter = self.trackers[selectedT].getFilteredFrame()
-                        miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
-                        x0 = WINDOW_FILS_X + 14
-                        w = WINDOW_FILS_WIDTH - 27
-                        h = np.asarray(miniFilter).shape[0]
-                        y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
-                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                        miniFilter = self.rescale_mini_filter(miniFilter)
+                        self.drawMiniFilter(miniFilter, False)
 
             elif self.CFCamShiftOnOff[0] and not len(self.filterConditions) == 0:
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Cam Shift", self.CamShiftFilter):
@@ -590,32 +572,20 @@ class cvGui():
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
                         miniFilter = self.rescale_hist(miniFilter, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
-                        x0 = WINDOW_FILS_X + 14
-                        w = WINDOW_FILS_WIDTH - 27
-                        h = np.asarray(miniFilter).shape[0]
-                        y0 = int(WINDOW_FILS_Y + 125)
-                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                        self.drawMiniFilter(miniFilter, False)
 
                         # CORRELATION FILTER
                         cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Correlation Filter")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter2 = self.trackers[selectedT].getCorrFrame()
                         if miniFilter2 is not None:
-                            miniFilter2 = self.rescale_frame_standar(miniFilter2, WINDOW_FILS_WIDTH - 27)
+                            miniFilter2 = self.rescale_mini_filter(miniFilter2)
                             miniFilter2 = cv.cvtColor(miniFilter2, cv.COLOR_GRAY2BGR) * 255
-                            x0 = WINDOW_FILS_X + 14
-                            w = WINDOW_FILS_WIDTH - 27
-                            h = np.asarray(miniFilter2).shape[0]
-                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2) + WINDOW_FILS_WIDTH
-                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
+                            self.drawMiniFilter(miniFilter2, True)
                         else:
-                            miniFilter = self.lastFrame.copy()
-                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
-                            x0 = WINDOW_FILS_X + 14
-                            w = WINDOW_FILS_WIDTH - 27
-                            h = np.asarray(miniFilter).shape[0]
-                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2) + WINDOW_FILS_WIDTH
-                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                            miniFilter2 = self.lastFrame.copy()
+                            miniFilter2 = self.rescale_mini_filter(miniFilter2)
+                            self.drawMiniFilter(miniFilter2, True)
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "HUE Histogram", self.Hist):
                     self.ColorFilter[0] = False
@@ -628,34 +598,22 @@ class cvGui():
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter = self.trackers[selectedT].getCorrFrame()
                         if miniFilter is not None:
-                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
+                            miniFilter = self.rescale_mini_filter(miniFilter)
                             miniFilter = cv.cvtColor(miniFilter, cv.COLOR_GRAY2BGR) * 255
-                            x0 = WINDOW_FILS_X + 14
-                            w = WINDOW_FILS_WIDTH - 27
-                            h = np.asarray(miniFilter).shape[0]
-                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
-                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                            self.drawMiniFilter(miniFilter, False)
 
                         else:
                             miniFilter = self.lastFrame.copy()
-                            miniFilter = self.rescale_frame_standar(miniFilter, WINDOW_FILS_WIDTH - 27)
-                            x0 = WINDOW_FILS_X + 14
-                            w = WINDOW_FILS_WIDTH - 27
-                            h = np.asarray(miniFilter).shape[0]
-                            y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
-                            self.frame[y0:y0 + h, x0:x0 + w] = miniFilter
+                            miniFilter = self.rescale_mini_filter(miniFilter)
+                            self.drawMiniFilter(miniFilter, False)
 
                         # LAB COLOR FILTER
                         cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "Cam Shift")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         self.trackers[selectedT].setFilter("FILTER_CSHIFT")
                         miniFilter2 = self.trackers[selectedT].getFilteredFrame()
-                        miniFilter2 = self.rescale_frame_standar(miniFilter2, WINDOW_FILS_WIDTH - 27)
-                        x0 = WINDOW_FILS_X + 14
-                        w = WINDOW_FILS_WIDTH - 27
-                        h = np.asarray(miniFilter2).shape[0]
-                        y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2) + WINDOW_FILS_WIDTH
-                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
+                        miniFilter2 = self.rescale_mini_filter(miniFilter2)
+                        self.drawMiniFilter(miniFilter2, True)
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 70, "Correlation Filter", self.CorrFilter):
                     self.CamShiftFilter[0] = False
@@ -668,24 +626,17 @@ class cvGui():
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         self.trackers[selectedT].setFilter("FILTER_CSHIFT")
                         miniFilter2 = self.trackers[selectedT].getFilteredFrame()
-                        miniFilter2 = self.rescale_frame_standar(miniFilter2, WINDOW_FILS_WIDTH - 27)
-                        x0 = WINDOW_FILS_X + 14
-                        w = WINDOW_FILS_WIDTH - 27
-                        h = np.asarray(miniFilter2).shape[0]
-                        y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50))/2.0) - h/2)
-                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
+                        miniFilter2 = self.rescale_mini_filter(miniFilter2)
+                        self.drawMiniFilter(miniFilter2, False)
 
                         # HISTOGRAM
                         cvui.window(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 100 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 20, WINDOW_FILS_WIDTH - 20, "HUE Histogram")
                         cvui.rect(self.frame, WINDOW_FILS_X + 12, WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH, WINDOW_FILS_WIDTH - 25, WINDOW_FILS_WIDTH - 50, 0x5c585a, 0x242223)
                         miniFilter2 = self.trackers[selectedT].MF.hist_filter.get_histogram_plot()
                         miniFilter2 = self.rescale_hist(miniFilter2, WINDOW_FILS_WIDTH - 27, WINDOW_FILS_WIDTH - 50)
-                        x0 = WINDOW_FILS_X + 14
-                        w = WINDOW_FILS_WIDTH - 27
-                        h = np.asarray(miniFilter2).shape[0]
-                        y0 = int(WINDOW_FILS_Y + 125) + WINDOW_FILS_WIDTH
-                        self.frame[y0:y0 + h, x0:x0 + w] = miniFilter2
+                        self.drawMiniFilter(miniFilter2, True)
 
+            # Missing and Search Algorithm
             if not selectedT == -1:
                 cvui.printf(self.frame, 20, 775, 0.4, 0xdd97fb, "Missing Algorithm")
                 if cvui.checkbox(self.frame, 20, 790, "Correlation", self.missAlgCorr):
@@ -721,17 +672,18 @@ class cvGui():
                     if not selectedT == -1 and self.CFCamShiftOnOff[0]:
                         autoCS = True
 
+            # Tracking Error
             alreadyTex = False
-            nizu = 0
+            errPos = 0
             for i in range(len(self.trackers)):
                 if self.trackers[i].SC.trackingError:
                     if not alreadyTex:
                         cvui.printf(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 25, 0.4, 0xdc1076, 'Tracker Error In Tracker:')        #0xdc2710
                         alreadyTex = True
-                    cvui.printf(self.frame, WINDOW_SOU_X + 165 + nizu * 10, WINDOW_SOU_Y + 25, 0.4, self.trackerColors[i], f'{i + 1}')
-                    nizu += 1
+                    cvui.printf(self.frame, WINDOW_SOU_X + 165 + errPos * 10, WINDOW_SOU_Y + 25, 0.4, self.trackerColors[i], f'{i + 1}')
+                    errPos += 1
 
-
+            # Draw Frame
             cvui.rect(self.frame, WINDOW_SOU_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if ((self.usingCamera) or (self.usingVideo)):
                 if not (self.pause or self.replaceRoi):
@@ -756,9 +708,13 @@ class cvGui():
                     else:
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
+            # Draw Filter
             if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0] or self.Hist[0]):
                 self.updateFilterFrame()
-                x0 = self.sourceX + WINDOW_SOU_WIDTH + WINDOW_VS_X
+                if self.Hist[0]:
+                    x0 = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X*2
+                else:
+                    x0 = self.sourceX + WINDOW_SOU_WIDTH + WINDOW_VS_X
                 if self.filteredFrame is None:
                     self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, x0:x0 + self.sourceWIDTH] = self.lastFrame
                 else:
@@ -767,7 +723,7 @@ class cvGui():
                     y0 = int(((WINDOW_SOU_Y + 37) + (WINDOW_SOU_Y + 37 + WINDOW_SOU_HEIGHT - 75))/2 - self.filterHEIGHT/2)
                     self.frame[y0:y0 + self.filterHEIGHT, x0:x0 + self.filterWIDTH] = self.filteredFrame
 
-            #Help Frame
+            # Help Frame
             cvui.rect(self.frame, 210, 182, 20, 20, 0x494949, 0x545454)
             cvui.text(self.frame, 215, 185, "?", 0.6)
             if not cvui.iarea(210, 182, 20, 20) == cvui.OUT:
@@ -797,7 +753,7 @@ class cvGui():
                 cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 250, "Remeber this option is only available when a tracker is selected and", 0.4, 0xdd97fb)
                 cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 270, "Cam Shift option is on.", 0.4, 0xdd97fb)
 
-
+            # Selection ROI
             if ((cvui.button(self.frame, 20, 180, "Add Tracker") and ( (self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
 
                 if len(self.trackers) < MAX_TRACKERS:
@@ -834,19 +790,17 @@ class cvGui():
                     if len(self.coordsRoi) == 4:
                         if self.coordsRoi[0] - self.coordsRoi[2] > 0:
                             posX = self.coordsRoi[2]
-                            wid = self.coordsRoi[0] - self.coordsRoi[2]
                         else:
                             posX = self.coordsRoi[0]
-                            wid = self.coordsRoi[2] - self.coordsRoi[0]
 
                         if self.coordsRoi[1] - self.coordsRoi[3] > 0:
                             posY = self.coordsRoi[3]
-                            hei = self.coordsRoi[1] - self.coordsRoi[3]
-                            b = self.coordsRoi[3]
                         else:
                             posY = self.coordsRoi[1]
-                            hei = self.coordsRoi[3] - self.coordsRoi[1]
-                            b = self.coordsRoi[3]
+
+                        wid = np.abs(self.coordsRoi[0] - self.coordsRoi[2])
+                        hei = np.abs(self.coordsRoi[1] - self.coordsRoi[3])
+                        b = self.coordsRoi[3]
 
                         cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
                         if not(b == 0):
@@ -875,10 +829,7 @@ class cvGui():
                             self.configSelected.append(originalParam)
                             w = int(np.asarray(toRescale).shape[1])
                             h = int(np.asarray(toRescale).shape[0])
-                            if w >= h:
-                                self.kernel.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
-                            else:
-                                self.kernel.append(self.rescale_frame_standar2(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
+                            self.kernel.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
 
                         self.coordsRoi.clear()
                         self.replaceRoi = False
@@ -891,16 +842,17 @@ class cvGui():
             else:
                 self.trackerAdded = False
 
+            # Auto CS "Load Screen"
             if autoCS:
                 cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto CS")
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 875, 0.4, 0xdd97fb, "Calcualting optimum Cam Shift")
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 895, 0.4, 0xdd97fb, f'parameters for tracker {selectedT + 1}. Hold')
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 915, 0.4, 0xdd97fb, 'on, this could take a while...')
 
-
             #Show everything on the screen
             cvui.imshow(WINDOW_NAME, self.frame)
 
+            # Auto CS Real Function
             if autoCS:
                 cv.waitKey(1)
                 autoCS = False
@@ -909,8 +861,12 @@ class cvGui():
                 self.camShift_mb[0] = params["mask_blur"]
                 self.camShift_sb[0] = params["kernel_blur"]
                 self.camShift_lbpt[0] = params["low_pth"]
+                self.configSelected[selectedT][9] = params["bins"]
+                self.configSelected[selectedT][10] = params["mask_blur"]
+                self.configSelected[selectedT][11] = params["kernel_blur"]
+                self.configSelected[selectedT][12] = params["low_pth"]
 
-            #Check if ESC key was pressed
+            # Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
                 break
 
@@ -1143,13 +1099,16 @@ class cvGui():
             elif self.CorrFilter[0] and (self.CFPropOnOff[0] or self.CFCamShiftOnOff[0]):
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
-                    self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
+                    if self.sourceWIDTH >= self.sourceHEIGHT:
+                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, self.sourceWIDTH) #STANDAR_WIDTH)
+                    else:
+                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, self.sourceHEIGHT)
                 else:
                     self.filteredFrame = None
             #HISTOGRAM
             elif self.Hist[0] and self.CFCamShiftOnOff[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].MF.hist_filter.get_histogram_plot()
-                self.filteredFrame = self.rescale_hist(self.filteredFrame, STANDAR_WIDTH, self.sourceHEIGHT)
+                self.filteredFrame = self.rescale_hist(self.filteredFrame, STANDAR_WIDTH, STANDAR_WIDTH-60)#self.sourceHEIGHT)
             else:
                 self.filteredFrame = None
 
@@ -1157,6 +1116,9 @@ class cvGui():
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
             self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
             self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)*255
+        elif self.Hist[0] and self.CFCamShiftOnOff[0]:
+            self.filterWIDTH = int(len(self.filteredFrame[0, :]))
+            self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
         else:
             self.filterWIDTH = self.sourceWIDTH
             self.filterHEIGHT = self.sourceHEIGHT
@@ -1164,14 +1126,24 @@ class cvGui():
     def rescale_frame_standar(self, frame, maxWidth):
         width = int(frame.shape[1])
         height = int(frame.shape[0])
-        dim = (maxWidth, int(maxWidth*height/width))
+        if width >= height:
+            dim = (maxWidth, int(maxWidth * height / width))
+        else:
+            dim = (int(maxWidth * width / height), maxWidth)
         return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
 
-    def rescale_frame_standar2(self, frame, maxWidth):
-        width = int(frame.shape[1])
-        height = int(frame.shape[0])
-        dim = (int(maxWidth*width/height), maxWidth)
-        return cv.resize(frame, dim, interpolation=cv.INTER_AREA)
+    def rescale_mini_filter(self, miniFrame):
+        width = int(miniFrame.shape[1])
+        height = int(miniFrame.shape[0])
+
+        rw = WINDOW_FILS_WIDTH - 27
+        rh = WINDOW_FILS_WIDTH - 50
+
+        if width >= height:
+            dim = (rw, int(rw * height / width))
+        else:
+            dim = (int(rh * width / height), rh)
+        return cv.resize(miniFrame, dim, interpolation=cv.INTER_AREA)
 
     def rescale_hist(self, frame, width, height):
         dim = (int(width), int(height))
@@ -1375,15 +1347,14 @@ class cvGui():
         todoPiola, someCrazyShit = self.cap.read()
 
         if someCrazyShit.shape[1] >= someCrazyShit.shape[0]:
-            while todoPiola:
-                someCrazyShit = self.rescale_frame_standar(someCrazyShit, STANDAR_WIDTH)
-                self.arrayVideoLoaded.append(someCrazyShit)
-                todoPiola, someCrazyShit = self.cap.read()
+            dim = STANDAR_WIDTH
         else:
-            while todoPiola:
-                someCrazyShit = self.rescale_frame_standar2(someCrazyShit, WINDOW_SOU_HEIGHT - 80)
-                self.arrayVideoLoaded.append(someCrazyShit)
-                todoPiola, someCrazyShit = self.cap.read()
+            dim = WINDOW_SOU_HEIGHT - 80
+
+        while todoPiola:
+            someCrazyShit = self.rescale_frame_standar(someCrazyShit, dim)
+            self.arrayVideoLoaded.append(someCrazyShit)
+            todoPiola, someCrazyShit = self.cap.read()
 
         self.sourceWIDTH = int(self.arrayVideoLoaded[0].shape[1])
         self.sourceHEIGHT = int(self.arrayVideoLoaded[0].shape[0])
@@ -1427,6 +1398,15 @@ class cvGui():
 
         vect.append(0)  # 24
         return vect
+
+    def drawMiniFilter(self, miniFrame, bottom):
+        w = np.asarray(miniFrame).shape[1]
+        h = np.asarray(miniFrame).shape[0]
+        x0 = int(((WINDOW_FILS_X + 14) + (WINDOW_FILS_X + 14 + WINDOW_FILS_WIDTH - 27)) / 2.0 - w / 2)
+        y0 = int(((WINDOW_FILS_Y + 125 + (WINDOW_FILS_Y + 125 + WINDOW_FILS_WIDTH - 50)) / 2.0) - h / 2)
+        if bottom:
+            y0 += WINDOW_FILS_WIDTH
+        self.frame[y0:y0 + h, x0:x0 + w] = miniFrame
 
 def main():
     myGui = cvGui()
