@@ -911,8 +911,12 @@ class cvGui():
                 self.camShift_mb[0] = params["mask_blur"]
                 self.camShift_sb[0] = params["kernel_blur"]
                 self.camShift_lbpt[0] = params["low_pth"]
+                self.configSelected[selectedT][9] = params["bins"]
+                self.configSelected[selectedT][10] = params["mask_blur"]
+                self.configSelected[selectedT][11] = params["kernel_blur"]
+                self.configSelected[selectedT][12] = params["low_pth"]
 
-            #Check if ESC key was pressed
+                #Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
                 break
 
