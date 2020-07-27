@@ -228,7 +228,7 @@ class cvGui():
 
             # Text
             cvui.printf(self.frame, 17, 35, 0.4, 0xdd97fb, "Current Source:")                #Video Source
-            cvui.printf(self.frame, 17, 50, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
+            cvui.printf(self.frame, 17, 52, 0.4, 0xdd97fb, self.CurrentSource)               #Video Source
 
             if selectedT == -1:
                 cvui.printf(self.frame, 17, 275, 0.4, 0xdd97fb, "No Tracker Selected To Modify")        #0xd11616
@@ -253,7 +253,7 @@ class cvGui():
                     self.usingVideo = True
                     if(self.initSource()):                                                                #Chequear si se inicia bien
                         self.VideoLoaded = self.videoPath
-                        self.CurrentSource = "Video Loaded: " + self.videoName
+                        self.CurrentSource = "Video: " + self.videoName
                         selectedT = -1
                         self.pause = True
                     else:
@@ -277,7 +277,7 @@ class cvGui():
                self.usingVideo = False
                self.usingCamera = True
                if (self.initSource()):                                                  #Chequear si se inicia bien
-                   self.CurrentSource = "Camera On"
+                   self.CurrentSource = "Camera"
                    selectedT = -1
                else:
                    self.usingVideo = False
@@ -1099,7 +1099,10 @@ class cvGui():
             elif self.CorrFilter[0] and (self.CFPropOnOff[0] or self.CFCamShiftOnOff[0]):
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
-                    self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, STANDAR_WIDTH)
+                    if self.sourceWIDTH >= self.sourceHEIGHT:
+                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, self.sourceWIDTH) #STANDAR_WIDTH)
+                    else:
+                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, self.sourceHEIGHT)
                 else:
                     self.filteredFrame = None
             #HISTOGRAM
