@@ -668,7 +668,7 @@ class cvGui():
             if not self.replaceRoi:
                 if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
-                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 90, 915, "Auto Mask")):
+                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
                     if not selectedT == -1 and self.CFCamShiftOnOff[0]:
                         autoCS = True
 
@@ -844,7 +844,7 @@ class cvGui():
 
             # Auto CS "Load Screen"
             if autoCS:
-                cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto Mask")
+                cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto")
                 if self.CFCamShiftOnOff:
                     mask = "Cam Shift"
                 elif self.CFPropOnOff:
