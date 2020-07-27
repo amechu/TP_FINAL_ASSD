@@ -669,7 +669,7 @@ class cvGui():
                 if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
                 if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
-                    if not selectedT == -1 and (self.CFCamShiftOnOff[0] or self.CFPropOnOff[0]):
+                    if not selectedT == -1 and ((self.CFCamShiftOnOff[0] and self.CamShiftFilter[0]) or (self.CFPropOnOff[0] and self.ColorFilter[0])):
                         autoCS = True
 
             # Tracking Error
