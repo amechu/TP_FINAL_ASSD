@@ -27,7 +27,7 @@ CAMSHIFT_MB = 11.0
 CAMSHIFT_SB = 4.0
 CAMSHIFT_LBPT = 200.0
 
-INITIAL_ST_ONOFF = False
+INITIAL_ST_ONOFF = True
 SHIT_MAXFEAT = 100.0
 SHIT_FEATQUAL = 0.001
 SHIT_MINFEAT = 0.01
@@ -344,9 +344,11 @@ class cvGui():
                     del self.filterConditions[i]
                     del self.trackers[i]
                     del self.kernel[i]
+
                     self.trackerColors.append(self.trackerColors[i])
-                    self.trackSelectionBGR[i] = []
                     del self.trackerColors[i]
+
+                    self.trackSelectionBGR[i] = []
                     self.deletedTracker = i
                     selectedT = self.IsTrackerSelected()
 
