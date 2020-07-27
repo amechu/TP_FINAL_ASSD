@@ -169,7 +169,7 @@ Este filtrado de color no solo posee una gran sinergia con el método de obtenci
 Volviendo al caso de los objetos $A$ y $B$:
 
 \begin{itemize}
-\item Si $A$ y $B$ son de colores distintos, con el filtro de color, el algoritmo nunca detecta que existe un objeto $B$ por lo que seguirlo es imposible. Por consecuencia, se sigue únicamente a $A$ y no se t el problema de $A$ pasando por frente de $B$.
+\item Si $A$ y $B$ son de colores distintos, con el filtro de color, el algoritmo nunca detecta que existe un objeto $B$ por lo que seguirlo es imposible. Por consecuencia, se sigue únicamente a $A$ y no se tiene el problema de $A$ pasando por frente de $B$.
 \item Si $A$ y $B$ son de colores distintos, y $A$, el objeto a seguir, pasa por detrás de $B$, ahora no se adosan las features al objeto $B$, sino que el algoritmo ve que el área de $A$ se achica a medida que este queda oculto por $B$. Como los features no tienen bordes para seguir, estos desaparecen, por lo que se deja de entregar mediciones al filtro de Kalman y este estima correctamente la posición de $A$ mientras que este no haya sufrido aceleración alguna mientras estaba oculto. 
 \end{itemize}
 
@@ -199,7 +199,7 @@ Sin embargo, el filtro de Kalman no puede estimar la posición del objeto indefi
 
 Finalmente, para reforzar el algoritmo de seguimiento, se implemento además una recalculación periódica de las features con el método de Shi-Tomasi. Se parte de la media del cúmulo de features, removiendo los outliers, volviendo a calcular nuevamente la media y utilizar esta posición para aplicar el algoritmo de Shi-Tomasi, de la misma manera que se realiza sobre la primera selección proporcionada por el usuario. Todo esto permite subsanar varios de los problemas planteados anteriormente, sin embargo, existen aún otros problemas.
 
-\subsection{Escenarios de fallas}
+\subsubsection{Escenarios de fallas}
 Algunos casos donde puede fallar hasta ahora el Tracker son:
 \begin{itemize}
 \item El cambio de trayectoria de un objeto una vez que desaparece, provocando una falla en la predicción.
@@ -239,12 +239,27 @@ Algunos casos donde puede fallar hasta ahora el Tracker son:
 
 \subsection{Último diseño}
 
+En la última iteración del proceso de diseño se sacrificó bajo costo computacional por una mayor robustez en el algoritmo, reduciendo significativamente las probabilidades de:
+\begin{itemize}
+\item Error tipo I: no se encuentra el objeto a seguir por más que sea visible.
+\item Error tipo II: se detecta un objeto por más que el objeto a seguir no se encuentre en pantalla.
+\item Error tipo III: se detecta a otro objeto por más que el objeto a seguir este visible.
+\end{itemize}
+mediante el uso de \textit{Matched Filters}. Además, se logró obtener una gran robustez frente a cambios en la iluminación utilizando un algoritmo alternativo de enmascaramiento basado en la distribución de hue del objeto a seguir. Por último, se desarrolló una interfaz gráfica donde se puede cargar un video o bien utilizar una cámara en tiempo real, seguir varios objetos a la vez, modificar cualquier parámetro de cualquiera de los algoritmos utilizados en tiempo real e incluso se desarolló un método de optimización automático de los parámetros del algoritmo de enmascaramiento. En la Figura (\ref{gui}) se puede observar una captura de la interfaz gráfica desarrollada y en la Figura (\ref{fig:Flowchart}) se puede observar el diagrama de flujo entero del algoritmo de seguimiento desarrollado.
+
 
 \begin{figure*}
 	\centering
 	\includegraphics[width=0.9\textwidth]{../flowchart.jpg}
 	\caption{Flow-chart del algoritmo.}
 	\label{fig:Flowchart}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=0.9\textwidth]{Imagenes/gui.png}
+	\caption{Captura de pantalla de la interfaz gráfica desarrollada.}
+	\label{gui}
 \end{figure*}
 
 \begin{figure*}
@@ -260,11 +275,6 @@ Algunos casos donde puede fallar hasta ahora el Tracker son:
 	\caption{Diagrama de Clases del programa utilizado para presentar la funcionalidad del algoritmo desarollado. \LARGE{siento que esta foto no aporta mucho (alan)}}
 	\label{fig:class}
 \end{figure}
-EXPLICAR LO SIGUIENTE
-\begin{itemize}
-\item Filtro de color pasó del espacio HSV a CIE-LAB, explicar que es para mas invarianza a la iluminacion
-\item Al filtro de color se le unió una alternativa, el de camshift, explicar en qué situaciones es mejor uno o el otro
-\end{itemize}
 
 
 
@@ -396,16 +406,16 @@ Luego, se utiliza el filtro de correlación y se obtiene el punto donde esta es 
 		\centering
 		\includegraphics[width=0.75\textwidth]{Imagenes/corrmask.png}
 		\caption{Correlación con máscara ante oclusión del objeto}
-		\label{fig:sqdiff}
+		\label{fig:sqdiff2}
 	\end{subfigure}
 	\begin{subfigure}{.1\textwidth}
 		\centering
 		\includegraphics[width=1.5\textwidth]{Imagenes/kernelhsv.png}
 		\caption{Kernel}
-		\label{fig:kernel}
+		\label{fig:kernel2}
 	\end{subfigure}
 	\caption{Aplicación del algoritmo de correlación con máscara.}
-	\label{fig:corrtest}
+	\label{fig:corrtest2}
 \end{figure}
 
 Este algoritmo es utilizado en dos escenarios. En el primero se utiliza para la búsqueda de un objeto perdido. En caso de oclusión se utiliza el algoritmo para encontrar nuevamente el objeto, siendo efectivo siempre que no haya objetos que compartan tanto forma y color con el de interés. Por otro lado, en caso de que así sea y el objeto de interés se encuentre oculto, es posible que el algoritmo devuelva un falso positivo, siendo conviene utilizar el alternativo de Shi-Tomasi y medias móviles, dado que el tener información de la posición previa para el tracking resulta fundamental para poder distinguir entre estos.
