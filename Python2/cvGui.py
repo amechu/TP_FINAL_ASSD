@@ -423,10 +423,10 @@ class cvGui():
                         cvui.trackbar(self.frame, 20, 465, 210, self.colorFilter_LihtThr, 0.0, 150.0)
 
                         cvui.printf(self.frame, 20, 520, 0.4, 0xdd97fb, "A Semiamplitude")
-                        cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 200.0)
+                        cvui.trackbar(self.frame, 20, 535, 210, self.colorFilter_a, 0.0, 150.0)
 
                         cvui.printf(self.frame, 20, 590, 0.4, 0xdd97fb, "B Semiamplitude")
-                        cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 200.0)
+                        cvui.trackbar(self.frame, 20, 605, 210, self.colorFilter_b, 0.0, 150.0)
 
                         cvui.printf(self.frame, 20, 660, 0.4, 0xdd97fb, "Mask Blur")
                         cvui.trackbar(self.frame, 20, 675, 210, self.maskBlur_lab, 0.0, 20.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
@@ -668,7 +668,7 @@ class cvGui():
             if not self.replaceRoi:
                 if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
-                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 90, 915, "Auto CS")):
+                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
                     if not selectedT == -1 and self.CFCamShiftOnOff[0]:
                         autoCS = True
 
@@ -749,9 +749,9 @@ class cvGui():
 
                 cvui.rect(self.frame, WINDOW_SOU_X + 9, WINDOW_SET_Y + 213, 3, 3, 0xdd97fb, 0xdd97fb)
                 cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 210, "Reset Settings will set settings for the tracker select by default, while", 0.4, 0xdd97fb)
-                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 230, "Auto will stablish the best Cam Shift conditions for the selection.", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 230, "Auto will stablish the best Mask Filter conditions for the selection.", 0.4, 0xdd97fb)
                 cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 250, "Remeber this option is only available when a tracker is selected and", 0.4, 0xdd97fb)
-                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 270, "Cam Shift option is on.", 0.4, 0xdd97fb)
+                cvui.text(self.frame, WINDOW_SOU_X + 20, WINDOW_SET_Y + 270, "LAB or Cam Shift option is on.", 0.4, 0xdd97fb)
 
             # Selection ROI
             if ((cvui.button(self.frame, 20, 180, "Add Tracker") and ( (self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
@@ -844,8 +844,12 @@ class cvGui():
 
             # Auto CS "Load Screen"
             if autoCS:
-                cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto CS")
-                cvui.printf(self.frame, WINDOW_SET_X + 10, 875, 0.4, 0xdd97fb, "Calcualting optimum Cam Shift")
+                cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 840 - WINDOW_VS_Y * 2, "Auto")
+                if self.CFCamShiftOnOff:
+                    mask = "Cam Shift"
+                elif self.CFPropOnOff:
+                    mask = "LAB"
+                cvui.printf(self.frame, WINDOW_SET_X + 10, 875, 0.4, 0xdd97fb, f'Calcualting optimum {mask}')
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 895, 0.4, 0xdd97fb, f'parameters for tracker {selectedT + 1}. Hold')
                 cvui.printf(self.frame, WINDOW_SET_X + 10, 915, 0.4, 0xdd97fb, 'on, this could take a while...')
 
@@ -857,14 +861,22 @@ class cvGui():
                 cv.waitKey(1)
                 autoCS = False
                 params = self.trackers[selectedT].calculate_optimal_params()
-                self.camShift_bins[0] = params["bins"]
-                self.camShift_mb[0] = params["mask_blur"]
-                self.camShift_sb[0] = params["kernel_blur"]
-                self.camShift_lbpt[0] = params["low_pth"]
-                self.configSelected[selectedT][9] = params["bins"]
-                self.configSelected[selectedT][10] = params["mask_blur"]
-                self.configSelected[selectedT][11] = params["kernel_blur"]
-                self.configSelected[selectedT][12] = params["low_pth"]
+                if self.CFCamShiftOnOff:
+                    self.camShift_bins[0] = params["bins"]
+                    self.camShift_mb[0] = params["mask_blur"]
+                    self.camShift_sb[0] = params["kernel_blur"]
+                    self.camShift_lbpt[0] = params["low_pth"]
+                    self.configSelected[selectedT][9] = params["bins"]
+                    self.configSelected[selectedT][10] = params["mask_blur"]
+                    self.configSelected[selectedT][11] = params["kernel_blur"]
+                    self.configSelected[selectedT][12] = params["low_pth"]
+                elif self.CFPropOnOff:
+                    self.colorFilter_LihtThr[0] = params["l"]
+                    self.colorFilter_a[0] = params["a"]
+                    self.colorFilter_b[0] = params["b"]
+                    self.configSelected[selectedT][5] = params["l"]
+                    self.configSelected[selectedT][6] = params["a"]
+                    self.configSelected[selectedT][7] = params["b"]
 
             # Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
