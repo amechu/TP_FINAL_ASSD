@@ -297,7 +297,7 @@ mediante el uso de \textit{Matched Filters}. Además, se logró obtener una gran
 
 \subsubsection{Enmascaramiento Basado en CIE-Lab}
 
-El diseño anterior poseía un algoritmo de enmascaramiento basado en el espacio de color HSV. Si bien este funcionaba correctamente, este espacio de color fue reemplazado por CIE-Lab debido a que este posee un solo parámetro que caracteriza la iluminación de un objeto, es decir, con un valor nulo de L se obtiene el negro, miestras que con un valor máximo de L se obtiene blanco, pasando entre medio de esos dos valores por el color representado por a y b. En el espacio HSV, si se utiliza el máximo valor de la componente value, no necesariamente se obtiene blanco, sino que depende del valor de saturación elegido, mientras que si value es nulo, siempre se obtiene negro. Poseer un solo parámetro que correctamente caracterice la iluminación de un objeto brinda una mejor optimización de los valores de semiamplitudes L-a-b utilizados en el enmascaramiento. 
+El diseño anterior poseía un algoritmo de enmascaramiento basado en el espacio de color HSV. Si bien este funcionaba correctamente, este espacio de color fue reemplazado por CIE-Lab debido a que este posee un solo parámetro que caracteriza la iluminación de un objeto, es decir, con un valor nulo de L se obtiene el negro, mientras que con un valor máximo de L se obtiene blanco, pasando entre medio de esos dos valores por el color representado por a y b. En el espacio HSV, si se utiliza el máximo valor de la componente value, no necesariamente se obtiene blanco, sino que depende del valor de saturación elegido, mientras que si value es nulo, siempre se obtiene negro. Poseer un solo parámetro que correctamente caracterice la iluminación de un objeto brinda una mejor optimización de los valores de semiamplitudes L-a-b utilizados en el enmascaramiento. 
 
 La generación de la máscara se realiza de la misma forma que en el diseño anterior, con el único agregado de un suavizamiento de la máscara computada previo a la utilización de esta para el filtrado de la imagen. Esto se utiliza debido a que generalmente los bordes de un objeto poseen mayor o menor iluminación dependiendo de dónde este la fuente de luz más cercana. Estas diferencias en la iluminación pueden ocasionar que un objeto de similar color al de interés sea vez correctamente excluído de la imagen a excepción de sus bordes, lo cual genera problemas al pasar por delante o por detrás del objeto a seguir por causas detalladas anteriormente.
 
@@ -330,9 +330,50 @@ Sin embargo, si bien la utilización del espacio de color CIE-Lab subsanó vario
 
 
 
-\subsubsection{Enmascaramiento Basado en Camshift}
-%DEJO ESTAS IMAGENES POR ACA......
+\subsubsection{Enmascaramiento Basado en Histogramas de Hue}
+Los objetos pueden adquirir perfiles de color complejos, sus colores pueden estar distribuidos entorno a un solo valor de hue dominante o pueden tener más de uno en su composición. 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{.4\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth]{Imagenes/camshift_hist_bimodal.PNG}
+		\caption{Distribución de color bimodal}
+		\label{fig:bimodal}
+	\end{subfigure}
+	
+	\begin{subfigure}{.4\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth]{Imagenes/camshift_hist_unimodal.PNG}
+		\caption{Distribución de color unimodal}
+		\label{fig:unimodal}
+	\end{subfigure}
 
+\end{figure}
+Para obtener una mascara que podamos utilizar debemos establecer un limite para así dejar pasar solamente aquellos píxeles cuyo hue tenga una alta probabilidad de pertenecer al objeto seleccionado. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.32\textwidth]{Imagenes/mascara_bimodal.PNG}
+	\caption{Mascara obtenida luego de quedarnos con los píxeles más probables}
+	\label{fig:noisy_lpf}
+\end{figure}
+Debemos notar en la figura \ref{fig:noisy_lpf} que se pueden observar claramente las letras y el fondo de la tapa del libro. Como se puede apreciar, el histograma del ejemplo presenta una distribución bimodal la cual ha sido exitosamente capturada por el método de filtrado.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.32\textwidth]{Imagenes/mascara_bimodal_lpf.PNG}
+	\caption{Aplicamos el equivalente a un filtro pasabajos para disminuir el ruido}
+	\label{fig:lpf_hist}
+\end{figure}
+
+Sin embargo, la figura \ref{fig:noisy_lpf} presenta ciertos pixeles que pueden interferir con las features calculadas mediante Shi-Tomassi. Es por eso que utilizamos la operación de \textit{blur} para suavizar la imagen y eliminar el ruido. Esto trae acarreado otro beneficio, el interior de la mascara se vuelve más suave y permisivo para los píxeles que pertenecen al interior del objeto.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{Imagenes/camshift_mask3.png}
+	\caption{Comaparación antes y despues del filtrado}
+\end{figure}
+ 
+Se deja una vista global del ejemplo
 \begin{figure}[H]
 \centering
 	\includegraphics[width=0.45\textwidth]{Imagenes/camshift_mask2.png}

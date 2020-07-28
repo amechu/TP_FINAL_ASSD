@@ -51,20 +51,7 @@ class Tracker:
         self.kernel_blur_var = 1
         self.mask_blur_var = 1
         self.low_pth_var = 200
-        # self.bins_var = tf.Variable(64, trainable=True)
-        # self.kernel_blur_var = tf.Variable(0, trainable=True)
-        # self.mask_blur_var = tf.Variable(11, trainable=True)
-        # self.low_pth_var = tf.Variable(200, trainable=True)
 
-        #x_bounds = [(1, 200), (0, 20), (0, 20), (0, 250)]
-
-        #res = optimize.shgo(self.costChangeParams, x_bounds, options={'disp': True ,'eps' : 5e0})
-        # epochs = 200
-        # for i in range(epochs):
-        #     print([self.bins_var.numpy(), self.kernel_blur_var.numpy(),self.mask_blur_var.numpy(),self.low_pth_var.numpy(), self.target().numpy()])
-        #     opt = gradient_descent.GradientDescentOptimizer(0.01).minimize(self.target)
-
-        #print(res.x)
 
     def getTrackingError(self):
         return self.SC.trackingError
@@ -302,7 +289,7 @@ class Tracker:
     def optimize(self):
 
         if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
-            x_bounds = [(0, 150), (0, 150), (0, 150)]
+            x_bounds = 2*[(0, 150), (0, 150), (0, 150)]
             res = optimize.shgo(self.costChangeParamsLAB, x_bounds)
             print(res.x)
             self.MF.LSemiAmp = res.x[0]

@@ -183,16 +183,32 @@ En la Figura (\ref{fig:corrtest}) se puede observar una imagen y el resultado de
 Se puede apreciar como el punto más oscuro de la pantalla indica el punto de mayor correlación entre la imagen fuente y el kernel seleccionado para el algoritmo de cuadrados mínimos (Figura (\ref{fig:sqdiff})) mientras que el mas claro indica la mayor correlación para el otro (Figura (\ref{fig:corr})). 
 
 \subsection{Filtros basados en distribución de probabilidad de Hue:}
-Los filtros de color tradicionales usualmente se basan en la detección de un color especifico con la adición de una cierta tolerancia para poder incluir una gama de colores más amplia. Sin embargo dicha elección resulta ser demasiado restrictiva cuando aparecen sombras o cambios de iluminación. Es por eso que una alternativa más permisiva es la de utilizar mascaras que permitan el paso de ciertos colores según una función de masa de probabilidad dada. Dicha distribución se computa usando como semilla el objeto que deseamos seguir.
+Los filtros de color tradicionales usualmente se basan en la detección de un color especifico con la adición de una cierta tolerancia para poder incluir una gama de colores más amplia. Sin embargo dicha elección resulta ser demasiado restrictiva cuando aparecen sombras o cambios de iluminación. Es por eso que una alternativa más general es la de utilizar mascaras que permitan el paso de ciertos pixeles según una función de masa de probabilidad dada \ref{CAMSHIFT}. Dicha distribución se computa usando \textbf{kernel} el objeto que deseamos seguir. A partir del mismo se transforma la selección al espacio de color \textbf{HSV} . El mismo nos permite independizarnos de la variación de brillo dentro de la escena y concentrarnos unicamente en el \textbf{Hue}, cuyo valor nos indicara a que gama de colores pertenece el objetivo.
 \begin{figure}[H]
 \centering
-	\begin{subfigure}{.1\textwidth}
+	\begin{subfigure}{.15\textwidth}
 		\centering
-		\includegraphics[width=1.2\textwidth]{Imagenes/camshift_kernel.png}
+		\includegraphics[width=\textwidth]{Imagenes/camshift_kernel.png}
 		\caption{Kernel}
 		\label{fig:kernelHistFilter}
 	\end{subfigure}
+	
+	\begin{subfigure}{.4\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{Imagenes/camshift_hist.png}
+	\caption{Histograma de Hue}
+	\label{fig:kernelHist}
+	\end{subfigure}
+	
+	\begin{subfigure}{.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Imagenes/camshift_probabilidades.png}
+		\caption{Matriz de probabilidad}
+		\label{fig:probabilidades}
+	\end{subfigure}
 \end{figure}
+La figura \ref{fig:probabilidades} ilustra el proceso de asignar a cada pixel de la imagen la correspondiente probabilidad ocurrencia  de \textbf{HUE} según indique el histograma. Cabe destacar que cada bin del histograma engloba un cierto rango de valores de \textbf{HUE}. Para poder traducir estas probabilidades a valores de intensidad de pixel se realiza un mapeo lineal $[0,1] \rightarrow [0,255]$.
+En la secciones posteriores veremos ciertas mejoras que se incorporaron para conseguir una mascara que permita aislar al objeto con más definición.
 
 \subsection{Espacios de Color HSV y CIE-L*a*b*:}
 El espacio de color HSV, o hue-saturation-value logra representar a un color mediante tres ejes distintos. A diferencia del espacio de colores usual, RGB, que describe un color mediante sus componentes de rojo, verde y azul, en el espacio HSV se describe mediante la oscuridad/luminosidad del color, al cual se le asigna la componente value; la cantidad de pigmentación o pureza del color, al cual se le asigna la componente de saturación; y finalmente la componente de hue, que describe el \textit{chroma} según la teoría de colores, es decir la posición en la rueda de colores.
