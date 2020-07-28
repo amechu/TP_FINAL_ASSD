@@ -265,7 +265,7 @@ mediante el uso de \textit{Matched Filters}. Además, se logró obtener una gran
 \begin{figure*}
 \centering
 	\includegraphics[width=0.8\textwidth]{Imagenes/camshift_mask1.png}
-	\caption{Primer ejemplo del algoritmo de enmascaramiento basado en camshift. En este ejemplo se puede notar la eficiencia conseguida en la máscara, debido a que por más que se encuentren varios objetos en escena de un color muy similar al objeto de interés, estos son exluídos por la máscara. Además, y de mayor importancia, se puede notar como el algoritmo de enmascaramiento no excluye la zona del libro bajo sombra. Esto muestra la gran robustez frente a cambios en la iluminación del algoritmo.}
+	\caption{Primer ejemplo del algoritmo de enmascaramiento basado en histogramas de hue. En este ejemplo se puede notar la eficiencia conseguida en la máscara, debido a que por más que se encuentren varios objetos en escena de un color muy similar al objeto de interés, estos son exluídos por la máscara. Además, y de mayor importancia, se puede notar como el algoritmo de enmascaramiento no excluye la zona del libro bajo sombra. Esto muestra la gran robustez frente a cambios en la iluminación del algoritmo.}
 	\label{fig:c_mask1}
 \end{figure*}
 
@@ -337,43 +337,43 @@ Los objetos pueden adquirir perfiles de color complejos, sus colores pueden esta
 	\begin{subfigure}{.4\textwidth}
 		\centering
 		\includegraphics[width=0.8\textwidth]{Imagenes/camshift_hist_bimodal.PNG}
-		\caption{Distribución de color bimodal}
+		\caption{Distribución de color bimodal.}
 		\label{fig:bimodal}
 	\end{subfigure}
 	
 	\begin{subfigure}{.4\textwidth}
 		\centering
 		\includegraphics[width=0.8\textwidth]{Imagenes/camshift_hist_unimodal.PNG}
-		\caption{Distribución de color unimodal}
+		\caption{Distribución de color unimodal.}
 		\label{fig:unimodal}
 	\end{subfigure}
 
 \end{figure}
-Para obtener una mascara que podamos utilizar debemos establecer un limite para así dejar pasar solamente aquellos píxeles cuyo hue tenga una alta probabilidad de pertenecer al objeto seleccionado. 
+Para obtener una máscara que podamos utilizar debemos establecer un límite para así dejar pasar solamente aquellos pixeles cuyo hue tenga una alta probabilidad de pertenecer al objeto seleccionado. 
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.32\textwidth]{Imagenes/mascara_bimodal.PNG}
-	\caption{Mascara obtenida luego de quedarnos con los píxeles más probables}
+	\caption{Máscara obtenida luego de quedarnos con los pixeles más probables.}
 	\label{fig:noisy_lpf}
 \end{figure}
-Debemos notar en la figura \ref{fig:noisy_lpf} que se pueden observar claramente las letras y el fondo de la tapa del libro. Como se puede apreciar, el histograma del ejemplo presenta una distribución bimodal la cual ha sido exitosamente capturada por el método de filtrado.
+Debemos notar en la Figura (\ref{fig:noisy_lpf}) que se pueden observar claramente las letras y el fondo de la tapa del libro. Como se puede apreciar, el histograma del ejemplo presenta una distribución bimodal la cual ha sido exitosamente capturada por el método de filtrado.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.32\textwidth]{Imagenes/mascara_bimodal_lpf.PNG}
-	\caption{Aplicamos el equivalente a un filtro pasabajos para disminuir el ruido}
+	\caption{Aplicamos el equivalente a un filtro pasabajos para disminuir el ruido.}
 	\label{fig:lpf_hist}
 \end{figure}
 
-Sin embargo, la figura \ref{fig:noisy_lpf} presenta ciertos pixeles que pueden interferir con las features calculadas mediante Shi-Tomassi. Es por eso que utilizamos la operación de \textit{blur} para suavizar la imagen y eliminar el ruido. Esto trae acarreado otro beneficio, el interior de la mascara se vuelve más suave y permisivo para los píxeles que pertenecen al interior del objeto.
+Sin embargo, la Figura (\ref{fig:noisy_lpf}) presenta ciertos pixeles que pueden interferir con las features calculadas mediante Shi-Tomasi. Es por eso que utilizamos la operación de suavizado para eliminar el ruido. Esto trae acarreado otro beneficio, el interior de la mascara se vuelve más uniforme y permisivo para los pixeles que pertenecen al interior del objeto.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.5\textwidth]{Imagenes/camshift_mask3.png}
-	\caption{Comaparación antes y despues del filtrado}
+	\caption{Comaparación antes y después del filtrado.}
 \end{figure}
  
-Se deja una vista global del ejemplo
+
 \begin{figure}[H]
 \centering
 	\includegraphics[width=0.45\textwidth]{Imagenes/camshift_mask2.png}
@@ -405,8 +405,8 @@ Se deja una vista global del ejemplo
 
 
 
-\subsubsection{Algoritmo de Optimización de los Parámetros del Algoritmo de Enmascaramiento}
-\large{le cambie el nombre a la seccion por este porque seguramente pueda hacer andar optimize.shgo de scipy con el filtro de LAB que tiene los parametros rikis continuos}
+%\subsubsection{Algoritmo de Optimización de los Parámetros del Algoritmo de Enmascaramiento}
+%le cambie el nombre a la seccion por este porque seguramente pueda hacer andar optimize.shgo de scipy con el filtro de LAB que tiene los parametros rikis continuos
 
 
 
@@ -435,7 +435,7 @@ Se deja una vista global del ejemplo
 
 
 \subsubsection{Algoritmo correlación}
-Para el algoritmo de correlación no solo se utiliza el filtro explicado en la Sección \ref{sec:corr}, sino que ademas se trata tanto al frame como al kernel, aplicando una transformación al espacio \textbf{HSV} y allí un filtrado bajo las siguientes especificaciones: 
+Para el algoritmo de correlación no solo se utiliza el filtro explicado en la Sección \ref{sec:corr}, sino que ademas se trata tanto al frame como al kernel, aplicando una transformación al espacio HSV y allí un filtrado bajo las siguientes especificaciones: 
             
 \begin{align}
 MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (32,255)

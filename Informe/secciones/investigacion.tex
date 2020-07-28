@@ -182,8 +182,27 @@ En la Figura (\ref{fig:corrtest}) se puede observar una imagen y el resultado de
 \end{figure}
 Se puede apreciar como el punto más oscuro de la pantalla indica el punto de mayor correlación entre la imagen fuente y el kernel seleccionado para el algoritmo de cuadrados mínimos (Figura (\ref{fig:sqdiff})) mientras que el mas claro indica la mayor correlación para el otro (Figura (\ref{fig:corr})). 
 
+\subsection{Espacios de Color HSV y CIE-L*a*b*:}
+El espacio de color HSV, o hue-saturation-value logra representar a un color mediante tres ejes distintos. A diferencia del espacio de colores usual, RGB, que describe un color mediante sus componentes de rojo, verde y azul, en el espacio HSV se describe mediante la oscuridad/luminosidad del color, al cual se le asigna la componente value; la cantidad de pigmentación o pureza del color, al cual se le asigna la componente de saturación; y finalmente la componente de hue, que describe el \textit{chroma} según la teoría de colores, es decir la posición en la rueda de colores.
+
+\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.3\textwidth]{Imagenes/hsv.png}
+		\caption{Espacio de colores HSV representado como un cilindro.}
+		\label{fig:hsv}
+\end{figure}
+
+Este espacio se puede representar como un cilindro, como se demuestra en la Figura (\ref{fig:hsv}). Si bien la componente de value representa la oscuridad/luminosidad de un color, este modelo es incorrecto debido a que presenta uniformidades. Es por esto, que para obtener una verdadera representación de luminosidad se utiliza el espacio Lab.
+El espacio de color L*a*b* de la comisión internacional en iluminación o CIE por sus siglas en francés es un espacio de color perceptualmente uniforme que representa a un color mediante tres parámetros: lightness, a y b, siendo lightness un modelo correctamente calculado e uniforme de la luminosidad de un color, y a y b las componentes de rojo/verde y amarillo/azul del color respectivamente\footnote{Imagen atribuida en \href{https://opentextbc.ca/graphicdesign/chapter/colour-science/}{https:\slash \slash opentextbc.ca\slash graphicdesign\slash chapter\slash colour-science\slash}}.
+\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.3\textwidth]{Imagenes/lab.png}
+		\caption{Espacio de colores CIE-Lab en coordenadas cartesianas.}
+		\label{fig:lab}
+\end{figure}
+
 \subsection{Filtros basados en distribución de probabilidad de Hue:}
-Los filtros de color tradicionales usualmente se basan en la detección de un color especifico con la adición de una cierta tolerancia para poder incluir una gama de colores más amplia. Sin embargo dicha elección resulta ser demasiado restrictiva cuando aparecen sombras o cambios de iluminación. Es por eso que una alternativa más general es la de utilizar mascaras que permitan el paso de ciertos pixeles según una función de masa de probabilidad dada \ref{CAMSHIFT}. Dicha distribución se computa usando \textbf{kernel} el objeto que deseamos seguir. A partir del mismo se transforma la selección al espacio de color \textbf{HSV} . El mismo nos permite independizarnos de la variación de brillo dentro de la escena y concentrarnos unicamente en el \textbf{Hue}, cuyo valor nos indicara a que gama de colores pertenece el objetivo.
+Los filtros de color tradicionales usualmente se basan en la detección de un color especifico con la adición de una cierta tolerancia para poder incluir una gama de colores más amplia. Sin embargo dicha elección resulta ser demasiado restrictiva cuando aparecen sombras o cambios de iluminación. Es por eso que una alternativa más general es la de utilizar mascaras que permitan el paso de ciertos pixeles según una función de masa de probabilidad dada. Dicha distribución se computa usando el objeto que deseamos seguir. En la Figura (\ref{fig:kernelHistFilter}) se observa un ejemplo de una selección realizada por el usuario y en la Figura (\ref{fig:kernelHist}) su distribución asociada. A partir del mismo se transforma la selección al espacio de color HSV. El mismo nos permite independizarnos de la variación de brillo dentro de la escena y concentrarnos únicamente en la componente de hue, cuyo valor nos indicara a qué gama de colores pertenece el objetivo.
 \begin{figure}[H]
 \centering
 	\begin{subfigure}{.15\textwidth}
@@ -207,25 +226,5 @@ Los filtros de color tradicionales usualmente se basan en la detección de un co
 		\label{fig:probabilidades}
 	\end{subfigure}
 \end{figure}
-La figura \ref{fig:probabilidades} ilustra el proceso de asignar a cada pixel de la imagen la correspondiente probabilidad ocurrencia  de \textbf{HUE} según indique el histograma. Cabe destacar que cada bin del histograma engloba un cierto rango de valores de \textbf{HUE}. Para poder traducir estas probabilidades a valores de intensidad de pixel se realiza un mapeo lineal $[0,1] \rightarrow [0,255]$.
-En la secciones posteriores veremos ciertas mejoras que se incorporaron para conseguir una mascara que permita aislar al objeto con más definición.
-
-\subsection{Espacios de Color HSV y CIE-L*a*b*:}
-El espacio de color HSV, o hue-saturation-value logra representar a un color mediante tres ejes distintos. A diferencia del espacio de colores usual, RGB, que describe un color mediante sus componentes de rojo, verde y azul, en el espacio HSV se describe mediante la oscuridad/luminosidad del color, al cual se le asigna la componente value; la cantidad de pigmentación o pureza del color, al cual se le asigna la componente de saturación; y finalmente la componente de hue, que describe el \textit{chroma} según la teoría de colores, es decir la posición en la rueda de colores.
-
-\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.3\textwidth]{Imagenes/hsv.png}
-		\caption{Espacio de colores HSV representado como un cilindro.}
-		\label{fig:hsv}
-\end{figure}
-
-Este espacio se puede representar como un cilindro, como se demuestra en la Figura (\ref{fig:hsv}). Si bien la componente de value representa la oscuridad/luminosidad de un color, este modelo es incorrecto debido a que presenta uniformidades. Es por esto, que para obtener una verdadera representación de luminosidad se utiliza el espacio Lab.
-El espacio de color L*a*b* de la comisión internacional en iluminación o CIE por sus siglas en francés es un espacio de color perceptualmente uniforme que representa a un color mediante tres parámetros: lightness, a y b, siendo lightness un modelo correctamente calculado e uniforme de la luminosidad de un color, y a y b las componentes de rojo/verde y amarillo/azul del color respectivamente\footnote{Imagen atribuida en \href{https://opentextbc.ca/graphicdesign/chapter/colour-science/}{https:\slash \slash opentextbc.ca\slash graphicdesign\slash chapter\slash colour-science\slash}}.
-\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.3\textwidth]{Imagenes/lab.png}
-		\caption{Espacio de colores CIE-Lab en coordenadas cartesianas.}
-		\label{fig:lab}
-\end{figure}
-
+La Figura (\ref{fig:probabilidades}) ilustra el proceso de asignar a cada pixel de la imagen la correspondiente probabilidad de ocurrencia de hue según indique el histograma. Cabe destacar que cada bin del histograma engloba un cierto rango de valores de la componente de hue. Para poder traducir estas probabilidades a valores de intensidad de pixel se realiza un mapeo lineal $[0,1] \rightarrow [0,255]$.
+En la secciones posteriores veremos ciertas mejoras que se incorporaron para conseguir una máscara que permita aislar al objeto con más definición.
