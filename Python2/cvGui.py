@@ -505,6 +505,10 @@ class cvGui():
             if self.lastTracker != selectedT:
                 if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (self.deletedTracker == self.lastTracker)):
                     self.lastTracker = -1
+                    self.ColorFilter[0] = False
+                    self.CorrFilter[0] = False
+                    self.CamShiftFilter[0] = False
+                    self.Hist[0] = False
                 else:
                     if not (selectedT == -1):
                         self.loadParameters(selectedT)
@@ -526,7 +530,7 @@ class cvGui():
 
             # Mini filters
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
-            if self.CFPropOnOff[0] and not len(self.filterConditions) == 0:
+            if self.CFPropOnOff[0] and not selectedT == -1:#len(self.filterConditions) == 0:
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Color Filter", self.ColorFilter):
                     self.CamShiftFilter[0] = False
                     self.CorrFilter[0] = False
@@ -560,7 +564,7 @@ class cvGui():
                         miniFilter = self.rescale_mini_filter(miniFilter)
                         self.drawMiniFilter(miniFilter, False)
 
-            elif self.CFCamShiftOnOff[0] and not len(self.filterConditions) == 0:
+            elif self.CFCamShiftOnOff[0] and not selectedT == -1:#len(self.filterConditions) == 0:
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Cam Shift", self.CamShiftFilter):
                     self.ColorFilter[0] = False
                     self.CorrFilter[0] = False
