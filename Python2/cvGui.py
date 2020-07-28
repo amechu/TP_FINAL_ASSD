@@ -668,9 +668,10 @@ class cvGui():
             if not self.replaceRoi:
                 if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
-                if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
-                    if not selectedT == -1 and ((self.CFCamShiftOnOff[0] and self.CamShiftFilter[0]) or (self.CFPropOnOff[0] and self.ColorFilter[0])):
-                        autoCS = True
+                if (self.CFCamShiftOnOff[0] and (self.CamShiftFilter[0] or self.Hist[0] or self.CorrFilter[0])) or (self.CFPropOnOff[0] and (self.ColorFilter[0] or self.CorrFilter[0])):
+                    if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
+                        if not selectedT == -1:
+                            autoCS = True
 
             # Tracking Error
             alreadyTex = False
