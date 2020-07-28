@@ -145,10 +145,10 @@ class HistFilter:
         prob = cv.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
         prob &= mask
         mask2 = cv.inRange(prob, self.low_pth, 255)
-        cv.imshow("mascara",mask2)
+        # cv.imshow("mascara",mask2)
         if self.mask_blur_size != 0:
             mask2 = cv.medianBlur(mask2, int(self.mask_blur_size))
-        cv.imshow("mascara pasabajeada",mask2)
+        # cv.imshow("mascara pasabajeada",mask2)
 
 
         return mask2
