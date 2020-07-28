@@ -248,7 +248,6 @@ class Tracker:
 
 
     def costChangeParamsLAB(self, x):
-
         self.MF.LSemiAmp = x[0]
         self.MF.aSemiAmp = x[1]
         self.MF.bSemiAmp = x[2]
@@ -259,8 +258,9 @@ class Tracker:
         countInside = np.count_nonzero(testFrame[int(self.initPos[1] - self.selectionHeight / 2): int(self.initPos[1] + self.selectionHeight / 2),int(self.initPos[0] - self.selectionWidth / 2): int(self.initPos[0] + self.selectionWidth / 2)])
 
         countOutside = countTotal - countInside
-        print(countOutside-countInside)
-        return countOutside*(1/5) - countInside*(4/5)
+        # print(countOutside-countInside)
+        # return countOutside*(1/5) - countInside*(4/5)
+        return countOutside - countInside
 
     def calculate_optimal_params(self):
         if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
@@ -289,9 +289,10 @@ class Tracker:
     def optimize(self):
 
         if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
-            x_bounds = 2*[(0, 150), (0, 150), (0, 150)]
-            res = optimize.shgo(self.costChangeParamsLAB, x_bounds)
-            print(res.x)
+            x_bounds = [(0, 150), (0, 150), (0, 150)]
+            x0 = np.array([self.MF.LSemiAmp, self.MF.aSemiAmp, self.MF.bSemiAmp])
+            # res = optimize.least_squares(self.costChangeParamsLAB,x0=x0,bounds=[(0,0,0),(150,150,150)],ftol=1000)
+            res = optimize.minimize(self.costChangeParamsLAB, x0=x0, bounds=x_bounds,method="Powell")
             self.MF.LSemiAmp = res.x[0]
             self.MF.aSemiAmp = res.x[1]
             self.MF.bSemiAmp = res.x[2]
