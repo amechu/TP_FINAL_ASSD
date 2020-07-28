@@ -361,3 +361,9 @@ class Tracker:
         b = bgr[0]
         g = bgr[1]
         r = bgr[2]
+
+    def showSearchArea(self):
+        if self.SC.missAlgorithm== self.SC.missAlgorithmD["ST"]:
+            return True
+        else:
+            return False
