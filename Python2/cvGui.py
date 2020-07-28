@@ -1072,7 +1072,8 @@ class cvGui():
                 if self.ShowEstimate[0]:
                     self.source = Artist.Artist.estimate(self.source, *tracker.getEstimatedPosition(),
                                                          tracker.selectionWidth, tracker.selectionHeight, (b, g, r))
-                self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(),
+                if tracker.showSearchArea() is True:
+                    self.source = Artist.Artist.searchArea(self.source, *tracker.getEstimatedPosition(),
                                                        tracker.SC.searchWidth, tracker.SC.searchHeight, (b, g, r))
             i += 1
 
