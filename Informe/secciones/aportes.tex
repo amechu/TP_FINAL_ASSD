@@ -331,7 +331,7 @@ Sin embargo, si bien la utilización del espacio de color CIE-Lab subsanó vario
 
 
 \subsubsection{Enmascaramiento Basado en Histogramas de Hue}
-Los objetos pueden adquirir perfiles de color complejos, sus colores pueden estar distribuidos entorno a un solo valor de hue dominante o pueden tener más de uno en su composición. 
+Para este método de enmascaramiento, el espacio de color HSV fue utilizado debido a que un solo parámetro es el encargado de denotar el color, lo cual genera que la distribución de color de un objeto sea una variable aleatoria unidimensional y no bidimensional como lo sería en el espacio de color CIE-Lab. Aclarado esto, los objetos pueden adquirir perfiles de color complejos, sus colores pueden estar distribuidos entorno a un solo valor de hue dominante, o pueden tener más de uno en su composición, obteniendo distribuciones unimodales o multimodales, respectivamente. 
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}{.4\textwidth}
@@ -435,7 +435,7 @@ Sin embargo, la Figura (\ref{fig:noisy_lpf}) presenta ciertos pixeles que pueden
 
 
 \subsubsection{Algoritmo correlación}
-Para el algoritmo de correlación no solo se utiliza el filtro explicado en la Sección \ref{sec:corr}, sino que ademas se trata tanto al frame como al kernel, aplicando una transformación al espacio HSV y allí un filtrado bajo las siguientes especificaciones: 
+Para el algoritmo de correlación no solo se utiliza el filtro explicado en la Sección \ref{sec:corr}, sino que ademas se trata tanto al frame como al kernel, aplicando una transformación al espacio HSV. La trasformación de RGB a HSV posee un requerimiento computacional significativamente menor a la transformación de RGB a CIE-Lab y por eso se utilizó nuevamente el espacio HSV, dado que este filtrado sería complementario al método de la correlación y no lo más importante en el algoritmo. El filtrado se realizó bajo las siguientes especificaciones: 
             
 \begin{align}
 MSK = H \  \epsilon \ (0,180 ) \ \ S \  \epsilon \ (50,255) \ \ V \ \epsilon \ (32,255)
