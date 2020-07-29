@@ -46,7 +46,6 @@ class Searcher:
     def searchMissing(self,estX,estY,frame,filteredframe):
 
         if self.missAlgorithm== self.missAlgorithmD["ST"]:
-      #      print("IM USING SHI TOMASI for search missing")
             candidate = [None, None]
             frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
             y1 = np.clip(int(estY - self.searchHeight / 2), 1, frame.shape[0])
@@ -55,7 +54,21 @@ class Searcher:
             x2 = np.clip(int(estX + self.searchWidth / 2), 1, frame.shape[1])
             searchin = frameGray[y1: y2, x1:x2]
             self.features, self.trackingError = self.ST.recalculateFeatures(searchin)
-            self.features = self.featureTranslate(estX - self.searchWidth / 2, estY - self.searchHeight / 2, self.features)
+            self.features = self.featureTranslate(estX - (x2-x1) / 2, estY - (y2-y1) / 2, self.features)
+
+            #LO DE ABAJO SE ROMPE POR ALGUNA RAZON CUANDO SE CALCULA SHITOMASI CUANDO EL ESTIMADO SALE DE LA PANTALLA.
+            # if (estX>0)&(estX<frame.shape[1])&(estY>0)&(estY<frame.shape[0]):
+            #     candidate = [None, None]
+            #     frameGray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+            #     y1 = np.clip(int(estY - self.searchHeight / 2), 1, frame.shape[0])
+            #     y2 = np.clip(int(estY + self.searchHeight / 2), 1, frame.shape[0])
+            #     x1 = np.clip(int(estX - self.searchWidth / 2), 1, frame.shape[1])
+            #     x2 = np.clip(int(estX + self.searchWidth / 2), 1, frame.shape[1])
+            #     searchin = frameGray[y1: y2, x1:x2]
+            #     self.features, self.trackingError = self.ST.recalculateFeatures(searchin)
+            #     self.features = self.featureTranslate(estX - (x2-x1) / 2, estY - (y2-y1) / 2, self.features)
+            # else:
+            #     self.features, self.trackingError = self.ST.recalculateFeatures(filteredframe)
 
       #      print(f'Search Height : {self.searchHeight }')
       #      print(f'Search Width : {self.searchWidth }')
