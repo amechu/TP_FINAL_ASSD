@@ -705,7 +705,7 @@ class cvGui():
                             self.CurrentSource = "Video Ended. Load A New One!"
                             self.boolVideoLoaded = False
                 else:
-                    if self.changeInTrackers and ((self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera):
+                    if self.changeInTrackers or ((self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera):
                         self.changeInTrackers = False
                         self.callFilterPause()
                     if self.usingVideo and len(self.arrayVideoLoaded) == 0:
