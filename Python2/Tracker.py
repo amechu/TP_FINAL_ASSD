@@ -288,13 +288,71 @@ class Tracker:
     def optimize(self):
 
         if self.MF.mask is self.MF.maskingType["FILTER_LAB"]:
-            x_bounds = [(0, 150), (0, 150), (0, 150)]
-            x0 = np.array([self.MF.LSemiAmp, self.MF.aSemiAmp, self.MF.bSemiAmp])
-            # res = optimize.least_squares(self.costChangeParamsLAB,x0=x0,bounds=[(0,0,0),(150,150,150)],ftol=1000)
-            res = optimize.minimize(self.costChangeParamsLAB, x0=x0, bounds=x_bounds,method="Powell")
+
+            for j in range(3):
+                best_L = [self.MF.LSemiAmp]
+                best_cost = self.calculate_cost()
+
+                for i in range(10, 150):
+                    self.MF.LSemiAmp = i
+                    self.MF.updateMaskFromSettings()
+                    cost = self.calculate_cost()
+                    if cost < best_cost:
+                        best_L.append(i)
+                        best_cost = cost
+
+                self.MF.LSemiAmp = best_L[-1]
+                self.MF.updateMaskFromSettings()
+
+                best_mask_blur = [self.MF.ksize]
+                # best_cost = 0
+                for i in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]:
+                    self.MF.ksize = i
+                    cost = self.calculate_cost()
+                    if cost < best_cost:
+                        best_mask_blur.append(i)
+                        best_cost = cost
+                self.MF.ksize = best_mask_blur[-1]
+
+                best_a = [self.MF.aSemiAmp]
+                for i in range(5, 100):
+                    self.MF.aSemiAmp = i
+                    self.MF.updateMaskFromSettings()
+                    cost = self.calculate_cost()
+                    if cost < best_cost:
+                        best_a.append(i)
+                        best_cost = cost
+                self.MF.aSemiAmp = best_a[-1]
+                self.MF.updateMaskFromSettings()
+
+                best_b = [self.MF.bSemiAmp]
+                for i in range(5, 100):
+                    self.MF.bSemiAmp = i
+                    self.MF.updateMaskFromSettings()
+                    cost = self.calculate_cost()
+                    if cost < best_cost:
+                        best_b.append(i)
+                        best_cost = cost
+                self.MF.bSemiAmp = best_b[-1]
+                self.MF.updateMaskFromSettings()
+
+
+                self.MF.LSemiAmp = best_L[-1]
+                self.MF.aSemiAmp = best_a[-1]
+                self.MF.bSemiAmp = best_b[-1]
+                self.MF.ksize = best_mask_blur[-1]
+
+                self.MF.updateMaskFromSettings()
+
+                x_bounds = [(0, 150), (0, 150), (0, 150)]
+                x0 = np.array([self.MF.LSemiAmp, self.MF.aSemiAmp, self.MF.bSemiAmp])
+                # res = optimize.least_squares(self.costChangeParamsLAB,x0=x0,bounds=[(0,0,0),(150,150,150)],ftol=1000)
+                #res = optimize.minimize(self.costChangeParamsLAB, x0=x0, bounds=x_bounds,method="Powell")
+                res = optimize.minimize(self.costChangeParamsLAB, x0=x0,method="Powell")
             self.MF.LSemiAmp = res.x[0]
             self.MF.aSemiAmp = res.x[1]
             self.MF.bSemiAmp = res.x[2]
+            self.MF.updateMaskFromSettings()
 
         else:
             best_bin = [self.MF.hist_filter.bins]
@@ -313,7 +371,7 @@ class Tracker:
 
             best_mask_blur = [self.MF.hist_filter.mask_blur_size]
             # best_cost = 0
-            for i in range(1, 20):
+            for i in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]:
                 self.MF.hist_filter.set_mask_blur(i)
                 cost = self.calculate_cost()
                 if cost < best_cost:
@@ -322,7 +380,7 @@ class Tracker:
             self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
 
             best_kernel_blur = [self.MF.hist_filter.kernel_blur_size]
-            for i in range(1, 20):
+            for i in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]:
                 self.MF.hist_filter.set_kernel_blur(i)
                 self.MF.updateMaskFromSettings()
                 cost = self.calculate_cost()
@@ -333,15 +391,6 @@ class Tracker:
             self.MF.updateMaskFromSettings()
 
             best_low_pth = [self.MF.hist_filter.low_pth]
-
-            # for i in range(1, 254):
-            #     self.MF.hist_filter.set_low_pth(i)
-            #     self.MF.updateMaskFromSettings()
-            #     cost = self.calculate_cost()
-            #     print(f"low_pth{i} cost:{cost}")
-            #     if cost < best_cost:
-            #         best_low_pth.append(i)
-            #         best_cost = cost
 
             self.MF.hist_filter.set_bins(best_bin[-1])
             self.MF.hist_filter.set_mask_blur(best_mask_blur[-1])
