@@ -8,8 +8,7 @@ from Searcher import Searcher
 from scipy import optimize
 # from scipy.optimize import Bounds
 
-# import tensorflow as tf
-# from tensorflow.python.training import gradient_descent
+
 class Tracker:
     LIG_THR_EVERY_FRAMES = 15
 
