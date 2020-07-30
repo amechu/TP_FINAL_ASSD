@@ -27,6 +27,11 @@ CAMSHIFT_MB = 11.0
 CAMSHIFT_SB = 4.0
 CAMSHIFT_LBPT = 200.0
 
+FILTERONOFF_COLOR = True
+FILTERONOFF_COR = False
+FILTERONOFF_CAMSHIFT = True
+FILTERONOFF_HIST = False
+
 INITIAL_ST_ONOFF = True
 SHIT_MAXFEAT = 100.0
 SHIT_FEATQUAL = 0.01
@@ -39,7 +44,7 @@ MASK_COND = 0.2
 MIS_COR = True
 MIS_ST = False
 REC_COR = True
-REC_ST = True
+REC_ST = False
 
 Y_SCREEN = 960
 X_SCREEN = 1500 #1310 #1280
@@ -165,11 +170,14 @@ class cvGui():
         cvui.init(WINDOW_NAME)
 
         #Filter Edit
-        self.ColorFilter = [False]
-        self.CorrFilter = [False]
+        self.ColorFilter = [FILTERONOFF_COLOR] #[False]
+        self.CorrFilter = [FILTERONOFF_COR]
 
-        self.CamShiftFilter = [False]
-        self.Hist = [False]
+        self.CorrFilterLAB = [FILTERONOFF_COR]
+        self.CorrFilterCAM = [FILTERONOFF_COR]
+
+        self.CamShiftFilter = [FILTERONOFF_CAMSHIFT] #[False]
+        self.Hist = [FILTERONOFF_HIST]
 
         self.filterConditions = []
 
@@ -352,10 +360,12 @@ class cvGui():
                         self.filteredFrame = None
                         self.resetInitialCond()
 
-                        self.ColorFilter[0] = False
-                        self.CorrFilter[0] = False
-                        self.CamShiftFilter[0] = False
-                        self.Hist[0] = False
+                        self.ColorFilter[0] = FILTERONOFF_COLOR
+                        self.CorrFilterLAB[0] = FILTERONOFF_COR
+                        self.CorrFilterCAM[0] = FILTERONOFF_COR
+
+                        self.CamShiftFilter[0] = FILTERONOFF_CAMSHIFT
+                        self.Hist[0] = FILTERONOFF_HIST
                         self.CFPropOnOff[0] = False
                         self.CFCamShiftOnOff[0] = False
 
@@ -505,36 +515,40 @@ class cvGui():
             if self.lastTracker != selectedT:
                 if (selectedT == -1) and ((len(self.boolForTrackers) == 0) or (self.deletedTracker == self.lastTracker)):
                     self.lastTracker = -1
-                    self.ColorFilter[0] = False
-                    self.CorrFilter[0] = False
-                    self.CamShiftFilter[0] = False
-                    self.Hist[0] = False
+                    self.ColorFilter[0] = FILTERONOFF_COLOR
+                    self.CorrFilterLAB[0] = FILTERONOFF_COR
+                    self.CorrFilterCAM[0] = FILTERONOFF_COR
+
+                    self.CamShiftFilter[0] = FILTERONOFF_CAMSHIFT
+                    self.Hist[0] = FILTERONOFF_HIST
+
                 else:
                     if not (selectedT == -1):
                         self.loadParameters(selectedT)
                         self.lastTracker = selectedT
                     if not len(self.filterConditions) == 0:
                         self.ColorFilter[0] = self.filterConditions[selectedT][0]
-                        self.CorrFilter[0] = self.filterConditions[selectedT][1]
-                        self.CamShiftFilter[0] = self.filterConditions[selectedT][2]
-                        self.Hist[0] = self.filterConditions[selectedT][3]
-                        self.CFPropOnOff[0] = self.filterConditions[selectedT][4]
-                        self.CFCamShiftOnOff[0] = self.filterConditions[selectedT][5]
+                        self.CorrFilterLAB[0] = self.filterConditions[selectedT][1]
+                        self.CorrFilterCAM[0] = self.filterConditions[selectedT][2]
+                        self.CamShiftFilter[0] = self.filterConditions[selectedT][3]
+                        self.Hist[0] = self.filterConditions[selectedT][4]
+                        self.CFPropOnOff[0] = self.filterConditions[selectedT][5]
+                        self.CFCamShiftOnOff[0] = self.filterConditions[selectedT][6]
             elif not len(self.filterConditions) == 0:
                 self.filterConditions[selectedT][0] = self.ColorFilter[0]
-                self.filterConditions[selectedT][1] = self.CorrFilter[0]
-                self.filterConditions[selectedT][2] = self.CamShiftFilter[0]
-                self.filterConditions[selectedT][3] = self.Hist[0]
-                self.filterConditions[selectedT][4] = self.CFPropOnOff[0]
-                self.filterConditions[selectedT][5] = self.CFCamShiftOnOff[0]
+                self.filterConditions[selectedT][1] = self.CorrFilterLAB[0]
+                self.filterConditions[selectedT][2] = self.CorrFilterCAM[0]
+                self.filterConditions[selectedT][3] = self.CamShiftFilter[0]
+                self.filterConditions[selectedT][4] = self.Hist[0]
+                self.filterConditions[selectedT][5] = self.CFPropOnOff[0]
+                self.filterConditions[selectedT][6] = self.CFCamShiftOnOff[0]
 
             # Mini filters
             cvui.rect(self.frame, WINDOW_FIL_X + 5, WINDOW_SOU_Y + 37, WINDOW_SOU_WIDTH - 10, WINDOW_SOU_HEIGHT - 75, 0x5c585a, 0x242223)
             if self.CFPropOnOff[0] and not selectedT == -1:#len(self.filterConditions) == 0:
+                self.CFCamShiftOnOff[0] = False
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Color Filter", self.ColorFilter):
-                    self.CamShiftFilter[0] = False
-                    self.CorrFilter[0] = False
-                    self.Hist[0] = False
+                    self.CorrFilterLAB[0] = False
 
                     if not len(self.trackers) == 0:
                         # CORRELATION FILTER
@@ -550,10 +564,8 @@ class cvGui():
                             miniFilter = self.rescale_mini_filter(miniFilter)
                             self.drawMiniFilter(miniFilter, False)
 
-                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Correlation Filter",self.CorrFilter):
-                    self.CamShiftFilter[0] = False
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "Correlation Filter",self.CorrFilterLAB):
                     self.ColorFilter[0] = False
-                    self.Hist[0] = False
 
                     if not len(self.trackers) == 0:
                         # LAB COLOR FILTER
@@ -565,9 +577,9 @@ class cvGui():
                         self.drawMiniFilter(miniFilter, False)
 
             elif self.CFCamShiftOnOff[0] and not selectedT == -1:#len(self.filterConditions) == 0:
+                self.CFPropOnOff[0] = False
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 30, "Cam Shift", self.CamShiftFilter):
-                    self.ColorFilter[0] = False
-                    self.CorrFilter[0] = False
+                    self.CorrFilterCAM[0] = False
                     self.Hist[0] = False
 
                     if not len(self.trackers) == 0:
@@ -592,8 +604,7 @@ class cvGui():
                             self.drawMiniFilter(miniFilter2, True)
 
                 if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 50, "HUE Histogram", self.Hist):
-                    self.ColorFilter[0] = False
-                    self.CorrFilter[0] = False
+                    self.CorrFilterCAM[0] = False
                     self.CamShiftFilter[0] = False
 
                     if not len(self.trackers) == 0:
@@ -619,9 +630,8 @@ class cvGui():
                         miniFilter2 = self.rescale_mini_filter(miniFilter2)
                         self.drawMiniFilter(miniFilter2, True)
 
-                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 70, "Correlation Filter", self.CorrFilter):
+                if cvui.checkbox(self.frame, WINDOW_FILS_X + 10, WINDOW_FILS_Y + 70, "Correlation Filter", self.CorrFilterCAM):
                     self.CamShiftFilter[0] = False
-                    self.ColorFilter[0] = False
                     self.Hist[0] = False
 
                     if not len(self.trackers) == 0:
@@ -672,7 +682,7 @@ class cvGui():
             if not self.replaceRoi:
                 if (cvui.button(self.frame, 20, 915, "Reset Settings")):
                     self.resetInitialCond()
-                if (self.CFCamShiftOnOff[0] and (self.CamShiftFilter[0] or self.Hist[0] or self.CorrFilter[0])) or (self.CFPropOnOff[0] and (self.ColorFilter[0] or self.CorrFilter[0])):
+                if (self.CFCamShiftOnOff[0] and (self.CamShiftFilter[0] or self.Hist[0] or self.CorrFilterCAM[0])) or (self.CFPropOnOff[0] and (self.ColorFilter[0] or self.CorrFilterLAB[0])):
                     if (cvui.button(self.frame, WINDOW_SET_WIDTH + WINDOW_SET_X - 70, 915, "Auto")):
                         if not selectedT == -1:
                             autoCS = True
@@ -714,7 +724,7 @@ class cvGui():
                         self.frame[self.sourceY:self.sourceY + self.sourceHEIGHT, self.sourceX:self.sourceX + self.sourceWIDTH] = self.source
 
             # Draw Filter
-            if (self.usingVideo or self.usingCamera) and (self.ColorFilter[0] or self.CamShiftFilter[0] or self.CorrFilter[0] or self.Hist[0]):
+            if (self.usingVideo or self.usingCamera) and ((self.ColorFilter[0] or self.CorrFilterLAB[0]) and self.CFPropOnOff[0]) or ((self.CorrFilterCAM[0] or self.Hist[0] or self.CamShiftFilter[0]) and self.CFCamShiftOnOff[0]):
                 self.updateFilterFrame()
                 if self.Hist[0]:
                     x0 = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X*2
@@ -830,10 +840,8 @@ class cvGui():
                                 toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
 
                             self.trackers[-1].changeSettings(self.makeInitial())
-                            self.filterConditions.append([False, False, False, False, COLORFILTER_ONOFF, CAMSHIFT_ONOFF])
+                            self.filterConditions.append([FILTERONOFF_COLOR, FILTERONOFF_COR, FILTERONOFF_COR, FILTERONOFF_CAMSHIFT, FILTERONOFF_HIST, COLORFILTER_ONOFF, CAMSHIFT_ONOFF])
                             self.configSelected.append(originalParam)
-                            w = int(np.asarray(toRescale).shape[1])
-                            h = int(np.asarray(toRescale).shape[0])
                             self.kernel.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
 
                         self.coordsRoi.clear()
@@ -972,10 +980,13 @@ class cvGui():
         self.LKProp[0] = False
         self.ShiTProp[0] = False
         self.CFProp[0] = False
-        self.ColorFilter[0] = False
-        self.CorrFilter[0] = False
-        self.CamShiftFilter[0] = False
-        self.Hist[0] = False
+        self.ColorFilter[0] = FILTERONOFF_COLOR
+
+        self.CorrFilterLAB[0] = FILTERONOFF_COR
+        self.CorrFilterCAM[0] = FILTERONOFF_COR
+
+        self.CamShiftFilter[0] = FILTERONOFF_CAMSHIFT
+        self.Hist[0] = FILTERONOFF_HIST
         self.CFPropOnOff[0] = COLORFILTER_ONOFF
         self.CFCamShiftOnOff[0] = CAMSHIFT_ONOFF
 
@@ -1114,7 +1125,7 @@ class cvGui():
                 self.trackers[filterOfInteres].setFilter("FILTER_CSHIFT")
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
             #CORRELATION FILTER
-            elif self.CorrFilter[0] and (self.CFPropOnOff[0] or self.CFCamShiftOnOff[0]):
+            elif (self.CorrFilterLAB[0] and self.CFPropOnOff[0]) or (self.CorrFilterCAM[0] and self.CFCamShiftOnOff[0]):
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
                     if self.sourceWIDTH >= self.sourceHEIGHT:
@@ -1130,7 +1141,7 @@ class cvGui():
             else:
                 self.filteredFrame = None
 
-        if self.CorrFilter[0] and self.filteredFrame is not None:
+        if ((self.CorrFilterLAB[0] and self.CFPropOnOff[0]) or (self.CorrFilterCAM[0] and self.CFCamShiftOnOff[0])) and self.filteredFrame is not None:
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
             self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
             self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)*255
