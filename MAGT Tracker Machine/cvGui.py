@@ -725,7 +725,8 @@ class cvGui():
 
             # Draw Filter
             if (self.usingVideo or self.usingCamera) and ((self.ColorFilter[0] or self.CorrFilterLAB[0]) and self.CFPropOnOff[0]) or ((self.CorrFilterCAM[0] or self.Hist[0] or self.CamShiftFilter[0]) and self.CFCamShiftOnOff[0]):
-                self.updateFilterFrame()
+                if self.pause or self.replaceRoi:
+                    self.updateFilterFrame()
                 if self.Hist[0]:
                     x0 = WINDOW_SOU_X + WINDOW_SOU_WIDTH + WINDOW_VS_X*2
                 else:
@@ -1125,18 +1126,28 @@ class cvGui():
             if self.ColorFilter[0] and self.CFPropOnOff[0]:
                 self.trackers[filterOfInteres].setFilter("FILTER_LAB")
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
-                self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
+                if self.pause:
+                    self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
             #CAMSHIFT
             elif self.CamShiftFilter[0] and self.CFCamShiftOnOff[0]:
                 self.trackers[filterOfInteres].setFilter("FILTER_CSHIFT")
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
-                self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
+                if self.pause:
+                    self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
             #CORRELATION FILTER
             elif (self.CorrFilterLAB[0] and self.CFPropOnOff[0]) or (self.CorrFilterCAM[0] and self.CFCamShiftOnOff[0]):
+                if self.pause:
+                    if self.CorrFilterLAB[0]:
+                        self.trackers[filterOfInteres].setFilter("FILTER_LAB")
+                    elif self.CFPropOnOff[0]:
+                        self.trackers[filterOfInteres].setFilter("FILTER_CSHIFT")
+                    filtroPapa = self.trackers[filterOfInteres].getFilteredFrame()
+                    self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(filtroPapa, cv.COLOR_BGR2GRAY)
+
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
                 if self.filteredFrame is not None:
                     if self.sourceWIDTH >= self.sourceHEIGHT:
-                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, self.sourceWIDTH) #STANDAR_WIDTH)
+                        self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, self.sourceWIDTH)
                     else:
                         self.filteredFrame = self.rescale_frame_standar(self.filteredFrame, self.sourceHEIGHT)
                 else:
@@ -1145,7 +1156,8 @@ class cvGui():
             elif self.Hist[0] and self.CFCamShiftOnOff[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].MF.hist_filter.get_histogram_plot()
                 self.filteredFrame = self.rescale_hist(self.filteredFrame, STANDAR_WIDTH, STANDAR_WIDTH-60)#self.sourceHEIGHT)
-                self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
+                if self.pause:
+                    self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
             else:
                 self.filteredFrame = None
 
@@ -1153,7 +1165,7 @@ class cvGui():
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
             self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
             self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)*255
-            self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
+            # self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
         elif self.Hist[0] and self.CFCamShiftOnOff[0]:
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
             self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
