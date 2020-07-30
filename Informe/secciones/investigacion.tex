@@ -202,7 +202,7 @@ El espacio de color L*a*b* de la comisión internacional en iluminación o CIE p
 \end{figure}
 
 \subsection{Filtros basados en distribución de probabilidad de Hue:}
-Los filtros de color tradicionales usualmente se basan en la detección de un color especifico con la adición de una cierta tolerancia para poder incluir una gama de colores más amplia. Sin embargo dicha elección resulta ser demasiado restrictiva cuando aparecen sombras o cambios de iluminación. Es por eso que una alternativa más general es la de utilizar mascaras que permitan el paso de ciertos pixeles según una función de masa de probabilidad dada. Dicha distribución se computa usando el objeto que deseamos seguir. En la Figura (\ref{fig:kernelHistFilter}) se observa un ejemplo de una selección realizada por el usuario y en la Figura (\ref{fig:kernelHist}) su distribución asociada. A partir del mismo se transforma la selección al espacio de color HSV. El mismo nos permite independizarnos de la variación de brillo dentro de la escena y concentrarnos únicamente en la componente de hue, cuyo valor nos indicara a qué gama de colores pertenece el objetivo.
+Los filtros de color tradicionales usualmente se basan en la detección de un color especifico con la adición de una cierta tolerancia para poder incluir una gama de colores más amplia. Sin embargo dicha elección resulta ser demasiado restrictiva cuando aparecen sombras o cambios de iluminación. Es por eso que una alternativa más general es la de utilizar mascaras que permitan el paso de ciertos pixeles según una función de masa de probabilidad dada. Dicha distribución se computa usando el objeto que deseamos seguir. En la Figura (\ref{fig:kernelHistFilter}) se observa un ejemplo de una selección realizada por el usuario y en la Figura (\ref{fig:kernelHist}) su distribución asociada. Para obtenerla se transforma la selección al espacio de color HSV y se aplica un pre-filtrado del cual obtendremos las componentes menos ruidosas de la imagen. El espacio HSV mismo nos permite independizarnos de la variación de brillo dentro de la escena y concentrarnos únicamente en la componente de hue, cuyo valor nos indicara a qué gama de colores pertenece el objetivo. 
 \begin{figure}[H]
 \centering
 	\begin{subfigure}{.15\textwidth}
@@ -222,9 +222,9 @@ Los filtros de color tradicionales usualmente se basan en la detección de un co
 	\begin{subfigure}{.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{Imagenes/camshift_probabilidades.png}
-		\caption{Matriz de probabilidad}
+		\caption{Matriz de probabilidad, mayor intensidad equivale a mayor probabilidad}
 		\label{fig:probabilidades}
 	\end{subfigure}
 \end{figure}
-La Figura (\ref{fig:probabilidades}) ilustra el proceso de asignar a cada pixel de la imagen la correspondiente probabilidad de ocurrencia de hue según indique el histograma. Cabe destacar que cada bin del histograma engloba un cierto rango de valores de la componente de hue. Para poder traducir estas probabilidades a valores de intensidad de pixel se realiza un mapeo lineal $[0,1] \rightarrow [0,255]$.
+La Figura (\ref{fig:probabilidades}) ilustra el proceso de asignar a cada pixel de la imagen la correspondiente probabilidad de ocurrencia de hue según indique el histograma. Cabe destacar que cada bin del histograma engloba un cierto rango de valores de la componente de hue. Para poder traducir estas probabilidades a valores de intensidad de pixel se realiza un mapeo lineal $[0,1] \rightarrow [0,255]$ para poder vizualisarlas.
 En la secciones posteriores veremos ciertas mejoras que se incorporaron para conseguir una máscara que permita aislar al objeto con más definición.
