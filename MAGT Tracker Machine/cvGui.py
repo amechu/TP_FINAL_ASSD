@@ -1119,16 +1119,18 @@ class cvGui():
 
     def updateFilterFrame(self):
         filterOfInteres = self.IsTrackerSelected()
-        
+
         if not len(self.trackers) == 0:
             #LAB COLOR FILTER
             if self.ColorFilter[0] and self.CFPropOnOff[0]:
                 self.trackers[filterOfInteres].setFilter("FILTER_LAB")
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
+                self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
             #CAMSHIFT
             elif self.CamShiftFilter[0] and self.CFCamShiftOnOff[0]:
                 self.trackers[filterOfInteres].setFilter("FILTER_CSHIFT")
                 self.filteredFrame = self.trackers[filterOfInteres].getFilteredFrame()
+                self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
             #CORRELATION FILTER
             elif (self.CorrFilterLAB[0] and self.CFPropOnOff[0]) or (self.CorrFilterCAM[0] and self.CFCamShiftOnOff[0]):
                 self.filteredFrame = self.trackers[filterOfInteres].getCorrFrame()
@@ -1143,6 +1145,7 @@ class cvGui():
             elif self.Hist[0] and self.CFCamShiftOnOff[0]:
                 self.filteredFrame = self.trackers[filterOfInteres].MF.hist_filter.get_histogram_plot()
                 self.filteredFrame = self.rescale_hist(self.filteredFrame, STANDAR_WIDTH, STANDAR_WIDTH-60)#self.sourceHEIGHT)
+                self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
             else:
                 self.filteredFrame = None
 
@@ -1150,6 +1153,7 @@ class cvGui():
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
             self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
             self.filteredFrame = cv.cvtColor(self.filteredFrame, cv.COLOR_GRAY2BGR)*255
+            self.trackers[filterOfInteres].SC.prevFrameGray = cv.cvtColor(self.filteredFrame, cv.COLOR_BGR2GRAY)
         elif self.Hist[0] and self.CFCamShiftOnOff[0]:
             self.filterWIDTH = int(len(self.filteredFrame[0, :]))
             self.filterHEIGHT = int(len(self.filteredFrame[:, 0]))
