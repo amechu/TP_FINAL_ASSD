@@ -960,6 +960,8 @@ class cvGui():
         self.resetInitialCond()
         self.trackers.clear()
         self.kernel.clear()
+        self.configSelected.clear()
+        self.filterConditions.clear()
 
         self.replaceRoi = False
         self.coordsRoi.clear()
@@ -982,6 +984,7 @@ class cvGui():
         self.LKProp[0] = False
         self.ShiTProp[0] = False
         self.CFProp[0] = False
+
         self.ColorFilter[0] = FILTERONOFF_COLOR
 
         self.CorrFilterLAB[0] = FILTERONOFF_COR
