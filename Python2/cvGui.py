@@ -887,9 +887,11 @@ class cvGui():
                     self.colorFilter_LihtThr[0] = params["l"]
                     self.colorFilter_a[0] = params["a"]
                     self.colorFilter_b[0] = params["b"]
+                    self.maskBlur_lab[0] = params["blur"]
                     self.configSelected[selectedT][5] = params["l"]
                     self.configSelected[selectedT][6] = params["a"]
                     self.configSelected[selectedT][7] = params["b"]
+                    self.configSelected[selectedT][24] = params["blur"]
 
             # Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
