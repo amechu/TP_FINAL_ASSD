@@ -196,6 +196,12 @@ class cvGui():
         self.trackerAdded = False
         self.trackerChanged = False
 
+        self.lastX = 0
+        self.lastY = 0
+        self.lastwid = 0
+        self.lasthei = 0
+        self.acceptDuplicate = False
+
         #Video Loaded elements
         self.boolVideoLoaded = False
         self.arrayVideoLoaded = []
@@ -321,7 +327,7 @@ class cvGui():
                 cvui.printf(self.frame, xTx + 25, yTx + 100, 0.4, 0x000000, f'Vx = {round(vx, 1)}')
                 cvui.printf(self.frame, xTx + 125, yTx + 100, 0.4, 0x000000, f'Vy = {round(-vy, 1)}')
 
-                if cvui.checkbox(self.frame, xB, yTx+125, "Select Tracker", self.boolForTrackers[i], 0x000000):
+                if not self.acceptDuplicate and cvui.checkbox(self.frame, xB, yTx+125, "Select Tracker", self.boolForTrackers[i], 0x000000):
                     for j in range(a):
                         if not j == i:
                             self.boolForTrackers[j] = [False]
@@ -824,35 +830,80 @@ class cvGui():
                             cvui.rect(self.frame, posX + wid - 1, posY - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
                             cvui.rect(self.frame, posX - 1, posY + hei - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
 
-                    cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y*2, "Selection Options")
-                    cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y*2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
-                    asiAndaBienElEnter = (cv.waitKey(1) == 13)
-                    if ((cvui.button(self.frame, WINDOW_SET_X + 10, 890, "Ok") or asiAndaBienElEnter)  and (len(self.coordsRoi) >= 4)):
-                        if not (wid == 0 or hei == 0):
-                            posX = posX - self.sourceX
-                            posY = posY - self.sourceY
-                            self.changeInTrackers = True
-                            self.trackerAdded = True
+                    if not self.acceptDuplicate:
+                        cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y*2, "Selection Options")
+                        cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y*2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                        asiAndaBienElEnter = (cv.waitKey(1) == 13)
+                        if ((cvui.button(self.frame, WINDOW_SET_X + 10, 890, "Ok") or asiAndaBienElEnter)  and (len(self.coordsRoi) >= 4)):
+                            if not (wid == 0 or hei == 0):
+                                posX = posX - self.sourceX
+                                posY = posY - self.sourceY
+                                self.lastX = posX
+                                self.lastY = posY
+                                self.lastwid = wid
+                                self.lasthei = hei
+                                self.changeInTrackers = True
+                                self.trackerAdded = True
+                                if self.boolVideoLoaded:
+                                    self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.arrayVideoLoaded[0], self.parameters))
+                                    toRescale = self.arrayVideoLoaded[0][posY:posY + hei, posX:posX + wid].copy()
+                                else:
+                                    self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source, self.parameters))
+                                    toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
+
+                                self.trackers[-1].changeSettings(self.makeInitial())
+                                self.filterConditions.append([FILTERONOFF_COLOR, FILTERONOFF_COR, FILTERONOFF_COR, FILTERONOFF_CAMSHIFT, FILTERONOFF_HIST, COLORFILTER_ONOFF, CAMSHIFT_ONOFF])
+                                self.configSelected.append(originalParam)
+                                self.kernel.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
+
+                                if len(self.trackers) == MAX_TRACKERS:
+                                    self.acceptDuplicate = False
+                                    self.replaceRoi = False
+                                    self.lastX = 0
+                                    self.lastY = 0
+                                    self.lastwid = 0
+                                    self.lasthei = 0
+                                else:
+                                    self.acceptDuplicate = True
+                                    self.replaceRoi = True
+
+                            self.coordsRoi.clear()
+
+                        if (cvui.button(self.frame, WINDOW_SET_X + 73, 890, "Redo")):
+                            self.coordsRoi.clear()
+                        if (cvui.button(self.frame, WINDOW_SET_X + 148, 890, "Cancel")):
+                            self.coordsRoi.clear()
+                            self.replaceRoi = False
+
+                    elif not len(self.trackers) == MAX_TRACKERS:
+                        cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y * 2, "Clone Last Selection?")
+                        cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y * 2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                        asiAndaBienElEnter2 = (cv.waitKey(1) == 13)
+                        if cvui.button(self.frame, WINDOW_SET_X + 40, 890, "Yes") or asiAndaBienElEnter2:
+                            posX = self.lastX
+                            posY = self.lastY
+                            wid = self.lastwid
+                            hei = self.lasthei
                             if self.boolVideoLoaded:
-                                self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.arrayVideoLoaded[0], self.parameters))
+                                self.trackers.append(Tracker.Tracker((posX + wid / 2, posY + hei / 2), wid, hei, self.arrayVideoLoaded[0], self.parameters))
                                 toRescale = self.arrayVideoLoaded[0][posY:posY + hei, posX:posX + wid].copy()
                             else:
-                                self.trackers.append(Tracker.Tracker((posX + wid/2, posY + hei/2), wid, hei,self.source, self.parameters))
+                                self.trackers.append(Tracker.Tracker((posX + wid / 2, posY + hei / 2), wid, hei, self.source,self.parameters))
                                 toRescale = self.lastFrame[posY:posY + hei, posX:posX + wid].copy()
 
                             self.trackers[-1].changeSettings(self.makeInitial())
                             self.filterConditions.append([FILTERONOFF_COLOR, FILTERONOFF_COR, FILTERONOFF_COR, FILTERONOFF_CAMSHIFT, FILTERONOFF_HIST, COLORFILTER_ONOFF, CAMSHIFT_ONOFF])
                             self.configSelected.append(originalParam)
-                            self.kernel.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH-150)/MAX_TRACKERS) - 40))
+                            self.kernel.append(self.rescale_frame_standar(toRescale, int((WINDOW_TRK_WIDTH - 150) / MAX_TRACKERS) - 40))
+                            self.boolForTrackers.append([False])
 
-                        self.coordsRoi.clear()
-                        self.replaceRoi = False
-
-                    if (cvui.button(self.frame, WINDOW_SET_X + 73, 890, "Redo")):
-                        self.coordsRoi.clear()
-                    if (cvui.button(self.frame, WINDOW_SET_X + 148, 890, "Cancel")):
-                        self.coordsRoi.clear()
-                        self.replaceRoi = False
+                        if len(self.trackers) == MAX_TRACKERS or cvui.button(self.frame, WINDOW_SET_X + 140, 890, "No"):
+                            self.acceptDuplicate = False
+                            self.replaceRoi = False
+                            self.lastX = 0
+                            self.lastY = 0
+                            self.lastwid = 0
+                            self.lasthei = 0
             else:
                 self.trackerAdded = False
 
