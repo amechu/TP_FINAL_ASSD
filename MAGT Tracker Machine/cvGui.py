@@ -937,14 +937,7 @@ class cvGui():
                     self.configSelected[selectedT][11] = params["kernel_blur"]
                     self.configSelected[selectedT][12] = params["low_pth"]
                 elif self.CFPropOnOff[0]:
-                    self.colorFilter_LihtThr[0] = params["l"]
-                    self.colorFilter_a[0] = params["a"]
-                    self.colorFilter_b[0] = params["b"]
-                    self.maskBlur_lab[0] = params["blur"]
-                    self.configSelected[selectedT][5] = params["l"]
-                    self.configSelected[selectedT][6] = params["a"]
-                    self.configSelected[selectedT][7] = params["b"]
-                    self.configSelected[selectedT][24] = params["blur"]
+                    self.checkCFParam(params, selectedT)
 
             # Check if ESC key was pressed
             if ((cv.waitKey(1) == 27) or not (cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE))):
@@ -1126,6 +1119,41 @@ class cvGui():
             self.lastEditedFrame = self.source.copy()
 
         return todoPiola
+
+    def checkCFParam(self, par, selectedT):
+        l = par["l"]
+        a = par["a"]
+        b = par["b"]
+        blur = par["blur"]
+
+        if l <= 0:
+            l = 0
+        elif l >= 150:
+            l = 150
+
+        if a <= 0:
+            a = 0
+        elif a >= 150:
+            a = 150
+
+        if b <= 0:
+            b = 0
+        elif l >= 150:
+            b = 150
+
+        if blur <= 0:
+            blur = 0
+        elif blur >= 20:
+            blur = 20
+
+        self.colorFilter_LihtThr[0] = l
+        self.colorFilter_a[0] = a
+        self.colorFilter_b[0] = b
+        self.maskBlur_lab[0] = blur
+        self.configSelected[selectedT][5] = l
+        self.configSelected[selectedT][6] = a
+        self.configSelected[selectedT][7] = b
+        self.configSelected[selectedT][24] = blur
 
     def updateArtist(self):
         i = 0
