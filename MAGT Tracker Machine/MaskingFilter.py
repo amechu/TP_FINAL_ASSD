@@ -139,16 +139,20 @@ class HistFilter:
 
     def get_mask(self, src):
         hsv = cv.cvtColor(src, cv.COLOR_BGR2HSV)
+        # cv.imshow("1 - HSV", hsv)
         mask = cv.inRange(hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+        # cv.imshow("2, THRESHOLD HSV", mask)
         # mask = cv.inRange(hsv, np.array((0., 60., 0)), np.array((180., 255., 255.)))
 
         prob = cv.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
+        # cv.imshow("3 -MATRIZ DE PROBABILIDADES", prob)
         prob &= mask
+        # cv.imshow("4 -Primera mascara",prob)
         mask2 = cv.inRange(prob, self.low_pth, 255)
-        # cv.imshow("mascara",mask2)
+        # cv.imshow("5 -Filtrado de probabilidad", mask2)
         if self.mask_blur_size != 0:
             mask2 = cv.medianBlur(mask2, int(self.mask_blur_size))
-        # cv.imshow("mascara pasabajeada",mask2)
+        # cv.imshow("6- Mascara pasabajeada",mask2)
 
 
         return mask2

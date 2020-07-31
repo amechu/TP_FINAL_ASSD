@@ -6,8 +6,8 @@ import KalmanFilter as kalman
 kalman = kalman.KalmanFilter() #Se inicializa la clase del filtro de Kalman
 
 #cap = cv.VideoCapture(cv.samples.findFile("Videos/videoPeq2.mp4"))
-#cap = cv.VideoCapture(cv.samples.findFile("Videos/gido_completo.mp4"))
-cap = cv.VideoCapture(cv.samples.findFile("Videos/tomi1.mp4"))
+# cap = cv.VideoCapture(cv.samples.findFile("Videos/gido_completo.mp4"))
+# cap = cv.VideoCapture(cv.samples.findFile("Videos/tomi1.mp4"))
 #cap = cv.VideoCapture(cv.samples.findFile("pendulo_tobi.mp4"))
 #cap = cv.VideoCapture(cv.samples.findFile("Videos/car.mp4"))   #DESCOMENTAR LINEAS DE ABAJO
 #cap = cv.VideoCapture(0)
