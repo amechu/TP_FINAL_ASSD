@@ -779,58 +779,59 @@ class cvGui():
             if ((cvui.button(self.frame, 20, 180, "Add Tracker") and ( (self.usingVideo and not len(self.arrayVideoLoaded) == 0) or self.usingCamera)) or self.replaceRoi):
 
                 if len(self.trackers) < MAX_TRACKERS:
-                    self.replaceRoi = True
-
-                    posX = 0
-                    posY = 0
-                    wid = 0
-                    hei = 0
-
-                    status = cvui.iarea(self.sourceX, self.sourceY, self.sourceWIDTH, self.sourceHEIGHT)
-                    if status == cvui.CLICK or status == cvui.DOWN:
-                        cursorRoi = cvui.mouse(WINDOW_NAME)
-                        self.coordsRoi.append(cursorRoi.x)
-                        self.coordsRoi.append(cursorRoi.y)
-
-                    if len(self.coordsRoi) == 6:
-                        if self.coordsRoi[4] <= int((self.coordsRoi[0] + self.coordsRoi[2])/2.0):
-                            self.coordsRoi[0] = self.coordsRoi[4]
-                        else:
-                            self.coordsRoi[2] = self.coordsRoi[4]
-
-                        if self.coordsRoi[5] <= int((self.coordsRoi[1] + self.coordsRoi[3])/2.0):
-                            self.coordsRoi[1] = self.coordsRoi[5]
-                        else:
-                            self.coordsRoi[3] = self.coordsRoi[5]
-
-                        del self.coordsRoi[5]
-                        del self.coordsRoi[4]
-
-                    if not len(self.coordsRoi) == 0 and (self.coordsRoi[0] != 0 or self.coordsRoi[1] != 0):
-                        cvui.rect(self.frame, self.coordsRoi[0]-1, self.coordsRoi[1]-1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
-
-                    if len(self.coordsRoi) == 4:
-                        if self.coordsRoi[0] - self.coordsRoi[2] > 0:
-                            posX = self.coordsRoi[2]
-                        else:
-                            posX = self.coordsRoi[0]
-
-                        if self.coordsRoi[1] - self.coordsRoi[3] > 0:
-                            posY = self.coordsRoi[3]
-                        else:
-                            posY = self.coordsRoi[1]
-
-                        wid = np.abs(self.coordsRoi[0] - self.coordsRoi[2])
-                        hei = np.abs(self.coordsRoi[1] - self.coordsRoi[3])
-                        b = self.coordsRoi[3]
-
-                        cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
-                        if not(b == 0):
-                            cvui.rect(self.frame, self.coordsRoi[2] - 1, b - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
-                            cvui.rect(self.frame, posX + wid - 1, posY - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
-                            cvui.rect(self.frame, posX - 1, posY + hei - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
-
                     if not self.acceptDuplicate:
+                        self.replaceRoi = True
+
+                        posX = 0
+                        posY = 0
+                        wid = 0
+                        hei = 0
+
+                        status = cvui.iarea(self.sourceX, self.sourceY, self.sourceWIDTH, self.sourceHEIGHT)
+                        if status == cvui.CLICK or status == cvui.DOWN:
+                            cursorRoi = cvui.mouse(WINDOW_NAME)
+                            self.coordsRoi.append(cursorRoi.x)
+                            self.coordsRoi.append(cursorRoi.y)
+
+                        if len(self.coordsRoi) == 6:
+                            if self.coordsRoi[4] <= int((self.coordsRoi[0] + self.coordsRoi[2])/2.0):
+                                self.coordsRoi[0] = self.coordsRoi[4]
+                            else:
+                                self.coordsRoi[2] = self.coordsRoi[4]
+
+                            if self.coordsRoi[5] <= int((self.coordsRoi[1] + self.coordsRoi[3])/2.0):
+                                self.coordsRoi[1] = self.coordsRoi[5]
+                            else:
+                                self.coordsRoi[3] = self.coordsRoi[5]
+
+                            del self.coordsRoi[5]
+                            del self.coordsRoi[4]
+
+                        if not len(self.coordsRoi) == 0 and (self.coordsRoi[0] != 0 or self.coordsRoi[1] != 0):
+                            cvui.rect(self.frame, self.coordsRoi[0]-1, self.coordsRoi[1]-1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+
+                        if len(self.coordsRoi) == 4:
+                            if self.coordsRoi[0] - self.coordsRoi[2] > 0:
+                                posX = self.coordsRoi[2]
+                            else:
+                                posX = self.coordsRoi[0]
+
+                            if self.coordsRoi[1] - self.coordsRoi[3] > 0:
+                                posY = self.coordsRoi[3]
+                            else:
+                                posY = self.coordsRoi[1]
+
+                            wid = np.abs(self.coordsRoi[0] - self.coordsRoi[2])
+                            hei = np.abs(self.coordsRoi[1] - self.coordsRoi[3])
+                            b = self.coordsRoi[3]
+
+                            cvui.rect(self.frame, posX, posY, wid, hei, self.trackerColors[len(self.trackers)])
+                            if not(b == 0):
+                                cvui.rect(self.frame, self.coordsRoi[2] - 1, b - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                                cvui.rect(self.frame, posX + wid - 1, posY - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+                                cvui.rect(self.frame, posX - 1, posY + hei - 1, 3, 3, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
+
+
                         cvui.window(self.frame, WINDOW_SET_X + 5, 845, WINDOW_SET_WIDTH - 10, Y_SCREEN - 845 - WINDOW_VS_Y*2, "Selection Options")
                         cvui.rect(self.frame, WINDOW_SET_X + 7, 867, WINDOW_SET_WIDTH - 14, Y_SCREEN - 867 - WINDOW_VS_Y*2, self.trackerColors[len(self.trackers)], self.trackerColors[len(self.trackers)])
                         asiAndaBienElEnter = (cv.waitKey(1) == 13)
@@ -1112,7 +1113,7 @@ class cvGui():
                 self.sourceHEIGHT = int(self.source.shape[0])
 
             selectedTr = self.IsTrackerSelected()
-            if selectedTr != -1: # and not self.trackerChanged:
+            if selectedTr != -1 and selectedTr != self.lastTracker: # and not self.trackerChanged:
                 self.checkParametersChange()
 
             for tracker in self.trackers:
