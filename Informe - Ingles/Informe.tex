@@ -1,0 +1,99 @@
+\input{Header.tex}
+
+\usepackage[procnames]{listings}
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%
+%		Indice		%
+%%%%%%%%%%%%%%%%%%%%%
+
+%\tableofcontents
+%\newpage
+
+%%%%%%%%%%%%%%%%%%%%%
+%		Informe		%
+%%%%%%%%%%%%%%%%%%%%%
+
+\title{Illumination-invariant Object Tracking Using Optical Flow, Correlation Filtering and Color-Distribution-Based Image Masking}
+\author{Jacoby Daniel Andres, Mechoulam Alan, Lambertucci Guido, Rodriguez Turco Martín, Londero Bonaparte Tomás\\
+\small{Buenos Aires Institute of Technology, Argentina}}
+
+\twocolumn[
+  \begin{@twocolumnfalse}
+    \maketitle
+    \begin{abstract}
+		\input{secciones/abstracto.tex}
+	\end{abstract}
+  \end{@twocolumnfalse}
+  ]
+
+%\begin{figure*}
+
+
+
+%\maketitle
+
+%\begin{abstract}
+%\input{secciones/abstracto.tex}
+%\end{abstract}
+
+%\end{figure*}
+
+
+\section{Introduction}
+\input{secciones/introduccion.tex}
+	
+\section{Review of Literature}
+\input{secciones/investigacion.tex}
+
+\section{Methods and Results}
+\input{secciones/aportes.tex}
+
+%\section{Trabajo en futuro}
+%\input{secciones/mejoras.tex}
+
+\section{Discussion}
+\input{secciones/conclusion.tex}
+
+\begin{thebibliography}{9}
+
+\bibitem{ref:intro1}
+R. C. Gonzalez, R. E. Woods y S. L. Eddins. \textit{Digital Image Processing Using MATLAB}. Prentice Hall, 2nd ed, 2002.%, pp. 2-3.
+
+\bibitem{ref:digit1}
+R. C. Gonzalez, R. E. Woods y S. L. Eddins. \textit{Digital Image Processing Using MATLAB}. Prentice Hall, 2nd ed, 2002, pp. 52-54.
+
+\bibitem{ref:optic-flow}
+D. H. Warren y Edward R. Strelow. \textit{Electronic Spatial Sensing for the Blind: Contributions from Perception}. Springer Netherlands, 1st ed, 1985. pp. 414.
+
+\bibitem{ref:lucas-kanade}
+B. D. Lucas y T. Kanade. \textit{An iterative image registration technique with an application to stereo vision}. From Proceedings of Imaging Understanding Workshop, pp. 121-130.
+
+\bibitem{ref:shi-tomasi}
+J. Shi y C. Tomasi. \textit{Good Features to Track}. 9th IEEE Conference on Computer Vision and Pattern Recognition, June 1994, Springer, pp. 593–600.
+
+\bibitem{ref:lucas-kanade2}
+W.S.P. Fernando, L. Udawatta , P. Pathirana. \textit{Identification of Moving Obstacles with Pyramidal
+Lucas Kanade Optical Flow and k means
+Clustering}. Faculty of Engineering, University of Moratuwa, Sri Lanka.
+
+\bibitem{ref:kalman1}
+G. Terejanu, "Discrete Kalman Filter Tutorial", Cse.sc.edu, 2020. [Online]. Available: https://cse.sc.edu/~terejanu/files/tutorialKF.pdf. [Accessed: 15- Jun- 2020].
+
+\bibitem{ref:kalman2}
+G. Welch and G. Bishop, An Introduction to the Kalman Filter. University of North Carolina at Chapel Hill: Department of Computer Science, 2006.
+
+\bibitem{ref:shi-tomasi}
+J. Shi y C. Tomasi. \textit{Good Features to Track}. 9th IEEE Conference on Computer Vision and Pattern Recognition, June 1994, Springer, pp. 593–600.
+ \bibitem{ref:Corr}
+ G. Turin, "An introduction to matched filters," in IRE Transactions on Information Theory, vol. 6, no. 3, pp. 311-329, June 1960, doi: 10.1109/TIT.1960.1057571.
+ 
+ %Camshift
+  \bibitem{ref:CAMSHIFT}
+ Gary R. Bradski, "Computer Vision Face Tracking For Use in a Perceptual User
+ Interface" Microcomputer Research Lab, Santa Clara, CA, Intel Corporation
+
+
+\end{thebibliography}
+
+\end{document}

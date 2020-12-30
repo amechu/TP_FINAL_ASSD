@@ -1,0 +1,9 @@
+Algunas mejoras que pueden ser implementadas en futuros desarrollos son:
+\begin{itemize}
+
+\item Filtro de Kalman donde la matriz de covarianza de medición no sea constante: \\
+En el modelo utilizado actualmente la matriz de covarianza es constante, esto asume que la presición de  medición es fija. Esto último no suele ser verdad en la realidad. Una mejora es la introducción de modificaciones en la matriz de covarianza de manera dinámica así el filtro proporcionaría mejores predicciones. 
+
+\item Un mejor modelado de las ecuaciones dinámicas del filtro de Kalman para incluir la aceleración como variable de estado: \\
+El modelo utilizado actualmente consta de un movimiento rectilíneo uniforme bidimensional. La inclusión de la aceleración proporcionaría una mejor predicción.
+\end{itemize}
