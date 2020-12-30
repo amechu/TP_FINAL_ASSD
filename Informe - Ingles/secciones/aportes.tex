@@ -228,11 +228,15 @@ Finally, to reinforce the tracking algorithm, a periodic recalculation of the fe
 
 \subsubsection{Fail Scenarios}
 
-Algunos casos donde puede fallar hasta ahora el Tracker son:
+Some cases where the algorithm is found to fail are:
+%Algunos casos donde puede fallar hasta ahora el Tracker son:
 \begin{itemize}
-\item El cambio de trayectoria de un objeto una vez que desaparece, provocando una falla en la predicción.
-\item Interacción entre el objeto trackeado y un objeto de características similares, causando un error de detección
-\item Cambios bruscos de iluminación o en color del objeto.
+\item The change in trajectory of an object that is occluded.
+%\item El cambio de trayectoria de un objeto una vez que desaparece, provocando una falla en la predicción.
+\item Interaction between two objects of similar color.
+%\item Interacción entre el objeto trackeado y un objeto de características similares, causando un error de detección
+\item Changes on object color, for example a change in illumination.
+%\item Cambios bruscos de iluminación o en color del objeto.
 \end{itemize}
 
 
@@ -241,7 +245,7 @@ Algunos casos donde puede fallar hasta ahora el Tracker son:
 
 
 
-Having improved the reliability since the last sketch considerably, let again be the objects $A$ and $B$, where $A$ is the object to follow: 
+Having improved the reliability since the last sketch considerably, let again be the objects $A$ and $B$, where $A$ is the object to follow and propose the same situations as before: 
 %Volviendo al caso de los objetos $A$ y $B$:
 
 \begin{itemize}
@@ -276,42 +280,51 @@ Having improved the reliability since the last sketch considerably, let again be
 
 
 
-\subsection{Último diseño}
+\subsection{Final Design}
 
-En la última iteración del proceso de diseño se sacrificó bajo costo computacional por una mayor robustez en el algoritmo, reduciendo significativamente las probabilidades de:
+In the last iteration of the design process, low computational cost was sacrificed for greater robustness in the algorithm, significantly reducing the probabilities of:
+
+%En la última iteración del proceso de diseño se sacrificó bajo costo computacional por una mayor robustez en el algoritmo, reduciendo significativamente las probabilidades de:
 \begin{itemize}
-\item Error tipo I: no se encuentra el objeto a seguir por más que sea visible.
-\item Error tipo II: se detecta un objeto por más que el objeto a seguir no se encuentre en pantalla.
-\item Error tipo III: se detecta a otro objeto por más que el objeto a seguir este visible.
+\item Type I error: the object to follow cannot be found, even though it is visible.
+%\item Error tipo I: no se encuentra el objeto a seguir por más que sea visible.
+\item Type II error: an object is detected even though the object to be tracked is not on the screen.
+%\item Error tipo II: se detecta un objeto por más que el objeto a seguir no se encuentre en pantalla.
+\item Type III error: another object is detected even though the object to follow is visible.
+%\item Error tipo III: se detecta a otro objeto por más que el objeto a seguir este visible.
 \end{itemize}
-mediante el uso de \textit{Matched Filters}. Además, se logró obtener una gran robustez frente a cambios en la iluminación utilizando un algoritmo alternativo de enmascaramiento basado en la distribución de hue del objeto a seguir. Por último, se desarrolló una interfaz gráfica donde se puede cargar un video o bien utilizar una cámara en tiempo real, seguir varios objetos a la vez, modificar cualquier parámetro de cualquiera de los algoritmos utilizados en tiempo real e incluso se desarolló un método de optimización automático de los parámetros del algoritmo de enmascaramiento. En la Figura (\ref{gui}) se puede observar una captura de la interfaz gráfica desarrollada y en la Figura (\ref{fig:Flowchart}) se puede observar el diagrama de flujo entero del algoritmo de seguimiento desarrollado. La Figura (\ref{fig:class}) aporta una visión de cómo se organiza el programa mencionado.
+through the use of \textit{Matched Filters}. In addition, it was possible to obtain a greater robustness against changes in lighting using an alternative masking algorithm based on the hue distribution of the object to follow. Finally, with the purpose of presenting this work as the final project of the Digital Analysis of Signals and Systems subject, a graphical interface was developed where one can upload a video or use a camera in real time, follow several objects at the same time, modify any parameter of any of the algorithms used in real time, and even an optimization method was developed for the parameters of the masking algorithm. In Figure (\ref{gui}) one can see a screenshot of the developed graphical interface and in Figure (\ref{fig:Flowchart}) one can visualize the entire flow diagram of the developed tracking algorithm. Figure(\ref{fig:class}) provides a view of how the mentioned graphical interface is organized.
+
+
+%mediante el uso de \textit{Matched Filters}. Además, se logró obtener una gran robustez frente a cambios en la iluminación utilizando un algoritmo alternativo de enmascaramiento basado en la distribución de hue del objeto a seguir. Por último, se desarrolló una interfaz gráfica donde se puede cargar un video o bien utilizar una cámara en tiempo real, seguir varios objetos a la vez, modificar cualquier parámetro de cualquiera de los algoritmos utilizados en tiempo real e incluso se desarolló un método de optimización automático de los parámetros del algoritmo de enmascaramiento. En la Figura (\ref{gui}) se puede observar una captura de la interfaz gráfica desarrollada y en la Figura (\ref{fig:Flowchart}) se puede observar el diagrama de flujo entero del algoritmo de seguimiento desarrollado. La Figura (\ref{fig:class}) aporta una visión de cómo se organiza el programa mencionado.
 
 
 \begin{figure*}
 	\centering
 	\includegraphics[width=0.9\textwidth]{../flowchart.jpg}
-	\caption{Flow-chart del algoritmo.}
+	\caption{Flow-chart of the algorithm.}
 	\label{fig:Flowchart}
 \end{figure*}
 
 \begin{figure*}
 	\centering
 	\includegraphics[width=0.9\textwidth]{Imagenes/gui.png}
-	\caption{Captura de pantalla de la interfaz gráfica desarrollada.}
+	\caption{Screencap of the developed graphical interface.}
 	\label{gui}
 \end{figure*}
 
 \begin{figure*}
 \centering
 	\includegraphics[width=0.8\textwidth]{Imagenes/camshift_mask1.png}
-	\caption{Primer ejemplo del algoritmo de enmascaramiento basado en histogramas de hue. En este ejemplo se puede notar la eficiencia conseguida en la máscara, debido a que por más que se encuentren varios objetos en escena de un color muy similar al objeto de interés, estos son exluídos por la máscara. Además, y de mayor importancia, se puede notar como el algoritmo de enmascaramiento no excluye la zona del libro bajo sombra. Esto muestra la gran robustez frente a cambios en la iluminación del algoritmo.}
+	\caption{First example of the Hue histogram-based masking algorithm. In this example one can see the efficiency archieved in the masking process. Even if there are several objects in the scene with a color very similiar to the object of interest, they are excluded bby the masking process. In addition, and more importantly, it can be noted how the masking algorithm does not exclude the area of the book under shadow. This shows the robustness to changes in illumination of the algorithm.}
+	%ejemplo del algoritmo de enmascaramiento basado en histogramas de hue. En este ejemplo se puede notar la eficiencia conseguida en la máscara, debido a que por más que se encuentren varios objetos en escena de un color muy similar al objeto de interés, estos son exluídos por la máscara. Además, y de mayor importancia, se puede notar como el algoritmo de enmascaramiento no excluye la zona del libro bajo sombra. Esto muestra la gran robustez frente a cambios en la iluminación del algoritmo.}
 	\label{fig:c_mask1}
 \end{figure*}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.45\textwidth]{Imagenes/Classes.jpg}
-	\caption{Diagrama de Clases del programa utilizado para presentar la funcionalidad del algoritmo desarollado.}
+	\caption{Class diagram of the aforementioned graphical interface for the presentation of this work.}
 	\label{fig:class}
 \end{figure}
 
@@ -334,7 +347,7 @@ mediante el uso de \textit{Matched Filters}. Además, se logró obtener una gran
 
 
 
-\subsubsection{Enmascaramiento Basado en CIE-Lab}
+\subsubsection{CIE-Lab Based Masking}
 
 El diseño anterior poseía un algoritmo de enmascaramiento basado en el espacio de color HSV. Si bien este funcionaba correctamente, este espacio de color fue reemplazado por CIE-Lab debido a que este posee un solo parámetro que caracteriza la iluminación de un objeto, es decir, con un valor nulo de L se obtiene el negro, mientras que con un valor máximo de L se obtiene blanco, pasando entre medio de esos dos valores por el color representado por a y b. En el espacio HSV, si se utiliza el máximo valor de la componente value, no necesariamente se obtiene blanco, sino que depende del valor de saturación elegido, mientras que si value es nulo, siempre se obtiene negro. Poseer un solo parámetro que correctamente caracterice la iluminación de un objeto brinda una mejor optimización de los valores de semiamplitudes L-a-b utilizados en el enmascaramiento. 
 
